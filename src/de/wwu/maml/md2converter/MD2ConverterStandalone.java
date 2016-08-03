@@ -1,5 +1,9 @@
 package de.wwu.maml.md2converter;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.Diagnostic;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
@@ -19,69 +23,134 @@ import org.eclipse.m2m.qvt.oml.TransformationExecutor;
 import com.google.inject.Injector;
 
 import de.wwu.md2.framework.MD2StandaloneSetup;
+import de.wwu.md2.framework.mD2.Controller;
+import de.wwu.md2.framework.mD2.MD2Factory;
+import de.wwu.md2.framework.mD2.MD2ModelLayer;
+import de.wwu.md2.framework.mD2.Model;
+import de.wwu.md2.framework.mD2.View;
+import de.wwu.md2.framework.mD2.Workflow;
 import md2dot0.Md2dot0Factory;
 import md2dot0.UseCase;
 
 public class MD2ConverterStandalone {
-	
-	public static void main(String[] args){
-		// Register Xtext Resource Factory
-		new org.eclipse.emf.mwe.utils.StandaloneSetup().setPlatformUri("../");
-		Injector injector = new MD2StandaloneSetup().createInjectorAndDoEMFRegistration();
-		XtextResourceSet resourceSet2 = injector.getInstance(XtextResourceSet.class);
-		resourceSet2.addLoadOption(XtextResource.OPTION_RESOLVE_ALL, Boolean.TRUE);
-		
-		// Refer to an existing transformation via URI
-		URI transformationURI = URI.createURI("platform:/resource/de.wwu.maml/src/de/wwu/maml/md2converter/transformations/Md2Transformation.qvto");
-		// create executor for the given transformation
-		TransformationExecutor executor = new TransformationExecutor(transformationURI);
 
+	public static void main(String[] args) {
+		// Register Xtext Resource Factory
 		XmiToMd2Converter.init();
-		
-		// define the transformation input
-		// Remark: we take the objects from a resource, however
-		// a list of arbitrary in-memory EObjects may be passed
-		ResourceSet resourceSet = new ResourceSetImpl();
-		Resource inResource = resourceSet.getResource(
-				URI.createURI("platform:/resource/de.wwu.maml/resources/SimpleExample.md2dot0"), true);	
-		
-		EList<EObject> inObjects = inResource.getContents();
-		
-		// Add model root
-		if(inResource.getContents() == null || inResource.getContents().size() == 0){
-			System.out.println("No content");
-			return;
-		}
-		
-		EObject useCaseRoot = EcoreUtil.getRootContainer(inResource.getContents().get(0));
+
+		Injector injector = new MD2StandaloneSetup().createInjectorAndDoEMFRegistration();
+		XtextResourceSet resourceSetXtext = injector.getInstance(XtextResourceSet.class);
+		resourceSetXtext.addLoadOption(XtextResource.OPTION_RESOLVE_ALL, Boolean.TRUE);
+
+		// Define the common MD2Root element
 		md2dot0.Model modelRoot = Md2dot0Factory.eINSTANCE.createModel();
-		if(useCaseRoot instanceof UseCase){
-			modelRoot.getUseCases().add((UseCase) useCaseRoot);
+		EList<EObject> allObjects = new BasicEList<EObject>();
+		allObjects.add(modelRoot);
+
+		// Define the transformation input
+		// TODO crawl folders to find all .maml files
+		ResourceSet resourceSet = new ResourceSetImpl();
+		ArrayList<URI> modelSources = new ArrayList<URI>();
+		modelSources.add(URI.createURI("platform:/resource/de.wwu.maml/resources/SimpleExample.md2dot0"));
+
+		for (URI modelSource : modelSources) {
+			Resource inResource = resourceSet.getResource(modelSource, true);
+
+			// Add to common model root
+			if (inResource.getContents() == null || inResource.getContents().size() == 0) {
+				System.out.println("No content in model: " + modelSource.toPlatformString(true));
+				continue;
+			}
+
+			EObject useCaseRoot = EcoreUtil.getRootContainer(inResource.getContents().get(0));
+			if (useCaseRoot instanceof UseCase) {
+				// Add use case to model root
+				modelRoot.getUseCases().add((UseCase) useCaseRoot);
+				// Add all contained elements
+				Iterator<EObject> iter = modelRoot.eAllContents();
+				while (iter.hasNext()) {
+					allObjects.add(iter.next());
+				}
+			}
 		}
-		inResource.getContents().add(modelRoot);
+
+		// Perform four individual transformations
+		transformMamlToMd2(allObjects, MD2Factory.eINSTANCE.createModel());
+		transformMamlToMd2(allObjects, MD2Factory.eINSTANCE.createController());
+		transformMamlToMd2(allObjects, MD2Factory.eINSTANCE.createView());
+		transformMamlToMd2(allObjects, MD2Factory.eINSTANCE.createWorkflow());
+
+		System.out.println("Done");
+	}
+
+	public static void transformMamlToMd2(EList<EObject> modelObjects, MD2ModelLayer layer) {
+		if (modelObjects == null || modelObjects.size() == 0) {
+			throw new RuntimeException("No model objects to transform");
+		}
 
 		// create the input extent with its initial contents
-		ModelExtent input = new BasicModelExtent(inObjects);		
+		ModelExtent input = new BasicModelExtent(modelObjects);
 		// create an empty extent to catch the output
 		ModelExtent output = new BasicModelExtent();
 
-		// setup the execution environment details -> 
-		// configuration properties, logger, monitor object etc.
+		// setup the execution environment details
+		// -> configuration properties, logger, monitor object etc.
 		ExecutionContextImpl context = new ExecutionContextImpl();
 		context.setConfigProperty("keepModeling", true);
 
-		// run the transformation assigned to the executor with the given 
+		// Human readable model project name
+		String projectName = "mamlProject";
+		if (((md2dot0.Model) EcoreUtil.getRootContainer(modelObjects.get(0))).getProjectName() != null) {
+			projectName = ((md2dot0.Model) EcoreUtil.getRootContainer(modelObjects.get(0))).getProjectName();
+		}
+
+		// run the transformation assigned to the executor with the given
 		// input and output and execution context -> ChangeTheWorld(in, out)
-		// Remark: variable arguments count is supported
-		ExecutionDiagnostic result = executor.execute(context, input, output);
+		ExecutionDiagnostic result = null;
+		String outputFile = "platform:/resource/de.wwu.maml/src-gen/";
+		if (layer instanceof Model) {
+			URI transformationURI = URI.createURI(
+					"platform:/resource/de.wwu.maml/src/de/wwu/maml/md2converter/transformations/Md2ViewLayer.qvto");
+
+			TransformationExecutor executor = new TransformationExecutor(transformationURI);
+			result = executor.execute(context, input, output);
+			outputFile += projectName + "/models/" + projectName + "Model.md2";
+
+		} else if (layer instanceof View) {
+			URI transformationURI = URI.createURI(
+					"platform:/resource/de.wwu.maml/src/de/wwu/maml/md2converter/transformations/Md2ViewLayer.qvto");
+
+			TransformationExecutor executor = new TransformationExecutor(transformationURI);
+			result = executor.execute(context, input, output);
+			outputFile += projectName + "/views/" + projectName + "View.md2";
+
+		} else if (layer instanceof Controller) {
+			URI transformationURI = URI.createURI(
+					"platform:/resource/de.wwu.maml/src/de/wwu/maml/md2converter/transformations/Md2ControllerLayer.qvto");
+
+			TransformationExecutor executor = new TransformationExecutor(transformationURI);
+			result = executor.execute(context, input, output);
+			outputFile += projectName + "/controllers/" + projectName + "Controller.md2";
+
+		} else if (layer instanceof Workflow) {
+			URI transformationURI = URI.createURI(
+					"platform:/resource/de.wwu.maml/src/de/wwu/maml/md2converter/transformations/Md2WorkflowLayer.qvto");
+
+			TransformationExecutor executor = new TransformationExecutor(transformationURI);
+			result = executor.execute(context, input, output);
+			outputFile += projectName + "/workflows/" + projectName + "Workflow.md2";
+
+		} else {
+			System.out.println("Unsupported MD2 layer encountered!");
+			return;
+		}
 
 		// check the result for success
-		if(result.getSeverity() == Diagnostic.OK) {
+		if (result != null && result.getSeverity() == Diagnostic.OK) {
 			// the output objects got captured in the output extent
-			XmiToMd2Converter.writeToMd2(output.getContents(), "platform:/resource/de.wwu.maml/resources/output.md2");
+			XmiToMd2Converter.writeToMd2(output.getContents(), outputFile);
 		} else {
 			throw new RuntimeException("Transformation failed. " + result.toString());
 		}
-		System.out.println("Done");
 	}
 }

@@ -1,7 +1,11 @@
-library Md2ModelLayer;
-
 modeltype MAML "strict" uses "http://de/wwu/md2dot0";
 modeltype MD2 "strict" uses "http://www.wwu.de/md2/framework/MD2";
+
+transformation Md2ModelLayerTransformation(in Source: MAML, out Target: MD2);
+
+main() {
+	Source.rootObjects()[Model] -> map ToModelLayer();
+}
 
 mapping Model::ToModelLayer(): MD2Model {
 	package := self.map toPackage();

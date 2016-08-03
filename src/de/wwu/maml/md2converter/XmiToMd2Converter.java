@@ -20,7 +20,7 @@ import com.google.inject.Injector;
 import de.wwu.md2.framework.MD2StandaloneSetup;
 import de.wwu.md2.framework.mD2.MD2Package;
 
-public class XMIConverter {
+public class XmiToMd2Converter {
 
 	public static void main(String[] args) {
 
@@ -86,15 +86,22 @@ public class XMIConverter {
 		ResourceSet resourceSet = new ResourceSetImpl();
 		Resource resourceXmi = resourceSet.getResource(URI.createURI(inputUri), true);
 		
+		writeToMd2(resourceXmi.getContents(), outputUri);
+	}
+	
+	public static void writeToMd2(List<EObject> output, String outputUri){
+		init();
+
 		// Create new target file
 		Injector injector = new MD2StandaloneSetup().createInjectorAndDoEMFRegistration();
-		XtextResourceSet resourceSet2 = injector.getInstance(XtextResourceSet.class);
-		resourceSet2.addLoadOption(XtextResource.OPTION_RESOLVE_ALL, Boolean.TRUE);
-		Resource resourceMd2 = resourceSet2.createResource(URI.createURI(outputUri));
+		XtextResourceSet resourceSet = injector.getInstance(XtextResourceSet.class);
+		resourceSet.addLoadOption(XtextResource.OPTION_RESOLVE_ALL, Boolean.TRUE);
+		Resource resourceMd2 = resourceSet.createResource(URI.createURI(outputUri));
 
 		// Copy content
-		List<EObject> outObjects = resourceXmi.getContents();
-		resourceMd2.getContents().addAll(outObjects);
+		resourceMd2.getContents().addAll(output);
+		
+		// TODO check that at least one element is contained
 
 		try {
 			resourceMd2.save(Collections.emptyMap());

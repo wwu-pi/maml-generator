@@ -8,6 +8,7 @@ import org.eclipse.emf.common.util.Diagnostic;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
@@ -33,10 +34,21 @@ public class MD2ConverterStandalone {
 		resourceSet2.addLoadOption(XtextResource.OPTION_RESOLVE_ALL, Boolean.TRUE);
 		
 		// Refer to an existing transformation via URI
-		URI transformationURI = URI.createURI("platform:/resource/de.wwu.maml/de.wwu.maml.md2converter.transformations/Md2Transformation.qvto");
+		URI transformationURI = URI.createURI("platform:/resource/de.wwu.maml/src/de/wwu/maml/md2converter/transformations/Md2Transformation.qvto");
 		// create executor for the given transformation
 		TransformationExecutor executor = new TransformationExecutor(transformationURI);
 
+		// Register MAML meta models
+		if (!EPackage.Registry.INSTANCE.containsKey("http://de/wwu/md2dot0")) {
+			EPackage.Registry.INSTANCE.put("http://de/wwu/md2dot0", md2dot0.Md2dot0Package.eINSTANCE);
+		}
+		if (!EPackage.Registry.INSTANCE.containsKey("http://de/wwu/md2dot0data")) {
+			EPackage.Registry.INSTANCE.put("http://de/wwu/md2dot0data", md2dot0data.Md2dot0dataPackage.eINSTANCE);
+		}
+		if (!EPackage.Registry.INSTANCE.containsKey("http://de/wwu/md2dot0gui")) {
+			EPackage.Registry.INSTANCE.put("http://de/wwu/md2dot0gui", md2dot0gui.Md2dot0guiPackage.eINSTANCE);
+		}
+		
 		// define the transformation input
 		// Remark: we take the objects from a resource, however
 		// a list of arbitrary in-memory EObjects may be passed
@@ -81,5 +93,6 @@ public class MD2ConverterStandalone {
 //			IStatus status = BasicDiagnostic.toIStatus(result);
 //			Activator.getDefault().getLog().log(status);
 		}
+		System.out.println("Done");
 	}
 }

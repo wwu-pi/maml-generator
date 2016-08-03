@@ -7,6 +7,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.resource.XtextResourceSet;
 import org.eclipse.m2m.qvt.oml.BasicModelExtent;
@@ -18,6 +19,8 @@ import org.eclipse.m2m.qvt.oml.TransformationExecutor;
 import com.google.inject.Injector;
 
 import de.wwu.md2.framework.MD2StandaloneSetup;
+import md2dot0.Md2dot0Factory;
+import md2dot0.UseCase;
 
 public class MD2ConverterStandalone {
 	
@@ -40,8 +43,22 @@ public class MD2ConverterStandalone {
 		// a list of arbitrary in-memory EObjects may be passed
 		ResourceSet resourceSet = new ResourceSetImpl();
 		Resource inResource = resourceSet.getResource(
-				URI.createURI("platform:/resource/de.wwu.maml/resources/SimpleExample.md2dot0"), true);		
+				URI.createURI("platform:/resource/de.wwu.maml/resources/SimpleExample.md2dot0"), true);	
+		
 		EList<EObject> inObjects = inResource.getContents();
+		
+		// Add model root
+		if(inResource.getContents() == null || inResource.getContents().size() == 0){
+			System.out.println("No content");
+			return;
+		}
+		
+		EObject useCaseRoot = EcoreUtil.getRootContainer(inResource.getContents().get(0));
+		md2dot0.Model modelRoot = Md2dot0Factory.eINSTANCE.createModel();
+		if(useCaseRoot instanceof UseCase){
+			modelRoot.getUseCases().add((UseCase) useCaseRoot);
+		}
+		inResource.getContents().add(modelRoot);
 
 		// create the input extent with its initial contents
 		ModelExtent input = new BasicModelExtent(inObjects);		

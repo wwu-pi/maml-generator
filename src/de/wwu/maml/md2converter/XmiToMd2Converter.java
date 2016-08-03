@@ -22,16 +22,13 @@ import de.wwu.md2.framework.mD2.MD2Package;
 
 public class XmiToMd2Converter {
 
-	public static void main(String[] args) {
-
-		//md2ToXmi("platform:/resource/de.wwu.maml/resources/input.md2",
-		//		"platform:/resource/de.wwu.maml/resources/output.xmi");
-
-		XmiToMd2("platform:/resource/de.wwu.maml/resources/input.xmi",
-				"platform:/resource/de.wwu.maml/resources/output.md2");
-		
-		System.out.println("Done");
-	}
+//	public static void main(String[] args) {
+//		md2ToXmi("platform:/resource/de.wwu.maml/resources/input.md2",
+//				"platform:/resource/de.wwu.maml/resources/output.xmi");
+//
+//		XmiToMd2("platform:/resource/de.wwu.maml/resources/input.xmi",
+//				"platform:/resource/de.wwu.maml/resources/output.md2");
+//	}
 
 	public static void init() {
 		// Register Xtext Resource Factory
@@ -57,9 +54,9 @@ public class XmiToMd2Converter {
 
 		// Source
 		Injector injector = new MD2StandaloneSetup().createInjectorAndDoEMFRegistration();
-		XtextResourceSet resourceSet2 = injector.getInstance(XtextResourceSet.class);
-		resourceSet2.addLoadOption(XtextResource.OPTION_RESOLVE_ALL, Boolean.TRUE);
-		Resource resourceMd2 = resourceSet2.getResource(URI.createURI(inputUri), true);
+		XtextResourceSet resourceSetXtext = injector.getInstance(XtextResourceSet.class);
+		resourceSetXtext.addLoadOption(XtextResource.OPTION_RESOLVE_ALL, Boolean.TRUE);
+		Resource resourceMd2 = resourceSetXtext.getResource(URI.createURI(inputUri), true);
 
 		// Create new target file
 		ResourceSet resourceSet = new ResourceSetImpl();

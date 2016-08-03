@@ -9,4 +9,5 @@ Require-Bundle: org.eclipse.emf.ecore,
  org.eclipse.emf.mwe.core,
  org.eclipse.xtext,
  org.eclipse.emf.common,
- org.eclipse.m2m.qvt.oml
+ org.eclipse.m2m.qvt.oml,
+ md2dot0

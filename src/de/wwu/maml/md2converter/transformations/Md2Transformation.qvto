@@ -12,5 +12,5 @@ mapping UseCase::UseCaseToModel(): MD2Model {
 }
 
 mapping UseCase::toPackage(): PackageDefinition {
-	pkgName := "test";
+	pkgName := self.title.replaceAll(" ", "") + "." + "model"
 }

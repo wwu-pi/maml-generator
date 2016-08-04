@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<de.wwu.md2dot0:UseCase xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:de.wwu.md2dot0="http://de/wwu/md2dot0" xmlns:de.wwu.md2dot0data="http://de/wwu/md2dot0data" xmlns:de.wwu.md2dot0gui="http://de/wwu/md2dot0gui" title="Gebührenübersicht">
+  <processFlowElements xsi:type="de.wwu.md2dot0:ProcessStartEvent" nextElements="//@processFlowConnections.0"/>
+  <processFlowElements xsi:type="de.wwu.md2dot0:RemoteDataSource" nextElements="//@processFlowConnections.1" previousElements="//@processFlowConnections.0" dataType="//@dataTypes.13" typeName="Nutzer"/>
+  <processFlowElements xsi:type="de.wwu.md2dot0:SelectEntity" parameters="//@processFlowConnections.2 //@processFlowConnections.3 //@processFlowConnections.4" nextElements="//@processFlowConnections.5" previousElements="//@processFlowConnections.1" description="Nutzer auswählen"/>
+  <processFlowElements xsi:type="de.wwu.md2dot0:Webservice" previousElements="//@processFlowConnections.5" description="http://ulb.wwu.de/gebuehren"/>
+  <processFlowElements xsi:type="de.wwu.md2dot0:Webservice" previousElements="" description="http://ulb.wwu.de/gebuehren"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ProcessConnector" sourceProcessFlowElement="//@processFlowElements.0" targetProcessFlowElement="//@processFlowElements.1"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ProcessConnector" sourceProcessFlowElement="//@processFlowElements.1" targetProcessFlowElement="//@processFlowElements.2"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ParameterConnector" targetElement="//@attributes.0" order="1" sourceElement="//@processFlowElements.2"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ParameterConnector" targetElement="//@attributes.1" order="2" sourceElement="//@processFlowElements.2"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ParameterConnector" targetElement="//@attributes.2" order="3" sourceElement="//@processFlowElements.2"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ProcessConnector" sourceProcessFlowElement="//@processFlowElements.2" targetProcessFlowElement="//@processFlowElements.3"/>
+  <roles name="Angemeldeter Nutzer"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="STRING" name="String" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="BOOLEAN" name="Boolean" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="PHONENUMBER" name="PhoneNumber" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="URL" name="Url" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="EMAIL" name="Email" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="FILE" name="File" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="IMAGE" name="Image" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="LOCATION" name="Location" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="INTEGER" name="Integer" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="FLOAT" name="Float" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="DATE" name="Date" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="TIME" name="Time" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="DATETIME" name="DateTime" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="NUTZER" name="Nutzer"/>
+  <attributes xsi:type="de.wwu.md2dot0gui:Attribute" description="nachname" type="String"/>
+  <attributes xsi:type="de.wwu.md2dot0gui:Attribute" description="vorname" type="String"/>
+  <attributes xsi:type="de.wwu.md2dot0gui:Attribute" description="geburtsdatum" type="Date"/>
+</de.wwu.md2dot0:UseCase>

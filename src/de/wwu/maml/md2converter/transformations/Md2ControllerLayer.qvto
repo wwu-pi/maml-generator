@@ -26,7 +26,7 @@ mapping Model::toController(): Controller {
 	//controllerElements += self.map toValidator();
 	controllerElements += self.map toRemoteConnection();
 	//controllerElements += self.map toWorkflowElement();
-	//controllerElements += self.map toWebServiceCall();
+	controllerElements += self.distinctWebServiceCalls();
 	controllerElements += self.map toMain();
 }
 
@@ -41,25 +41,53 @@ mapping Model::toValidator(): Validator {
 mapping Model::toMain(): Main {
 	log("toMain");
 	
-	appVersion := "1.0.0"; // No alternatives implemented in MAML
-	modelVersion := "1.0.0"; // No alternative options implemented in MAML
-	workflowManager := self.getRemoteConnection(self.getDefaultConnectionName()); // No alternatives implemented in MAML
-	defaultConnection := self.getRemoteConnection(self.getDefaultConnectionName()); // No alternatives implemented in MAML
-	fileUploadConnection := self.getRemoteConnection(self.getDefaultConnectionName()); // No alternatives implemented in MAML
+	appVersion := "1.0.0"; // Not explicitly modelled in MAML
+	modelVersion := "1.0.0"; // Not explicitly modelled in MAML
+	workflowManager := self.getRemoteConnection(self.getDefaultConnectionName()); // Not explicitly modelled in MAML
+	defaultConnection := self.getRemoteConnection(self.getDefaultConnectionName()); // Not explicitly modelled in MAML
+	fileUploadConnection := self.getRemoteConnection(self.getDefaultConnectionName()); // Not explicitly modelled in MAML
 }
 
 mapping Model::toRemoteConnection(): RemoteConnection {
 	log("toRemoteConnection");
 	
+	// Main remote connection, not explicitly modelled in MAML
 	name := _debug(self.getDefaultConnectionName());
 	uri := "http://localhost:8080/" + safeVal(self.projectName, DEFAULT_PROJECT_NAME).toFirstUpper() + ".backend/service/";
-	// TODO
+	password := null; 
+	user := null;
+	key := null;
+	storagePath := null;
 }
 
 mapping Model::toWorkflowElement(): WorkflowElement {
 	// TODO
 }
 
-mapping Model::toWebServiceCall(): WebServiceCall {
-	// TODO
+helper Model::distinctWebServiceCalls(): Set(WebServiceCall) {
+	var webServiceCalls: Set(WebServiceCall);
+	
+	self.useCases->forEach(uc) {
+		uc.processFlowElements[Webservice]->oclAsType(Webservice)->forEach(ws){
+			webServiceCalls += ws.lookupOrCreate();
+		};
+	};
+	
+	return webServiceCalls;
+}
+
+helper Webservice::lookupOrCreate(): WebServiceCall {
+	if(resolveone(webservice : WebServiceCall | webservice.url = self.description) <> null) then {
+		return resolveone(webservice : WebServiceCall | webservice.url = self.description);
+	} else {
+		return self.map toWebServiceCall();
+	} endif;
+}
+
+mapping Webservice::toWebServiceCall(): WebServiceCall {
+	name := "test"; // Not explicitly modelled in MAML // TODO generate
+	url := self.description;
+	method := RESTMethod::GET; // Not explicitly modelled in MAML
+	queryparams := null; // Not explicitly modelled in MAML
+	bodyparams := null; // TODO attached read attributes
 }

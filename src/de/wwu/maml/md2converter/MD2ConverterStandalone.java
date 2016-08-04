@@ -1,5 +1,6 @@
 package de.wwu.maml.md2converter;
 
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -19,6 +20,8 @@ import org.eclipse.m2m.qvt.oml.ExecutionContextImpl;
 import org.eclipse.m2m.qvt.oml.ExecutionDiagnostic;
 import org.eclipse.m2m.qvt.oml.ModelExtent;
 import org.eclipse.m2m.qvt.oml.TransformationExecutor;
+import org.eclipse.m2m.qvt.oml.util.Log;
+import org.eclipse.m2m.qvt.oml.util.WriterLog;
 
 import com.google.inject.Injector;
 
@@ -33,6 +36,8 @@ import md2dot0.Md2dot0Factory;
 import md2dot0.UseCase;
 
 public class MD2ConverterStandalone {
+
+	private static final String DEFAULT_PROJECT_NAME = "mamlProject";
 
 	public static void main(String[] args) {
 		// Register Xtext Resource Factory
@@ -85,7 +90,11 @@ public class MD2ConverterStandalone {
 
 	public static void transformMamlToMd2(EList<EObject> modelObjects, MD2ModelLayer layer) {
 		if (modelObjects == null || modelObjects.size() == 0) {
-			throw new RuntimeException("No model objects to transform");
+			throw new RuntimeException("No model objects to transform!");
+		} else if(layer == null) {
+			throw new RuntimeException("No MD2 layer to transform to!");
+		} else {
+			System.out.println("Start transformation for " + layer.getClass().getSimpleName() + " layer...");
 		}
 
 		// create the input extent with its initial contents
@@ -97,9 +106,14 @@ public class MD2ConverterStandalone {
 		// -> configuration properties, logger, monitor object etc.
 		ExecutionContextImpl context = new ExecutionContextImpl();
 		context.setConfigProperty("keepModeling", true);
+		
+		// Activate logging
+		OutputStreamWriter outStream = new OutputStreamWriter(System.out);
+		Log log = new WriterLog(outStream);
+		context.setLog(log);
 
 		// Human readable model project name
-		String projectName = "mamlProject";
+		String projectName = DEFAULT_PROJECT_NAME;
 		if (((md2dot0.Model) EcoreUtil.getRootContainer(modelObjects.get(0))).getProjectName() != null) {
 			projectName = ((md2dot0.Model) EcoreUtil.getRootContainer(modelObjects.get(0))).getProjectName();
 		}
@@ -141,8 +155,7 @@ public class MD2ConverterStandalone {
 			outputFile += projectName + "/workflows/" + projectName + "Workflow.md2";
 
 		} else {
-			System.out.println("Unsupported MD2 layer encountered!");
-			return;
+			throw new RuntimeException("Unsupported MD2 layer encountered!");
 		}
 
 		// check the result for success

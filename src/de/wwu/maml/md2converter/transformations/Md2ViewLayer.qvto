@@ -4,13 +4,17 @@ modeltype MD2 "strict" uses "http://www.wwu.de/md2/framework/MD2";
 transformation Md2ViewLayerTransformation(in Source: MAML, out Target: MD2);
 
 main() {
-	Source.rootObjects()[Model] -> map ToViewLayer();
+	Source.rootObjects()[Model] -> map toViewLayer();
 }
 
-mapping Model::ToViewLayer(): MD2Model {
+mapping Model::toViewLayer(): MD2Model {
+	log("toViewLayer");
+	
 	package := self.map toPackage();
 }
 
 mapping Model::toPackage(): PackageDefinition {
+	log("toPackage");
+	
 	pkgName := "projectName.views" 
 }

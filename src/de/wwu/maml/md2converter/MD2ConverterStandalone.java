@@ -124,7 +124,7 @@ public class MD2ConverterStandalone {
 		String outputFile = "platform:/resource/de.wwu.maml/src-gen/";
 		if (layer instanceof Model) {
 			URI transformationURI = URI.createURI(
-					"platform:/resource/de.wwu.maml/src/de/wwu/maml/md2converter/transformations/Md2ViewLayer.qvto");
+					"platform:/resource/de.wwu.maml/src/de/wwu/maml/md2converter/transformations/Md2ModelLayer.qvto");
 
 			TransformationExecutor executor = new TransformationExecutor(transformationURI);
 			result = executor.execute(context, input, output);

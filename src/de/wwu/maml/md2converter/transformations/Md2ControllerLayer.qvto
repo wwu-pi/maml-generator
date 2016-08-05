@@ -6,7 +6,6 @@ modeltype MD2 "strict" uses "http://www.wwu.de/md2/framework/MD2";
 transformation Md2ControllerLayerTransformation(in Source: MAML, out Target: MD2);
 
 main() {
-	log("Start ControllerLayer transformation");
 	Source.rootObjects()[Model] -> map toControllerLayer();
 }
 
@@ -18,7 +17,8 @@ mapping Model::toControllerLayer(): MD2Model {
 }
 
 mapping Model::toPackage(): PackageDefinition {
-	pkgName := "projectName.controllers" 
+	log(".toPackage");
+	pkgName := safeVal(self.projectName, DEFAULT_PROJECT_NAME).toFirstUpper() + ".controllers";
 }
 
 mapping Model::toController(): Controller {
@@ -47,7 +47,7 @@ mapping Model::toValidator(): Validator {
 }
 
 mapping Model::toMain(): Main {
-	log("toMain");
+	log(".toMain");
 	
 	appVersion := "1.0.0"; // Not explicitly modelled in MAML
 	modelVersion := "1.0.0"; // Not explicitly modelled in MAML
@@ -57,7 +57,7 @@ mapping Model::toMain(): Main {
 }
 
 mapping Model::toRemoteConnection(): RemoteConnection {
-	log("toRemoteConnection");
+	log(".toRemoteConnection");
 	
 	// Main remote connection, not explicitly modelled in MAML
 	name := _debug(self.getDefaultConnectionName());
@@ -69,6 +69,8 @@ mapping Model::toRemoteConnection(): RemoteConnection {
 }
 
 helper Model::distinctWorkflowElements(): Set(WorkflowElement) {
+	log(".distinctWorkflowElements");
+	
 	return Set{}; // TODO
 }
 
@@ -77,6 +79,8 @@ mapping Model::toWorkflowElement(): WorkflowElement {
 }
 
 helper Model::distinctWebServiceCalls(): Set(WebServiceCall) {
+	log(".distinctWebServiceCalls");
+
 	var webServiceCalls: Set(WebServiceCall);
 	
 	self.useCases->forEach(uc) {

@@ -4,13 +4,17 @@ modeltype MD2 "strict" uses "http://www.wwu.de/md2/framework/MD2";
 transformation Md2WorkflowLayerTransformation(in Source: MAML, out Target: MD2);
 
 main() {
-	Source.rootObjects()[Model] -> map ToWorkflowLayer();
+	Source.rootObjects()[Model] -> map toWorkflowLayer();
 }
 
-mapping Model::ToWorkflowLayer(): MD2Model {
+mapping Model::toWorkflowLayer(): MD2Model {
+	log("toWorkflowLayer");
+	
 	package := self.map toPackage();
 }
 
 mapping Model::toPackage(): PackageDefinition {
+	log("toPackage");
+	
 	pkgName := "projectName.workflows" 
 }

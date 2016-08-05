@@ -1,16 +1,102 @@
+import Md2Helper;
+
 modeltype MAML "strict" uses "http://de/wwu/md2dot0";
+modeltype MAMLdata "strict" uses "http://de/wwu/md2dot0data";
 modeltype MD2 "strict" uses "http://www.wwu.de/md2/framework/MD2";
 
 transformation Md2ModelLayerTransformation(in Source: MAML, out Target: MD2);
 
 main() {
-	Source.rootObjects()[Model] -> map ToModelLayer();
+	Source.rootObjects()[Model] -> map toModelLayer();
 }
 
-mapping Model::ToModelLayer(): MD2Model {
+mapping Model::toModelLayer(): MD2Model {
+	log("toModelLayer");
+	
 	package := self.map toPackage();
+	modelLayer := self.map toModel();
 }
 
 mapping Model::toPackage(): PackageDefinition {
-	pkgName := "projectName.models" 
+	log(".toPackage");
+	
+	pkgName := safeVal(self.projectName, DEFAULT_PROJECT_NAME).toFirstUpper() + ".models";
+}
+
+mapping Model::toModel(): MD2::Model {
+	modelElements := self.distinctModelElements();
+}
+
+helper Model::distinctModelElements(): Set(ModelElement) {
+	log(".distinctModelElements");
+	
+	var elements: Set(ModelElement);
+	
+	// Primitive types
+	elements += self.initPrimitiveTypes();
+	
+	// Custom types
+	self.useCases->forEach(uc) {
+		uc.dataTypes->forEach(dataType){
+			elements += dataType->oclAsType(DataType).lookupOrCreate();
+		};
+	};
+	
+	return elements;
+}
+
+helper Model::initPrimitiveTypes(): Set(ModelElement) {
+	return null;// TODO 
+}
+
+helper DataType::lookupOrCreate(): ModelElement {
+	if(resolveone(dataType : ModelElement | dataType.name = self.metaClassName()) <> null) then {
+	log("metaclass" + self.metaClassName());
+		return resolveone(dataType : ModelElement | dataType.name = self.metaClassName());
+	} endif;
+	return self.map toModelElement();
+}
+
+helper DataType::toModelElement(): ModelElement {
+	//TODO enum
+	switch {
+		case (self.oclIsTypeOf(CustomType)) return self.oclAsType(CustomType).map toEntity();
+		case (self.oclIsTypeOf(PhoneNumber)) return self.oclAsType(_String).map toEntity();
+		else return null; // Skip data type literals
+	};
+}
+
+mapping CustomType::toEntity(): Entity {
+	log("..toEntity: " + self.metaClassName());
+	
+	name := "";
+	attributes := null;
+}
+
+mapping _String::toEntity(): Entity {
+	log("..toEntity: " + self.metaClassName().toFirstUpper());
+	
+	name := self.metaClassName().toFirstUpper();
+	attributes := "value".map toAttribute();
+}
+
+mapping _Collection::toEntity(): Entity {
+	log("..toEntity: " + self.metaClassName().toFirstUpper());
+	
+	name := self.metaClassName().toFirstUpper();
+	attributes := null;
+}
+
+mapping DataType::toEnum(): Enum {
+	log("..toEnum: " + self.metaClassName().toFirstUpper());
+	//TODO
+}
+
+mapping String::toAttribute(): Attribute{
+	log("..toAttribute: " + self);
+	
+	name := "test"; //TODO
+	type := object StringType{};//TODO
+	extendedName := null; // Not explicitly modelled in MAML
+	description := null; // Not explicitly modelled in MAML
 }

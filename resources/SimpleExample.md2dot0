@@ -13,7 +13,7 @@
   <processFlowConnections xsi:type="de.wwu.md2dot0:ParameterConnector" targetElement="//@attributes.0" order="1" sourceElement="//@processFlowElements.1"/>
   <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="STRING" name="String" primitive="true"/>
   <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="BOOLEAN" name="Boolean" primitive="true"/>
-  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="PHONENUMBER" name="PhoneNumber" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:PhoneNumber" value=""/>
   <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="URL" name="Url" primitive="true"/>
   <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="EMAIL" name="Email" primitive="true"/>
   <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="FILE" name="File" primitive="true"/>

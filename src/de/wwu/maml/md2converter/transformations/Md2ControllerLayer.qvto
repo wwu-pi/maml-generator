@@ -60,7 +60,7 @@ mapping Model::toRemoteConnection(): RemoteConnection {
 	log(".toRemoteConnection");
 	
 	// Main remote connection, not explicitly modelled in MAML
-	name := _debug(self.getDefaultConnectionName());
+	name := self.getDefaultConnectionName();
 	uri := "http://localhost:8080/" + safeVal(self.projectName, DEFAULT_PROJECT_NAME).toFirstUpper() + ".backend/service/";
 	password := null; 
 	user := null;

@@ -24,60 +24,47 @@ mapping Model::toPackage(): PackageDefinition {
 }
 
 mapping Model::toModel(): MD2::Model {
-	modelElements := self.distinctModelElements();
+ 	self.distinctModelElements();
+	modelElements := late resolve(ModelElement);
 }
 
 helper Model::distinctModelElements(): Set(ModelElement) {
 	log(".distinctModelElements");
 	
-	var elements: Set(ModelElement);
-	
-	// Primitive types
-	elements += self.initPrimitiveTypes();
-	
 	// Custom types
 	self.useCases->forEach(uc) {
 		uc.dataTypes->forEach(dataType){
-			elements += dataType->oclAsType(DataType).lookupOrCreate();
+			dataType->oclAsType(DataType).lookupOrCreate();
 		};
 	};
-	
-	return elements;
-}
 
-helper Model::initPrimitiveTypes(): Set(ModelElement) {
-	return null;// TODO 
+	return null;
 }
 
 helper DataType::lookupOrCreate(): ModelElement {
-	if(resolveone(dataType : ModelElement | dataType.name = self.metaClassName()) <> null) then {
-	log("metaclass" + self.metaClassName());
-		return resolveone(dataType : ModelElement | dataType.name = self.metaClassName());
+	if(resolveone(dataType : ModelElement | dataType.name = self.metaClassName().toFirstUpper()) <> null) then {
+		return resolveone(dataType : ModelElement | dataType.name = self.metaClassName().toFirstUpper());
 	} endif;
-	return self.map toModelElement();
+	return self.toModelElement();
 }
 
 helper DataType::toModelElement(): ModelElement {
-	//TODO enum
+	var element : Entity;
+	
 	switch {
-		case (self.oclIsTypeOf(CustomType)) return self.oclAsType(CustomType).map toEntity();
-		case (self.oclIsTypeOf(PhoneNumber)) return self.oclAsType(_String).map toEntity();
+		case (self.oclIsTypeOf(CustomType)) element := self.oclAsType(CustomType).map toEntity();
+		// TODO collection, enum
 		else return null; // Skip data type literals
 	};
+	
+	return element;
 }
 
-mapping CustomType::toEntity(): Entity {
-	log("..toEntity: " + self.metaClassName());
+mapping CustomType::toEntity(): Entity when {self.attributes->size() > 0} {
+	log("..toEntity: " + self.name.toFirstUpper());
 	
-	name := "";
-	attributes := null;
-}
-
-mapping _String::toEntity(): Entity {
-	log("..toEntity: " + self.metaClassName().toFirstUpper());
-	
-	name := self.metaClassName().toFirstUpper();
-	attributes := "value".map toAttribute();
+	name := self.name.toFirstUpper();
+	attributes := self.attributes->toPrimitiveOrComplexAttribute();
 }
 
 mapping _Collection::toEntity(): Entity {
@@ -92,11 +79,52 @@ mapping DataType::toEnum(): Enum {
 	//TODO
 }
 
-mapping String::toAttribute(): Attribute{
-	log("..toAttribute: " + self);
+helper MAMLdata::Attribute::toPrimitiveOrComplexAttribute(): MD2::Attribute {
+	log("...toPrimitiveOrComplexAttributeType: Attribute " + self.name);
 	
-	name := "test"; //TODO
-	type := object StringType{};//TODO
+	return object MD2::Attribute {
+		name := self.name.toFirstLower();
+		type := self.type.toPrimitiveOrComplexAttributeType();
+	} 
+}
+
+helper DataType::toPrimitiveOrComplexAttributeType(): MD2::AttributeType {
+	switch {
+		// Primitive
+		case (self.oclIsTypeOf(_String)) return self.oclAsType(_String).map toPrimitiveString();
+		// TODO others
+		// TODO MAML primitives MD2 non-primitives (phonenumber etc)
+		// Complex
+		case (self.oclIsTypeOf(CustomType)) return self.oclAsType(CustomType).toReferencedType();
+		// TODO collection, enum
+		else return null; // TODO default to String?
+	};
+}
+
+mapping _String::toPrimitiveString(): StringType {
+	log("....toPrimitiveString");
+	
+	object result: StringType {
+			many := false; // TODO
+			// TODO params 
+	} 
+}
+
+helper DataType::toReferencedType(): ReferencedType {
+	// wrapper to find or create modelElement and reference it
+	return self.lookupOrCreate().map toReferencedType();
+}
+
+mapping MD2::ModelElement::toReferencedType(): ReferencedType {
+	element := self;
+}
+
+
+mapping MAMLdata::Attribute::toAttribute(): MD2::Attribute {
+	log("...toAttribute: " + self.name.toFirstLower());
+	
+	name := self.name.toFirstLower();
+	type := self.type.toReferencedType();
 	extendedName := null; // Not explicitly modelled in MAML
 	description := null; // Not explicitly modelled in MAML
 }

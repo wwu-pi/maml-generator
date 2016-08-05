@@ -22,16 +22,24 @@ mapping Model::toPackage(): PackageDefinition {
 }
 
 mapping Model::toController(): Controller {
-	//controllerElements := self.map toContentProvider();
-	//controllerElements += self.map toValidator();
+	controllerElements := self.distinctContentProviders();
+	controllerElements += self.distinctValidators();
 	controllerElements += self.map toRemoteConnection();
-	//controllerElements += self.map toWorkflowElement();
+	controllerElements += self.distinctWorkflowElements();
 	controllerElements += self.distinctWebServiceCalls();
 	controllerElements += self.map toMain();
 }
 
+helper Model::distinctContentProviders(): Set(WebServiceCall) {
+	return Set{}; // TODO
+}
+
 mapping Model::toContentProvider(): ContentProvider {
 	// TODO
+}
+
+helper Model::distinctValidators(): Set(Validator) {
+	return Set{}; // TODO
 }
 
 mapping Model::toValidator(): Validator {
@@ -60,6 +68,10 @@ mapping Model::toRemoteConnection(): RemoteConnection {
 	storagePath := null;
 }
 
+helper Model::distinctWorkflowElements(): Set(WorkflowElement) {
+	return Set{}; // TODO
+}
+
 mapping Model::toWorkflowElement(): WorkflowElement {
 	// TODO
 }
@@ -85,7 +97,7 @@ helper Webservice::lookupOrCreate(): WebServiceCall {
 }
 
 mapping Webservice::toWebServiceCall(): WebServiceCall {
-	name := "test"; // Not explicitly modelled in MAML // TODO generate
+	name := "test"; // Not explicitly modelled in MAML // TODO generate unique Name
 	url := self.description;
 	method := RESTMethod::GET; // Not explicitly modelled in MAML
 	queryparams := null; // Not explicitly modelled in MAML

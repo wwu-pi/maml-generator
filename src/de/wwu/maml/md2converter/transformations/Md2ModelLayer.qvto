@@ -91,7 +91,14 @@ helper MAMLdata::Attribute::toPrimitiveOrComplexAttribute(): MD2::Attribute {
 helper DataType::toPrimitiveOrComplexAttributeType(): MD2::AttributeType {
 	switch {
 		// Primitive
+		case (self.oclIsTypeOf(_Integer)) return self.oclAsType(_Integer).map toPrimitiveInt();
+		case (self.oclIsTypeOf(Float)) return self.oclAsType(Float).map toPrimitiveFloat();
 		case (self.oclIsTypeOf(_String)) return self.oclAsType(_String).map toPrimitiveString();
+		case (self.oclIsTypeOf(_Boolean)) return self.oclAsType(_Boolean).map toPrimitiveBoolean();
+		case (self.oclIsTypeOf(Date)) return self.oclAsType(Date).map toPrimitiveDate();
+		case (self.oclIsTypeOf(Time)) return self.oclAsType(Time).map toPrimitiveTime();
+		case (self.oclIsTypeOf(DateTime)) return self.oclAsType(DateTime).map toPrimitiveDateTime();
+		case (self.oclIsTypeOf(File)) return self.oclAsType(File).map toPrimitiveFile();
 		// TODO others
 		// TODO MAML primitives MD2 non-primitives (phonenumber etc)
 		// Complex
@@ -101,10 +108,73 @@ helper DataType::toPrimitiveOrComplexAttributeType(): MD2::AttributeType {
 	};
 }
 
+mapping _Integer::toPrimitiveInt(): IntegerType {
+	log("....toPrimitiveInt");
+	
+	object result: IntegerType {
+			many := false; // TODO
+			// TODO params 
+	} 
+}
+
+mapping Float::toPrimitiveFloat(): FloatType {
+	log("....toPrimitiveFloat");
+	
+	object result: FloatType {
+			many := false; // TODO
+			// TODO params 
+	} 
+}
+
 mapping _String::toPrimitiveString(): StringType {
 	log("....toPrimitiveString");
 	
 	object result: StringType {
+			many := false; // TODO
+			// TODO params 
+	} 
+}
+
+mapping _Boolean::toPrimitiveBoolean(): BooleanType {
+	log("....toPrimitiveBoolean");
+	
+	object result: BooleanType {
+			many := false; // TODO
+			// TODO params 
+	} 
+}
+
+mapping Date::toPrimitiveDate(): DateType {
+	log("....toPrimitiveDate");
+	
+	object result: DateType {
+			many := false; // TODO
+			// TODO params 
+	} 
+}
+
+mapping Time::toPrimitiveTime(): TimeType {
+	log("....toPrimitiveTime");
+	
+	object result: TimeType {
+			many := false; // TODO
+			// TODO params 
+	} 
+}
+
+mapping DateTime::toPrimitiveDateTime(): DateTimeType {
+	log("....toPrimitiveDateTime");
+	
+	object result: DateTimeType {
+			many := false; // TODO
+			// TODO params 
+	} 
+}
+
+mapping File::toPrimitiveFile(): FileType {
+	log("....toPrimitiveFile");
+	
+	object result: FileType {
 			many := false; // TODO
 			// TODO params 
 	} 

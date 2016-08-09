@@ -6,31 +6,35 @@ modeltype MAML "strict" uses "http://de/wwu/md2dot0";
 modeltype MAMLdata "strict" uses "http://de/wwu/md2dot0data";
 modeltype MD2 "strict" uses "http://www.wwu.de/md2/framework/MD2";
 
-helper Model::distinctViewElements(): Set(ViewElement) {
+helper Model::distinctViewElementTypes(): Collection(ViewElementType) {
 	log(".distinctViewElements");
 	
-	// Custom types
-	self.useCases->forEach(uc) {
-		uc.dataTypes->forEach(dataType){
-			dataType->oclAsType(ProcessElement).lookupOrCreateViewElement();
-		};
-	};
-
-	return null;
+	return self.useCases.processFlowElements[ProcessElement]->oclAsType(ProcessElement).lookupOrCreateViewElement();
 }
 
 helper ProcessElement::lookupOrCreateViewElement(): ViewElementType {
-	if(resolveone(dataType : ModelElement | dataType.name = self.metaClassName().toFirstUpper()) <> null) then {
-		return null;//	return resolveone(dataType : ModelElement | dataType.name = self.metaClassName().toFirstUpper());
+	if(resolveone(ve : ViewElementType | ve.name = self.metaClassName().toFirstUpper()) <> null) then {
+		return resolveone(ve : ViewElementType | ve.name = self.metaClassName().toFirstUpper());
 	} endif;
 	return self.map toViewElement();
 }
 
-mapping ProcessElement::toViewElement(): ViewGUIElement {
-	name := "test";
+mapping ProcessElement::toViewElement(): FlowLayoutPane {
+	log("..toViewElement: " + self.metaClassName() + "View");
+	
+	name := self.metaClassName() + "View".addSuffixNumber();
+	params := map getHorizontalFlowDirectionParam();
+	elements := null; //TODO
+}
+
+mapping getHorizontalFlowDirectionParam(): FlowLayoutPaneFlowDirectionParam {
+	object result: FlowLayoutPaneFlowDirectionParam {
+		flowDirection := FlowDirection::VERTICAL;
+	}
 }
 
 mapping MD2::ViewElementType::toReferencedType(): AbstractViewGUIElementRef {
 	ref := self;
 	tail := null; // TODO/necessary for MAML?
 }
+

@@ -14,10 +14,16 @@ mapping Model::toViewLayer(): MD2Model {
 	log("toViewLayer");
 	
 	package := self.map toPackage();
+	modelLayer := self.map toView();
 }
 
 mapping Model::toPackage(): PackageDefinition {
 	log("toPackage");
 	
 	pkgName := "projectName.views" 
+}
+
+mapping Model::toView(): View {
+	viewElements := self.distinctViewElementTypes();
+	// Styles not explicitly modelled in MAML // TODO add default styles
 }

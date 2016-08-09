@@ -119,7 +119,7 @@ helper Model::distinctWorkflowElements(): Collection(WorkflowElement) {
 	log(".distinctWorkflowElements");
 	
 	// initialize data model
-	self.distinctViewElements();
+	self.distinctViewElementTypes();
 	
 	// One MD2-WFE for each MAML-PFE
 	self.useCases.processFlowElements->forEach(elem){

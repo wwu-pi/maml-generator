@@ -1,5 +1,6 @@
 import Md2Helper;
 import Md2ModelHelper;
+import Md2ViewHelper;
 
 modeltype MAML "strict" uses "http://de/wwu/md2dot0";
 modeltype MD2 "strict" uses "http://www.wwu.de/md2/framework/MD2";
@@ -140,14 +141,40 @@ mapping SelectEntity::toWorkflowElement(): WorkflowElement {
 	log("..toWorkflowElement: " + self.description);
 	// TODO
 	name := self.metaClassName().toFirstUpper().addSuffixNumber();
-	initActions := null; //TODO
+	initActions := self.map toInitAction(); //TODO
 	actions := null; //TODO
-	processChain := null; //TODO
+	processChain := self.map toProcessChain(); //TODO
 	invoke := null; //TODO
-	defaultProcessChain := null; //TODO	
+	defaultProcessChain := self.map toProcessChain(); //TODO	
 }
 
 mapping ProcessElement::toProcessChain(): ProcessChain {
+	log("...toProcessChain");
+	
 	name := self.metaClassName().toFirstUpper() + "ProcessChain".addSuffixNumber();
-	processChainSteps := null; // TODO
+	processChainSteps := self.map toProcessChainSteps(); // TODO
+}
+
+mapping ProcessElement::toProcessChainSteps(): ProcessChainStep {
+	log("...toProcessChainSteps");
+	
+	name := self.metaClassName().toFirstUpper() + "ProcessChain".addSuffixNumber();
+	view := self.lookupOrCreateProcessElement().map toReferencedType();// TODO
+	gotos := null; // TODO
+	message := null; // Not explicitly modelled in MAML
+}
+
+helper ProcessElement::lookupOrCreateProcessElement(): ViewElementType {
+	return self.map toView(); // TODO
+}
+
+mapping MD2::ViewElementType::toReferencedType(): AbstractViewGUIElementRef {
+	ref := self;
+	tail := null; // TODO/necessary for MAML?
+}
+
+mapping ProcessElement::toInitAction(): Action {
+	log("...toProcessChainSteps");
+	
+	name := "testAction"; // TODO
 }

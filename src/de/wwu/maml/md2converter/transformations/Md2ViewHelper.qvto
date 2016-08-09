@@ -1,0 +1,11 @@
+library Md2ViewHelper;
+
+import Md2Helper;
+
+modeltype MAML "strict" uses "http://de/wwu/md2dot0";
+modeltype MAMLdata "strict" uses "http://de/wwu/md2dot0data";
+modeltype MD2 "strict" uses "http://www.wwu.de/md2/framework/MD2";
+
+mapping ProcessElement::toView(): ViewGUIElement {
+	name := "test";
+}

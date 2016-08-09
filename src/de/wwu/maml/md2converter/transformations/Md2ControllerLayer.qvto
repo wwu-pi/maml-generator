@@ -86,16 +86,6 @@ mapping Model::toRemoteConnection(): RemoteConnection {
 	storagePath := null;
 }
 
-helper Model::distinctWorkflowElements(): Set(WorkflowElement) {
-	log(".distinctWorkflowElements");
-	
-	return Set{}; // TODO
-}
-
-mapping Model::toWorkflowElement(): WorkflowElement {
-	// TODO
-}
-
 helper Model::distinctWebServiceCalls(): Set(WebServiceCall) {
 	log(".distinctWebServiceCalls");
 
@@ -124,4 +114,40 @@ mapping Webservice::toWebServiceCall(): WebServiceCall {
 	method := RESTMethod::GET; // Not explicitly modelled in MAML
 	queryparams := null; // Not explicitly modelled in MAML
 	bodyparams := null; // TODO attached read attributes
+}
+
+helper Model::distinctWorkflowElements(): Collection(WorkflowElement) {
+	log(".distinctWorkflowElements");
+	
+	// One MD2-WFE for each MAML-PFE
+	self.useCases.processFlowElements->forEach(elem){
+		elem.toWorkflowElement();
+	};
+	
+	return resolve(WorkflowElement);
+}
+
+helper ProcessFlowElement::toWorkflowElement(): WorkflowElement {
+	switch {
+		case (self.oclIsKindOf(SelectEntity)) return self.oclAsType(SelectEntity).map toWorkflowElement();
+		// TODO others
+		// Skip Start/End Events and data sources
+	};
+	return null;
+}
+
+mapping SelectEntity::toWorkflowElement(): WorkflowElement {
+	log("..toWorkflowElement: " + self.description);
+	// TODO
+	name := self.metaClassName().toFirstUpper().addSuffixNumber();
+	initActions := null; //TODO
+	actions := null; //TODO
+	processChain := null; //TODO
+	invoke := null; //TODO
+	defaultProcessChain := null; //TODO	
+}
+
+mapping ProcessElement::toProcessChain(): ProcessChain {
+	name := self.metaClassName().toFirstUpper() + "ProcessChain".addSuffixNumber();
+	processChainSteps := null; // TODO
 }

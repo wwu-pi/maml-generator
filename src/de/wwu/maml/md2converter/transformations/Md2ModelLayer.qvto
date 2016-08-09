@@ -90,7 +90,7 @@ helper MAMLdata::Attribute::toPrimitiveOrComplexAttribute(): MD2::Attribute {
 
 helper DataType::toPrimitiveOrComplexAttributeType(): MD2::AttributeType {
 	switch {
-		// Primitive
+		// Primitive conversion
 		case (self.oclIsTypeOf(_Integer)) return self.oclAsType(_Integer).map toPrimitiveInt();
 		case (self.oclIsTypeOf(Float)) return self.oclAsType(Float).map toPrimitiveFloat();
 		case (self.oclIsTypeOf(_String)) return self.oclAsType(_String).map toPrimitiveString();
@@ -99,12 +99,14 @@ helper DataType::toPrimitiveOrComplexAttributeType(): MD2::AttributeType {
 		case (self.oclIsTypeOf(Time)) return self.oclAsType(Time).map toPrimitiveTime();
 		case (self.oclIsTypeOf(DateTime)) return self.oclAsType(DateTime).map toPrimitiveDateTime();
 		case (self.oclIsTypeOf(File)) return self.oclAsType(File).map toPrimitiveFile();
-		// TODO others
-		// TODO MAML primitives MD2 non-primitives (phonenumber etc)
-		// Complex
+		// MAML primitives to MD2 non-primitives
+		case (self.oclIsTypeOf(PhoneNumber)) return self.oclAsType(PhoneNumber).map toPrimitiveString();
+		case (self.oclIsTypeOf(Url)) return self.oclAsType(Url).map toPrimitiveString();
+		case (self.oclIsTypeOf(Email)) return self.oclAsType(Email).map toPrimitiveString();
+		// Complex types
 		case (self.oclIsTypeOf(CustomType)) return self.oclAsType(CustomType).toReferencedType();
 		// TODO collection, enum
-		else return null; // TODO default to String?
+		else return null;
 	};
 }
 
@@ -127,6 +129,33 @@ mapping Float::toPrimitiveFloat(): FloatType {
 }
 
 mapping _String::toPrimitiveString(): StringType {
+	log("....toPrimitiveString");
+	
+	object result: StringType {
+			many := false; // TODO
+			// TODO params 
+	} 
+}
+
+mapping PhoneNumber::toPrimitiveString(): StringType {
+	log("....toPrimitiveString");
+	
+	object result: StringType {
+			many := false; // TODO
+			// TODO params 
+	} 
+}
+
+mapping Url::toPrimitiveString(): StringType {
+	log("....toPrimitiveString");
+	
+	object result: StringType {
+			many := false; // TODO
+			// TODO params 
+	} 
+}
+
+mapping Email::toPrimitiveString(): StringType {
 	log("....toPrimitiveString");
 	
 	object result: StringType {

@@ -49,11 +49,11 @@ helper DataType::lookupOrCreate(): ModelElement {
 }
 
 helper DataType::toModelElement(): ModelElement {
-	var element : Entity;
+	var element : ModelElement;
 	
 	switch {
 		case (self.oclIsTypeOf(CustomType)) element := self.oclAsType(CustomType).map toEntity();
-		// TODO collection, enum
+		case (self.oclIsTypeOf(Enum)) element := self.oclAsType(Enum).map toEnum();
 		else return null; // Skip data type literals
 	};
 	
@@ -67,16 +67,10 @@ mapping CustomType::toEntity(): Entity when {self.attributes->size() > 0} {
 	attributes := self.attributes->toPrimitiveOrComplexAttribute();
 }
 
-mapping _Collection::toEntity(): Entity {
-	log("..toEntity: " + self.metaClassName().toFirstUpper());
-	
-	name := self.metaClassName().toFirstUpper();
-	attributes := null;
-}
-
-mapping DataType::toEnum(): Enum {
+mapping DataType::toEnum(): MD2::Enum {
 	log("..toEnum: " + self.metaClassName().toFirstUpper());
-	//TODO
+	//TODO enumBody
+	name := self.metaClassName().toFirstUpper();
 }
 
 helper MAMLdata::Attribute::toPrimitiveOrComplexAttribute(): MD2::Attribute {
@@ -89,133 +83,140 @@ helper MAMLdata::Attribute::toPrimitiveOrComplexAttribute(): MD2::Attribute {
 }
 
 helper DataType::toPrimitiveOrComplexAttributeType(): MD2::AttributeType {
+	return self.toPrimitiveOrComplexAttributeType(false);
+}
+
+helper DataType::toPrimitiveOrComplexAttributeType(isCollection : Boolean): MD2::AttributeType {
 	switch {
 		// Primitive conversion
-		case (self.oclIsTypeOf(_Integer)) return self.oclAsType(_Integer).map toPrimitiveInt();
-		case (self.oclIsTypeOf(Float)) return self.oclAsType(Float).map toPrimitiveFloat();
-		case (self.oclIsTypeOf(_String)) return self.oclAsType(_String).map toPrimitiveString();
-		case (self.oclIsTypeOf(_Boolean)) return self.oclAsType(_Boolean).map toPrimitiveBoolean();
-		case (self.oclIsTypeOf(Date)) return self.oclAsType(Date).map toPrimitiveDate();
-		case (self.oclIsTypeOf(Time)) return self.oclAsType(Time).map toPrimitiveTime();
-		case (self.oclIsTypeOf(DateTime)) return self.oclAsType(DateTime).map toPrimitiveDateTime();
-		case (self.oclIsTypeOf(File)) return self.oclAsType(File).map toPrimitiveFile();
+		case (self.oclIsTypeOf(_Integer)) return self.oclAsType(_Integer).map toPrimitiveInt(isCollection);
+		case (self.oclIsTypeOf(Float)) return self.oclAsType(Float).map toPrimitiveFloat(isCollection);
+		case (self.oclIsTypeOf(_String)) return self.oclAsType(_String).map toPrimitiveString(isCollection);
+		case (self.oclIsTypeOf(_Boolean)) return self.oclAsType(_Boolean).map toPrimitiveBoolean(isCollection);
+		case (self.oclIsTypeOf(Date)) return self.oclAsType(Date).map toPrimitiveDate(isCollection);
+		case (self.oclIsTypeOf(Time)) return self.oclAsType(Time).map toPrimitiveTime(isCollection);
+		case (self.oclIsTypeOf(DateTime)) return self.oclAsType(DateTime).map toPrimitiveDateTime(isCollection);
+		case (self.oclIsTypeOf(File)) return self.oclAsType(File).map toPrimitiveFile(isCollection);
 		// MAML primitives to MD2 non-primitives
-		case (self.oclIsTypeOf(PhoneNumber)) return self.oclAsType(PhoneNumber).map toPrimitiveString();
-		case (self.oclIsTypeOf(Url)) return self.oclAsType(Url).map toPrimitiveString();
-		case (self.oclIsTypeOf(Email)) return self.oclAsType(Email).map toPrimitiveString();
+		case (self.oclIsTypeOf(PhoneNumber)) return self.oclAsType(PhoneNumber).map toPrimitiveString(isCollection);
+		case (self.oclIsTypeOf(Url)) return self.oclAsType(Url).map toPrimitiveString(isCollection);
+		case (self.oclIsTypeOf(Email)) return self.oclAsType(Email).map toPrimitiveString(isCollection);
 		// Complex types
-		case (self.oclIsTypeOf(CustomType)) return self.oclAsType(CustomType).toReferencedType();
-		// TODO collection, enum
+		case (self.oclIsTypeOf(CustomType)) return self.oclAsType(CustomType).toReferencedType(isCollection);
+		case (self.oclIsTypeOf(_Collection)) return self.oclAsType(_Collection).type.toPrimitiveOrComplexAttributeType(true);
+		case (self.oclIsTypeOf(Enum)) return self.oclAsType(Enum).toReferencedType(isCollection);
 		else return null;
 	};
 }
 
-mapping _Integer::toPrimitiveInt(): IntegerType {
+mapping _Integer::toPrimitiveInt(isCollection : Boolean): IntegerType {
 	log("....toPrimitiveInt");
 	
 	object result: IntegerType {
-			many := false; // TODO
+			many := isCollection;
 			// TODO params 
 	} 
 }
 
-mapping Float::toPrimitiveFloat(): FloatType {
+mapping Float::toPrimitiveFloat(isCollection : Boolean): FloatType {
 	log("....toPrimitiveFloat");
 	
 	object result: FloatType {
-			many := false; // TODO
+			many := isCollection;
 			// TODO params 
 	} 
 }
 
-mapping _String::toPrimitiveString(): StringType {
+mapping _String::toPrimitiveString(isCollection : Boolean): StringType {
 	log("....toPrimitiveString");
 	
 	object result: StringType {
-			many := false; // TODO
+			many := isCollection;
 			// TODO params 
 	} 
 }
 
-mapping PhoneNumber::toPrimitiveString(): StringType {
+mapping PhoneNumber::toPrimitiveString(isCollection : Boolean): StringType {
 	log("....toPrimitiveString");
 	
 	object result: StringType {
-			many := false; // TODO
+			many := isCollection;
 			// TODO params 
 	} 
 }
 
-mapping Url::toPrimitiveString(): StringType {
+mapping Url::toPrimitiveString(isCollection : Boolean): StringType {
 	log("....toPrimitiveString");
 	
 	object result: StringType {
-			many := false; // TODO
+			many := isCollection;
 			// TODO params 
 	} 
 }
 
-mapping Email::toPrimitiveString(): StringType {
+mapping Email::toPrimitiveString(isCollection : Boolean): StringType {
 	log("....toPrimitiveString");
 	
 	object result: StringType {
-			many := false; // TODO
+			many := isCollection;
 			// TODO params 
 	} 
 }
 
-mapping _Boolean::toPrimitiveBoolean(): BooleanType {
+mapping _Boolean::toPrimitiveBoolean(isCollection : Boolean): BooleanType {
 	log("....toPrimitiveBoolean");
 	
 	object result: BooleanType {
-			many := false; // TODO
+			many := isCollection;
 			// TODO params 
 	} 
 }
 
-mapping Date::toPrimitiveDate(): DateType {
+mapping Date::toPrimitiveDate(isCollection : Boolean): DateType {
 	log("....toPrimitiveDate");
 	
 	object result: DateType {
-			many := false; // TODO
+			many := isCollection;
 			// TODO params 
 	} 
 }
 
-mapping Time::toPrimitiveTime(): TimeType {
+mapping Time::toPrimitiveTime(isCollection : Boolean): TimeType {
 	log("....toPrimitiveTime");
 	
 	object result: TimeType {
-			many := false; // TODO
+			many := isCollection;
 			// TODO params 
 	} 
 }
 
-mapping DateTime::toPrimitiveDateTime(): DateTimeType {
+mapping DateTime::toPrimitiveDateTime(isCollection : Boolean): DateTimeType {
 	log("....toPrimitiveDateTime");
 	
 	object result: DateTimeType {
-			many := false; // TODO
+			many := isCollection;
 			// TODO params 
 	} 
 }
 
-mapping File::toPrimitiveFile(): FileType {
+mapping File::toPrimitiveFile(isCollection : Boolean): FileType {
 	log("....toPrimitiveFile");
 	
 	object result: FileType {
-			many := false; // TODO
+			many := isCollection;
 			// TODO params 
 	} 
 }
 
-helper DataType::toReferencedType(): ReferencedType {
+helper DataType::toReferencedType(isCollection : Boolean): ReferencedType {
 	// wrapper to find or create modelElement and reference it
-	return self.lookupOrCreate().map toReferencedType();
+	return self.lookupOrCreate().map toReferencedType(isCollection);
 }
 
-mapping MD2::ModelElement::toReferencedType(): ReferencedType {
+mapping MD2::ModelElement::toReferencedType(isCollection : Boolean): ReferencedType {
 	element := self;
+	many := isCollection;
+	// TODO params
 }
 
 
@@ -223,7 +224,7 @@ mapping MAMLdata::Attribute::toAttribute(): MD2::Attribute {
 	log("...toAttribute: " + self.name.toFirstLower());
 	
 	name := self.name.toFirstLower();
-	type := self.type.toReferencedType();
+	type := self.type.toReferencedType(self.type.oclIsKindOf(_Collection));
 	extendedName := null; // Not explicitly modelled in MAML
 	description := null; // Not explicitly modelled in MAML
 }

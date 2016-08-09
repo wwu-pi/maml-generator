@@ -1,4 +1,5 @@
 import Md2Helper;
+import Md2ModelHelper;
 
 modeltype MAML "strict" uses "http://de/wwu/md2dot0";
 modeltype MD2 "strict" uses "http://www.wwu.de/md2/framework/MD2";
@@ -22,20 +23,37 @@ mapping Model::toPackage(): PackageDefinition {
 }
 
 mapping Model::toController(): Controller {
-	controllerElements := self.distinctContentProviders();
+	controllerElements := self.map toRemoteConnection();
+	controllerElements += self.distinctContentProviders(); // also initializes data model
 	controllerElements += self.distinctValidators();
-	controllerElements += self.map toRemoteConnection();
 	controllerElements += self.distinctWorkflowElements();
 	controllerElements += self.distinctWebServiceCalls();
 	controllerElements += self.map toMain();
 }
 
-helper Model::distinctContentProviders(): Set(WebServiceCall) {
-	return Set{}; // TODO
+helper Model::distinctContentProviders(): Collection(ContentProvider) {
+	// initialize data model
+	self.distinctModelElements();
+	
+	resolve(Entity)->forEach(entity) {
+		entity.map toContentProvider();
+	};
+	
+	return resolve(ContentProvider);
 }
 
-mapping Model::toContentProvider(): ContentProvider {
-	// TODO
+mapping MD2::Entity::toContentProvider(): ContentProvider {
+	log(".toContentProvider: " + self.name);
+
+	type := self.map toReferencedModelType(false);
+	name := self.name.toFirstUpper() + "Provider";
+	_default := false; // Not explicitly modelled in MAML
+	local:= false; // TODO
+	connection := resolveone(conn : RemoteConnection | conn.name = Source.rootObjects()[Model]->collectOne(model | model.getDefaultConnectionName()));
+	filter := false; // Not explicitly modelled in MAML
+	filterType := null; // Not explicitly modelled in MAML
+	whereClause := null; // Not explicitly modelled in MAML
+	_readonly := false; // Not explicitly modelled in MAML
 }
 
 helper Model::distinctValidators(): Set(Validator) {

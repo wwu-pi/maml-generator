@@ -4,6 +4,7 @@ import Md2Helper;
 
 modeltype MAML "strict" uses "http://de/wwu/md2dot0";
 modeltype MAMLdata "strict" uses "http://de/wwu/md2dot0data";
+modeltype MAMLgui "strict" uses "http://de/wwu/md2dot0gui";
 modeltype MD2 "strict" uses "http://www.wwu.de/md2/framework/MD2";
 
 helper Model::distinctViewElementTypes(): Collection(ViewElementType) {
@@ -23,11 +24,11 @@ mapping ProcessElement::toViewElement(): FlowLayoutPane {
 	log("..toViewElement: " + self.metaClassName() + "View");
 	
 	name := self.metaClassName() + "View".addSuffixNumber();
-	params := map getHorizontalFlowDirectionParam();
-	elements := null; //TODO
+	params := map getVerticalFlowDirectionParam();
+	elements := self.toViewElementContent();
 }
 
-mapping getHorizontalFlowDirectionParam(): FlowLayoutPaneFlowDirectionParam {
+mapping getVerticalFlowDirectionParam(): FlowLayoutPaneFlowDirectionParam {
 	object result: FlowLayoutPaneFlowDirectionParam {
 		flowDirection := FlowDirection::VERTICAL;
 	}
@@ -38,3 +39,71 @@ mapping MD2::ViewElementType::toReferencedType(): AbstractViewGUIElementRef {
 	tail := null; // TODO/necessary for MAML?
 }
 
+helper ProcessElement::toViewElementContent(): Collection(ViewGUIElement){
+	// Different representation per ProcessElement type //TODO switch selectEntity...
+	switch {
+		case (self.oclIsTypeOf(SelectEntity)) return self.oclAsType(SelectEntity).map toViewElementContent();
+	};
+	return null;//self.getAttachedParameters()->toContentElement(); 
+}
+
+helper SelectEntity::toViewElementContent(): Collection(ViewGUIElement){
+	return Set { self.map toTitle() } // Title
+		->union(self.getAttachedLabels().map toLabel()); // Labels
+		// Table
+		// Button
+}
+
+mapping ProcessElement::toTitle(): MD2::Label {
+	log("...toTitle");
+	
+	object result: MD2::Label {
+		name := "title".addSuffixNumber();
+		text := self.description;
+		width := 100;
+		style := null; // TODO heading style?
+	}
+} 
+
+mapping ParameterConnector::toLabel(): MD2::Label {
+	log("...toLabel");
+	
+	object result: MD2::Label {
+		name := "label".addSuffixNumber();
+		text := self.description;
+		width := 100;
+		style := null; // TODO label style?
+	}
+} 
+
+//helper ParameterConnector::toContentElement(): ContentElement {
+//	log("...toContentElement: " + self.targetElement.description);
+//	
+//	switch {
+//		case (self.targetElement.oclIsTypeOf(MAMLgui::Attribute)) return null;
+//	};
+//	return null;
+//}
+
+helper ProcessElement::getAttachedParameters(): Set(MAML::ParameterConnector) {
+	var useCase: UseCase := self.container().oclAsType(UseCase);
+	
+	return useCase.processFlowConnections[ParameterConnector]
+		->select(conn : ParameterConnector | conn.sourceElement = self)
+		->sortedBy(conn : ParameterConnector | conn.order);
+}
+
+helper ProcessElement::getAttachedLabels(): Set(MAML::ParameterConnector) {
+	return self.getAttachedParameters()
+		->select(conn : ParameterConnector | conn.targetElement.oclIsTypeOf(MAMLgui::Label));
+}
+
+helper ProcessElement::getAttachedAttributes(): Set(MAML::ParameterConnector) {
+	return self.getAttachedParameters()
+		->select(conn : ParameterConnector | conn.targetElement.oclIsTypeOf(MAMLgui::Attribute));
+}
+
+helper ProcessElement::getAttachedAbstractAttributes(): Set(MAML::ParameterConnector) {
+	return self.getAttachedParameters()
+		->select(conn : ParameterConnector | conn.targetElement.oclIsKindOf(MAMLgui::AbstractAttribute));
+}

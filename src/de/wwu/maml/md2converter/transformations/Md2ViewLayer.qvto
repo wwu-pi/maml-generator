@@ -18,9 +18,9 @@ mapping Model::toViewLayer(): MD2Model {
 }
 
 mapping Model::toPackage(): PackageDefinition {
-	log("toPackage");
+	log(".toPackage");
 	
-	pkgName := "projectName.views" 
+	pkgName := safeVal(self.projectName, DEFAULT_PROJECT_NAME).toFirstUpper() + ".views";
 }
 
 mapping Model::toView(): View {

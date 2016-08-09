@@ -27,7 +27,7 @@ mapping Model::toController(): Controller {
 	controllerElements := self.map toRemoteConnection();
 	controllerElements += self.distinctContentProviders(); // also initializes data model
 	controllerElements += self.distinctValidators();
-	controllerElements += self.distinctWorkflowElements();
+	controllerElements += self.distinctWorkflowElements(); // also initializes view elements
 	controllerElements += self.distinctWebServiceCalls();
 	controllerElements += self.map toMain();
 }
@@ -92,16 +92,14 @@ helper Model::distinctWebServiceCalls(): Set(WebServiceCall) {
 
 	var webServiceCalls: Set(WebServiceCall);
 	
-	self.useCases->forEach(uc) {
-		uc.processFlowElements[Webservice]->oclAsType(Webservice)->forEach(ws){
-			webServiceCalls += ws.lookupOrCreate();
-		};
+	self.useCases.processFlowElements[Webservice]->oclAsType(Webservice)->forEach(ws){
+		webServiceCalls += ws.lookupOrCreateWebService();
 	};
-	
+
 	return webServiceCalls;
 }
 
-helper Webservice::lookupOrCreate(): WebServiceCall {
+helper Webservice::lookupOrCreateWebService(): WebServiceCall {
 	if(resolveone(webservice : WebServiceCall | webservice.url = self.description) <> null) then {
 		return resolveone(webservice : WebServiceCall | webservice.url = self.description);
 	} else {
@@ -119,6 +117,9 @@ mapping Webservice::toWebServiceCall(): WebServiceCall {
 
 helper Model::distinctWorkflowElements(): Collection(WorkflowElement) {
 	log(".distinctWorkflowElements");
+	
+	// initialize data model
+	self.distinctViewElements();
 	
 	// One MD2-WFE for each MAML-PFE
 	self.useCases.processFlowElements->forEach(elem){
@@ -159,18 +160,9 @@ mapping ProcessElement::toProcessChainSteps(): ProcessChainStep {
 	log("...toProcessChainSteps");
 	
 	name := self.metaClassName().toFirstUpper() + "ProcessChain".addSuffixNumber();
-	view := self.lookupOrCreateProcessElement().map toReferencedType();// TODO
+	view := self.lookupOrCreateViewElement().map toReferencedType();// TODO
 	gotos := null; // TODO
 	message := null; // Not explicitly modelled in MAML
-}
-
-helper ProcessElement::lookupOrCreateProcessElement(): ViewElementType {
-	return self.map toView(); // TODO
-}
-
-mapping MD2::ViewElementType::toReferencedType(): AbstractViewGUIElementRef {
-	ref := self;
-	tail := null; // TODO/necessary for MAML?
 }
 
 mapping ProcessElement::toInitAction(): Action {

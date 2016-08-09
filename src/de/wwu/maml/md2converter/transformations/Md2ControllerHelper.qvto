@@ -1,0 +1,48 @@
+library Md2ControllerHelper;
+
+import Md2Helper;
+import Md2ModelHelper;
+
+modeltype MAML "strict" uses "http://de/wwu/md2dot0";
+modeltype MAMLdata "strict" uses "http://de/wwu/md2dot0data";
+modeltype MAMLgui "strict" uses "http://de/wwu/md2dot0gui";
+modeltype MD2 "strict" uses "http://www.wwu.de/md2/framework/MD2";
+
+helper Model::distinctContentProviders(): Collection(ContentProvider) {
+	// initialize data model
+	self.distinctModelElements();
+	
+	resolve(Entity)->forEach(entity) {
+		entity.map toContentProvider(self);
+	};
+	
+	return resolve(ContentProvider);
+}
+
+mapping MD2::Entity::toContentProvider(rootModel : Model): ContentProvider {
+	log(".toContentProvider: " + self.name);
+
+	type := self.map toReferencedModelType(false);
+	name := self.name.toFirstUpper() + "Provider";
+	_default := false; // Not explicitly modelled in MAML
+	local:= false; // TODO
+	connection := resolveone(conn : RemoteConnection | conn.name = rootModel.getDefaultConnectionName());
+	filter := false; // Not explicitly modelled in MAML
+	filterType := null; // Not explicitly modelled in MAML
+	whereClause := null; // Not explicitly modelled in MAML
+	_readonly := false; // Not explicitly modelled in MAML
+}
+
+mapping MD2::ModelElement::toContentProviderPath(attribute : ParameterConnector): ContentProviderPath {
+	log("...toContentProviderPath: " + self.name);
+	
+	contentProviderRef := resolveone(cp : ContentProvider | cp.type.oclAsType(ReferencedModelType).entity.name = self.oclAsType(Entity).name);
+	
+	tail := self.map toContentProviderPathTail(attribute);
+}
+
+mapping MD2::ModelElement::toContentProviderPathTail(attribute : ParameterConnector): PathTail {
+	log("CP path wrong!");
+	log(self.oclAsType(Entity).attributes->first().toString());
+	attributeRef := self.oclAsType(Entity).attributes->first(); // TODO wrong
+}

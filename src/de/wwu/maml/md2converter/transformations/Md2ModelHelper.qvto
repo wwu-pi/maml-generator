@@ -10,10 +10,8 @@ helper Model::distinctModelElements(): Set(ModelElement) {
 	log(".distinctModelElements");
 	
 	// Custom types
-	self.useCases->forEach(uc) {
-		uc.dataTypes->forEach(dataType){
-			dataType->oclAsType(DataType).lookupOrCreate();
-		};
+	self.useCases.dataTypes->forEach(dataType){
+		dataType->oclAsType(DataType).lookupOrCreate();
 	};
 
 	return null;
@@ -32,6 +30,7 @@ helper DataType::toModelElement(): ModelElement {
 	switch {
 		case (self.oclIsTypeOf(CustomType)) element := self.oclAsType(CustomType).map toEntity();
 		case (self.oclIsTypeOf(Enum)) element := self.oclAsType(Enum).map toEnum();
+		case (self.oclIsTypeOf(DataTypeLiteral) and not self.oclAsType(DataTypeLiteral)._primitive) element := self.oclAsType(DataTypeLiteral).map toEntity();
 		else return null; // Skip data type literals
 	};
 	
@@ -45,6 +44,13 @@ mapping CustomType::toEntity(): Entity when {self.attributes->size() > 0} {
 	attributes := self.attributes->toPrimitiveOrComplexAttribute();
 }
 
+mapping DataTypeLiteral::toEntity(): Entity {
+	log("..toEntity: " + self.name.toFirstUpper());
+	
+	name := self.name.toFirstUpper();
+	attributes := null;
+}
+
 mapping DataType::toEnum(): MD2::Enum {
 	log("..toEnum: " + self.metaClassName().toFirstUpper());
 	//TODO enumBody
@@ -54,10 +60,7 @@ mapping DataType::toEnum(): MD2::Enum {
 helper MAMLdata::Attribute::toPrimitiveOrComplexAttribute(): MD2::Attribute {
 	log("...toPrimitiveOrComplexAttributeType: Attribute " + self.name);
 	
-	return object MD2::Attribute {
-		name := self.name.toFirstLower();
-		type := self.type.toPrimitiveOrComplexAttributeType();
-	} 
+	return self.map toAttribute();
 }
 
 helper DataType::toPrimitiveOrComplexAttributeType(): MD2::AttributeType {
@@ -202,7 +205,7 @@ mapping MAMLdata::Attribute::toAttribute(): MD2::Attribute {
 	log("...toAttribute: " + self.name.toFirstLower());
 	
 	name := self.name.toFirstLower();
-	type := self.type.toReferencedType(self.type.oclIsKindOf(_Collection));
+	type := self.type.toPrimitiveOrComplexAttributeType();
 	extendedName := null; // Not explicitly modelled in MAML
 	description := null; // Not explicitly modelled in MAML
 }
@@ -212,4 +215,8 @@ mapping MD2::Entity::toReferencedModelType(isCollection : Boolean): ReferencedMo
 	
 	many := isCollection;
 	entity := self;
+}
+
+helper DataTypeLiteral::toCustomType(): CustomType {
+	return resolveone(type : CustomType | type.name.equalsIgnoreCase(self.identifier));
 }

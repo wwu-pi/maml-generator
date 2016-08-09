@@ -1,6 +1,7 @@
 library Md2ViewHelper;
 
 import Md2Helper;
+import Md2ControllerHelper;
 
 modeltype MAML "strict" uses "http://de/wwu/md2dot0";
 modeltype MAMLdata "strict" uses "http://de/wwu/md2dot0data";
@@ -9,6 +10,9 @@ modeltype MD2 "strict" uses "http://www.wwu.de/md2/framework/MD2";
 
 helper Model::distinctViewElementTypes(): Collection(ViewElementType) {
 	log(".distinctViewElements");
+	
+	// initialize controller layer
+	self.distinctContentProviders();
 	
 	return self.useCases.processFlowElements[ProcessElement]->oclAsType(ProcessElement).lookupOrCreateViewElement();
 }
@@ -48,10 +52,12 @@ helper ProcessElement::toViewElementContent(): Collection(ViewGUIElement){
 }
 
 helper SelectEntity::toViewElementContent(): Collection(ViewGUIElement){
-	return Set { self.map toTitle() } // Title
-		->union(self.getAttachedLabels().map toLabel()); // Labels
-		// Table
+	var content : Collection(ViewGUIElement) := Set { self.map toTitle() }; // Title 
+	content += self.getAttachedLabels().map toLabel(); // Labels
+	content += self->map toTable(self.getAttachedAttributes()); // Table (ideally)
+	content += Set { self.map toContinueButton() };
 		// Button
+	return content;
 }
 
 mapping ProcessElement::toTitle(): MD2::Label {
@@ -76,14 +82,21 @@ mapping ParameterConnector::toLabel(): MD2::Label {
 	}
 } 
 
-//helper ParameterConnector::toContentElement(): ContentElement {
-//	log("...toContentElement: " + self.targetElement.description);
-//	
-//	switch {
-//		case (self.targetElement.oclIsTypeOf(MAMLgui::Attribute)) return null;
-//	};
-//	return null;
-//}
+mapping ProcessElement::toContinueButton(): MD2::Button {
+	log("...toContinueButton");
+	
+	name := "button".addSuffixNumber();
+	text := self.getContinueButtonText(0);
+	width := 100;
+	style := null; // TODO button style?
+} 
+
+mapping ProcessElement::toTable(attributes : Collection(ParameterConnector)): MD2::EntitySelector {
+	log("...toTable");
+	
+	name := "table".addSuffixNumber();
+	textProposition := self.dataType.lookupOrCreate().map toContentProviderPath(attributes->asOrderedSet()->first()); // TODO fix
+}
 
 helper ProcessElement::getAttachedParameters(): Set(MAML::ParameterConnector) {
 	var useCase: UseCase := self.container().oclAsType(UseCase);
@@ -106,4 +119,12 @@ helper ProcessElement::getAttachedAttributes(): Set(MAML::ParameterConnector) {
 helper ProcessElement::getAttachedAbstractAttributes(): Set(MAML::ParameterConnector) {
 	return self.getAttachedParameters()
 		->select(conn : ParameterConnector | conn.targetElement.oclIsKindOf(MAMLgui::AbstractAttribute));
+}
+
+helper ProcessElement::getContinueButtonText(atPosition : Integer): String {
+	if(self.nextElements->size() > atPosition){
+		return safeVal(self.nextElements->at(atPosition).description, DEFAULT_BUTTON_TEXT);
+	} endif;
+	return null;
+	// TODO Finish at last step
 }

@@ -32,6 +32,14 @@
   <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="DATE" name="Date" primitive="true"/>
   <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="TIME" name="Time" primitive="true"/>
   <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="DATETIME" name="DateTime" primitive="true"/>
-  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="BUCH" name="Buch"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:CustomType" name="Buch">
+    <attributes xsi:type="de.wwu.md2dot0data:Attribute" name="buchTest">
+	  <type xsi:type="de.wwu.md2dot0data:CustomType" name="BuchInner">
+		<attributes xsi:type="de.wwu.md2dot0data:Attribute" name="buchInnerTest">
+		  <type xsi:type="de.wwu.md2dot0data:String" value=""/>
+		</attributes>
+	  </type>
+	</attributes>
+  </dataTypes>
   <attributes xsi:type="de.wwu.md2dot0gui:Attribute" description="titel" type="String"/>
 </de.wwu.md2dot0:UseCase>

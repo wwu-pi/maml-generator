@@ -52,11 +52,10 @@ helper ProcessElement::toViewElementContent(): Collection(ViewGUIElement){
 }
 
 helper SelectEntity::toViewElementContent(): Collection(ViewGUIElement){
-	var content : Collection(ViewGUIElement) := Set { self.map toTitle() }; // Title 
+	var content : OrderedSet(ViewGUIElement) := OrderedSet { self.map toTitle() }; // Title 
 	content += self.getAttachedLabels().map toLabel(); // Labels
 	content += self->map toTable(self.getAttachedAttributes()); // Table (ideally)
-	content += Set { self.map toContinueButton() };
-		// Button
+	content += OrderedSet { self.map toContinueButton() }; // Button
 	return content;
 }
 
@@ -86,7 +85,7 @@ mapping ProcessElement::toContinueButton(): MD2::Button {
 	log("...toContinueButton");
 	
 	name := "button".addSuffixNumber();
-	text := self.getContinueButtonText(0);
+	text := self.getContinueButtonText(1);
 	width := 100;
 	style := null; // TODO button style?
 } 
@@ -122,7 +121,7 @@ helper ProcessElement::getAttachedAbstractAttributes(): Set(MAML::ParameterConne
 }
 
 helper ProcessElement::getContinueButtonText(atPosition : Integer): String {
-	if(self.nextElements->size() > atPosition){
+	if(self.nextElements->size() >= atPosition){
 		return safeVal(self.nextElements->at(atPosition).description, DEFAULT_BUTTON_TEXT);
 	} endif;
 	return null;

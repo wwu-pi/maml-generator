@@ -43,6 +43,6 @@ mapping MD2::ModelElement::toContentProviderPath(attribute : ParameterConnector)
 
 mapping MD2::ModelElement::toContentProviderPathTail(attribute : ParameterConnector): PathTail {
 	log("CP path wrong!");
-	log(self.oclAsType(Entity).attributes->first().toString());
+	
 	attributeRef := self.oclAsType(Entity).attributes->first(); // TODO wrong
 }

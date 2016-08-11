@@ -28,13 +28,20 @@ mapping ProcessElement::toViewElement(): FlowLayoutPane {
 	log("..toViewElement: " + self.metaClassName() + "View");
 	
 	name := self.metaClassName() + "View".addSuffixNumber();
-	params := map getVerticalFlowDirectionParam();
+	params := map getFlowDirectionParam(true);
 	elements := self.toViewElementContent();
 }
 
-mapping getVerticalFlowDirectionParam(): FlowLayoutPaneFlowDirectionParam {
+mapping getFlowDirectionParam(vertical : Boolean): FlowLayoutPaneFlowDirectionParam {
+	init {
+		var direction : FlowDirection := FlowDirection::VERTICAL;
+		if(not vertical) then {
+			direction := FlowDirection::HORIZONTAL;
+		} endif;
+	}
+	
 	object result: FlowLayoutPaneFlowDirectionParam {
-		flowDirection := FlowDirection::VERTICAL;
+		flowDirection := direction;
 	}
 }
 
@@ -57,6 +64,26 @@ helper SelectEntity::toViewElementContent(): Collection(ViewGUIElement){
 	content += self->map toTable(self.getAttachedAttributes()); // Table (ideally)
 	content += OrderedSet { self.map toContinueButton() }; // Button
 	return content;
+}
+
+helper ShowEntity::toViewElementContent(): Collection(ViewGUIElement){
+	var content : OrderedSet(ViewGUIElement) := OrderedSet { self.map toTitle() }; // Title 
+	content += self.getAttachedParameters().toViewElements(); // Fields
+	content += OrderedSet { self.map toContinueButton() }; // Button
+	return content->flatten();
+}
+
+helper ParameterConnector::toViewElements(): Collection(ViewGUIElement){
+	log("...toTitle");
+	
+	switch {
+		case (self.targetElement.oclIsTypeOf(Label)) return OrderedSet { self.map toLabel() };
+		case (self.targetElement.oclIsTypeOf(Attribute) and self.accessType = AccessType::READ) return OrderedSet { self.map toReadAttribute() };
+		case (self.targetElement.oclIsTypeOf(Attribute) and self.accessType = AccessType::WRITE) return OrderedSet { self.map toWriteAttribute() }->flatten();
+		// TODO more variants: label, computed, ...
+	};
+	
+	return Set {};
 }
 
 mapping ProcessElement::toTitle(): MD2::Label {
@@ -96,6 +123,44 @@ mapping ProcessElement::toTable(attributes : Collection(ParameterConnector)): MD
 	name := "table".addSuffixNumber();
 	textProposition := self.dataType.lookupOrCreate().map toContentProviderPath(attributes->asOrderedSet()->first()); // TODO fix
 }
+
+mapping ParameterConnector::toReadAttribute(): FlowLayoutPane {
+	log("...toReadAttribute");
+	
+	name := "attributePane".addSuffixNumber();
+	elements := OrderedSet { self.map toAttributeLabel() , self.map toReadAttributeField() };
+	params := map getFlowDirectionParam(false);
+}
+
+mapping ParameterConnector::toAttributeLabel(): MD2::Label {
+	name := "attributeLabel".addSuffixNumber();
+	text := self.description;
+	width := 40;
+	style := null; // TODO label style?
+}
+
+mapping ParameterConnector::toReadAttributeField(): MD2::Label {
+	name := "attributeField".addSuffixNumber();
+	text := safeVal(self.targetElement.description, "");
+	width := 60;
+	style := null; // TODO label style?
+}
+
+helper ParameterConnector::toWriteAttribute(): OrderedSet(ViewGUIElement) {
+	var attribute : MAMLgui::Attribute := self.targetElement.oclAsType(MAMLgui::Attribute); 
+	
+	switch {
+		//TODO more
+		case (attribute.type.oclIsTypeOf(_String)) attribute.map toInputField();
+	};
+	return OrderedSet{};
+}
+
+mapping MAMLgui::Attribute::toInputField(): InputElement {
+	name := "writeAttribute".addSuffixNumber();
+	width := 60;
+	labelText := self.description; // Instead of explicit label?
+} 
 
 helper ProcessElement::getAttachedParameters(): Set(MAML::ParameterConnector) {
 	var useCase: UseCase := self.container().oclAsType(UseCase);

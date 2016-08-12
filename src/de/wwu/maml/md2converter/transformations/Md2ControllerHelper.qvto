@@ -53,12 +53,17 @@ helper Model::distinctWorkflowElements(): Collection(WorkflowElement) {
 	// initialize data model
 	self.distinctViewElementTypes();
 	
-	// One MD2-WFE for each MAML-PFE
-	self.useCases.processFlowElements->forEach(elem){
+	// One MD2-WFE and WFEvent for each MAML-PFE
+	self.useCases.processFlowElements[ProcessElement]->forEach(elem){
 		elem.toWorkflowElement();
+		elem.map toWorkflowEvent();
 	};
 	
 	return resolve(WorkflowElement);
+}
+
+mapping ProcessElement::toWorkflowEvent(): WorkflowEvent {
+	name := "Event".addSuffixNumber();
 }
 
 helper ProcessFlowElement::toWorkflowElement(): WorkflowElement {

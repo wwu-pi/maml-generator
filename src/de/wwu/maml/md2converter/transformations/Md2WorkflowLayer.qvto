@@ -24,8 +24,8 @@ mapping Model::toPackage(): PackageDefinition {
 }
 
 mapping Model::toWorkflow(): Workflow {
-	workflowElementEntries := null;//TODO
-	apps := null;//TODO
+	workflowElementEntries := self.toWorkflowElementEntries();
+	apps := self.toApps();
 }
 
 helper Model::toWorkflowElementEntries(): Collection(WorkflowElementEntry) {
@@ -34,6 +34,7 @@ helper Model::toWorkflowElementEntries(): Collection(WorkflowElementEntry) {
 	var entries: Collection(WorkflowElementEntry) := Set {};
 	
 	self.distinctWorkflowElements(); // initialize controller layer
+
 	self.useCases.processFlowElements->forEach(elem) {
 		if(elem.oclIsTypeOf(ProcessElement) then {
 			entries += elem.oclAsType(ProcessElement).map toWorkflowElementEntry();
@@ -58,8 +59,13 @@ query ProcessElement::isWorkflowElementInvokable(): Boolean {
 }
 
 helper ProcessElement::toFiredEvents(): Collection(FiredEventEntry) {
-	// Fire event for each potentially following process element
-	// TODO
+	if(self.getNextProcessElements()->size() = 0) then {
+		// No follower -> end process
+		return self.map toEndEvent();
+	} else {
+		// Fire event for each potentially following process element
+		return self.getNextProcessElements()->map toFiredEvent(self);
+	} endif;
 }
 
 query ProcessElement::getNextProcessElements(): Collection(ProcessElement) {
@@ -72,12 +78,24 @@ query ProcessElement::getNextProcessElements(): Collection(ProcessElement) {
 	// TODO Error process flows?
 	self.nextElements.targetElement->forEach(elem) {
 		if(self.oclIsKindOf(ProcessElement)) then {
-			result += elem;
+			result += elem.oclAsType(ProcessElement);
 		} else {
 			// Else no real process element, e.g. end, xor, datasource -> get transitive follower
 			result += elem.getNextProcessElements();
-		};
-	}
+		} endif;
+	};
 
 	return result;
 }
+
+mapping ProcessElement::toFiredEvent(origin : ProcessElement): FiredEventEntry {
+	event := origin.resolveone(WorkflowEvent);
+	startedWorkflowElement := self;
+	endWorkflow := false;
+}
+
+mapping ProcessElement::toEndEvent(): FiredEventEntry {
+	event := self.resolveone(WorkflowEvent);
+	endWorkflow := true;
+}
+

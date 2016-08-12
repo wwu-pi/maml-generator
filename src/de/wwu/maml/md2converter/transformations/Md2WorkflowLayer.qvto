@@ -31,21 +31,53 @@ mapping Model::toWorkflow(): Workflow {
 helper Model::toWorkflowElementEntries(): Collection(WorkflowElementEntry) {
 	log(".toWorkflowElementEntries");
 	
-	var elements : Collection(WorkflowElement) := self.distinctWorkflowElements(); // initialize controller layer
-	elements->forEach(elem) {
-		elem.map toWorkflowElementEntry();
-	}
+	var entries: Collection(WorkflowElementEntry) := Set {};
+	
+	self.distinctWorkflowElements(); // initialize controller layer
+	self.useCases.processFlowElements->forEach(elem) {
+		if(elem.oclIsTypeOf(ProcessElement) then {
+			entries += elem.oclAsType(ProcessElement).map toWorkflowElementEntry();
+		} endif;
+	};
+	
+	return entries;
 }
 
-mapping WorkflowElement::toWorkflowElementEntry(): WorkflowElementEntry {
-	workflowElement := self;
+mapping ProcessElement::toWorkflowElementEntry(): WorkflowElementEntry {
+	workflowElement := resolveone(elem : WorkflowElement | elem.name = self.description);
 	invokable := self.isWorkflowElementInvokable();
 	eventDesc := safeVal(self.container().oclAsType(UseCase).description, self.description, "");
+	firedEvents := self.toFiredEvents();
 }
 
-query WorkflowElement::isWorkflowElementInvokable(): Boolean {
+query ProcessElement::isWorkflowElementInvokable(): Boolean {
 	if(self.previousElements->size() = 1 and self.previousElements->first()->oclisTypeOf(StartEvent)) then { // allow XOR as first element??
 		return true;
 	} endif;
 	return false;
+}
+
+helper ProcessElement::toFiredEvents(): Collection(FiredEventEntry) {
+	// Fire event for each potentially following process element
+	// TODO
+}
+
+query ProcessElement::getNextProcessElements(): Collection(ProcessElement) {
+	if(self.nextElements->size() = 0) then {
+		return Set {};
+	} endif;
+	
+	var result : Collection(ProcessElement) := OrderedSet {};
+	
+	// TODO Error process flows?
+	self.nextElements.targetElement->forEach(elem) {
+		if(self.oclIsKindOf(ProcessElement)) then {
+			result += elem;
+		} else {
+			// Else no real process element, e.g. end, xor, datasource -> get transitive follower
+			result += elem.getNextProcessElements();
+		};
+	}
+
+	return result;
 }

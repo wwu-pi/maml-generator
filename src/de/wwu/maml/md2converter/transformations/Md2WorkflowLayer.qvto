@@ -40,7 +40,7 @@ helper Model::toWorkflowElementEntries(): Collection(WorkflowElementEntry) {
 mapping WorkflowElement::toWorkflowElementEntry(): WorkflowElementEntry {
 	workflowElement := self;
 	invokable := self.isWorkflowElementInvokable();
-	eventDesc := safeVal(self.container().oclAsType(UseCase).description, saveVal(self.description, ""));
+	eventDesc := safeVal(self.container().oclAsType(UseCase).description, self.description, "");
 }
 
 query WorkflowElement::isWorkflowElementInvokable(): Boolean {

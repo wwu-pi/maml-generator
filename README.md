@@ -1,4 +1,5 @@
-# <img src="MAML_logo.png" width="50" style="position:relative; top:-5px"> MAML -  Münster App Modeling Language
+<img src="MAML_logo.png" width="75" align="left">
+# &nbsp; MAML &#8212; <br /> &nbsp; Münster App Modeling Language
 
 MAML is a framework for cross-platform development of native business apps using a graphical modeling language.
 

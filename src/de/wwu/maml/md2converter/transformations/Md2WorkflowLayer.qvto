@@ -1,3 +1,6 @@
+import Md2Helper;
+import Md2ControllerHelper;
+
 modeltype MAML "strict" uses "http://de/wwu/md2dot0";
 modeltype MD2 "strict" uses "http://www.wwu.de/md2/framework/MD2";
 
@@ -11,10 +14,38 @@ mapping Model::toWorkflowLayer(): MD2Model {
 	log("toWorkflowLayer");
 	
 	package := self.map toPackage();
+	modelLayer := self.map toWorkflow();
 }
 
 mapping Model::toPackage(): PackageDefinition {
-	log("toPackage");
+	log(".toPackage");
 	
-	pkgName := "projectName.workflows" 
+	pkgName := safeVal(self.projectName, DEFAULT_PROJECT_NAME).toFirstUpper() + ".workflows";
+}
+
+mapping Model::toWorkflow(): Workflow {
+	workflowElementEntries := null;//TODO
+	apps := null;//TODO
+}
+
+helper Model::toWorkflowElementEntries(): Collection(WorkflowElementEntry) {
+	log(".toWorkflowElementEntries");
+	
+	var elements : Collection(WorkflowElement) := self.distinctWorkflowElements(); // initialize controller layer
+	elements->forEach(elem) {
+		elem.map toWorkflowElementEntry();
+	}
+}
+
+mapping WorkflowElement::toWorkflowElementEntry(): WorkflowElementEntry {
+	workflowElement := self;
+	invokable := self.isWorkflowElementInvokable();
+	eventDesc := safeVal(self.container().oclAsType(UseCase).description, saveVal(self.description, ""));
+}
+
+query WorkflowElement::isWorkflowElementInvokable(): Boolean {
+	if(self.previousElements->size() = 1 and self.previousElements->first()->oclisTypeOf(StartEvent)) then { // allow XOR as first element??
+		return true;
+	} endif;
+	return false;
 }

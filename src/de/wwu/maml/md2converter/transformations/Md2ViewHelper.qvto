@@ -151,16 +151,67 @@ helper ParameterConnector::toWriteAttribute(): OrderedSet(ViewGUIElement) {
 	
 	switch {
 		//TODO more
-		case (attribute.type.oclIsTypeOf(_String)) attribute.map toInputField();
+		case (attribute.type.oclIsTypeOf(_String)) return OrderedSet { attribute.map toTextInput() };
+		case (attribute.type.oclIsTypeOf(Integer)) return OrderedSet { attribute.map toIntegerInput() };		
+		case (attribute.type.oclIsTypeOf(Float)) return OrderedSet { attribute.map toNumberInput() };
+	//	case (self.oclIsTypeOf(_Boolean)) return self.oclAsType(_Boolean).map toPrimitiveBoolean(isCollection);
+	//	case (self.oclIsTypeOf(Date)) return self.oclAsType(Date).map toPrimitiveDate(isCollection);
+	//	case (self.oclIsTypeOf(Time)) return self.oclAsType(Time).map toPrimitiveTime(isCollection);
+	//	case (self.oclIsTypeOf(DateTime)) return self.oclAsType(DateTime).map toPrimitiveDateTime(isCollection);
+	//	case (self.oclIsTypeOf(File)) return self.oclAsType(File).map toPrimitiveFile(isCollection);
+		// MAML primitives to MD2 non-primitives
+	//	case (self.oclIsTypeOf(PhoneNumber)) return self.oclAsType(PhoneNumber).map toPrimitiveString(isCollection);
+	//	case (self.oclIsTypeOf(Url)) return self.oclAsType(Url).map toPrimitiveString(isCollection);
+	//	case (self.oclIsTypeOf(Email)) return self.oclAsType(Email).map toPrimitiveString(isCollection);
+		// Complex types
+	//	case (self.oclIsTypeOf(CustomType)) return self.oclAsType(CustomType).toReferencedType(isCollection);
+	//	case (self.oclIsTypeOf(_Collection)) return self.oclAsType(_Collection).type.toPrimitiveOrComplexAttributeType(true);
+	//	case (self.oclIsTypeOf(Enum)) return self.oclAsType(Enum).toReferencedType(isCollection);
+		
+		else return OrderedSet { attribute.map toTextInput() };
 	};
 	return OrderedSet{};
 }
 
-mapping MAMLgui::Attribute::toInputField(): InputElement {
+mapping MAMLgui::Attribute::toTextInput(): TextInput {
 	name := "writeAttribute".addSuffixNumber();
-	width := 60;
-	labelText := self.description; // Instead of explicit label?
+	width := 100;
+	labelText := self.description;
+	tooltipText := self.description; // makes sense for Android?
+	isDisabled := false;
+	type := TextInputType::INPUT; //TODO textarea
+	defaultValue := "";
 } 
+
+mapping MAMLgui::Attribute::toIntegerInput(): IntegerInput {
+	name := "writeAttribute".addSuffixNumber();
+	width := 100;
+	labelText := self.description;
+	tooltipText := self.description; // makes sense for Android?
+	isDisabled := false;
+	type := IntegerInputType::DEFAULT;
+	defaultValue := 0;
+}
+
+mapping MAMLgui::Attribute::toNumberInput(): NumberInput {
+	name := "writeAttribute".addSuffixNumber();
+	width := 100;
+	labelText := self.description;
+	tooltipText := self.description; // makes sense for Android?
+	isDisabled := false;
+	type := NumberInputType::DEFAULT;
+	defaultValue := 0;
+}
+
+mapping MAMLgui::Attribute::toBooleanInput(): BooleanInput {
+	name := "writeAttribute".addSuffixNumber();
+	width := 100;
+	labelText := self.description;
+	tooltipText := self.description; // makes sense for Android?
+	isDisabled := false;
+	type := BooleanInputType::DEFAULT;
+	defaultValue := 'false';
+}
 
 helper ProcessElement::getAttachedParameters(): Set(MAML::ParameterConnector) {
 	var useCase: UseCase := self.container().oclAsType(UseCase);

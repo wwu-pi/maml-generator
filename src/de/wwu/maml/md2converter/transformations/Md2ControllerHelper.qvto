@@ -46,3 +46,64 @@ mapping MD2::ModelElement::toContentProviderPathTail(attribute : ParameterConnec
 	
 	attributeRef := self.oclAsType(Entity).attributes->first(); // TODO wrong
 }
+
+helper Model::distinctWorkflowElements(): Collection(WorkflowElement) {
+	log(".distinctWorkflowElements");
+	
+	// initialize data model
+	self.distinctViewElementTypes();
+	
+	// One MD2-WFE and WFEvent for each MAML-PFE
+	self.useCases.processFlowElements[ProcessElement]->forEach(elem){
+		elem.toWorkflowElement();
+		elem.map toWorkflowEvent();
+	};
+	
+	return resolve(WorkflowElement);
+}
+
+mapping ProcessElement::toWorkflowEvent(): WorkflowEvent {
+	name := "Event".addSuffixNumber();
+}
+
+helper ProcessFlowElement::toWorkflowElement(): WorkflowElement {
+	switch {
+		case (self.oclIsKindOf(SelectEntity)) return self.oclAsType(SelectEntity).map toWorkflowElement();
+		// TODO others
+		// Skip Start/End Events and data sources
+	};
+	return null;
+}
+
+mapping SelectEntity::toWorkflowElement(): WorkflowElement {
+	log("..toWorkflowElement: " + self.description);
+	// TODO
+	name := self.metaClassName().toFirstUpper().addSuffixNumber();
+	initActions := self.map toInitAction(); //TODO
+	actions := null; //TODO
+	processChain := self.map toProcessChain(); //TODO
+	invoke := null; //TODO
+	defaultProcessChain := self.map toProcessChain(); //TODO	
+}
+
+mapping ProcessElement::toProcessChain(): ProcessChain {
+	log("...toProcessChain");
+	
+	name := self.metaClassName().toFirstUpper() + "ProcessChain".addSuffixNumber();
+	processChainSteps := self.map toProcessChainSteps(); // TODO
+}
+
+mapping ProcessElement::toProcessChainSteps(): ProcessChainStep {
+	log("...toProcessChainSteps");
+	
+	name := self.metaClassName().toFirstUpper() + "ProcessChain".addSuffixNumber();
+	view := self.lookupOrCreateViewElement().map toReferencedType();// TODO
+	gotos := null; // TODO
+	message := null; // Not explicitly modelled in MAML
+}
+
+mapping ProcessElement::toInitAction(): Action {
+	log("...toProcessChainSteps");
+	
+	name := "testAction"; // TODO
+}

@@ -31,9 +31,17 @@ query safeVal(value : String):String {
 	return safeVal(value, "");
 }
 
-query safeVal(value : String, defaultValue : String):String {
+query safeVal(value : String, defaultValue : String): String {
+	return safeVal(value, defaultValue, "");
+}
+
+query safeVal(value : String, fallbackValue : String, defaultValue : String): String {
 	if(value = null) then {
-		return defaultValue;
+		if(fallbackValue = null) then {
+			return defaultValue;
+		} endif;
+		return fallbackValue;
+		
 	} endif;
 	
 	return value;

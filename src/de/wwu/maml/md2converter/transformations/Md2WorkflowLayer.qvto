@@ -37,7 +37,7 @@ helper Model::toWorkflowElementEntries(): Collection(WorkflowElementEntry) {
 	self.distinctWorkflowElements(); // initialize controller layer
 
 	self.useCases.processFlowElements->forEach(elem) {
-		if(elem.oclIsTypeOf(ProcessElement) then {
+		if(elem.oclIsTypeOf(ProcessElement)) then {
 			entries += elem.oclAsType(ProcessElement).map toWorkflowElementEntry();
 		} endif;
 	};
@@ -48,18 +48,18 @@ helper Model::toWorkflowElementEntries(): Collection(WorkflowElementEntry) {
 mapping ProcessElement::toWorkflowElementEntry(): WorkflowElementEntry {
 	workflowElement := resolveone(elem : WorkflowElement | elem.name = self.description);
 	invokable := self.isWorkflowElementInvokable();
-	eventDesc := safeVal(self.container().oclAsType(UseCase).description, self.description, "");
+	eventDesc := safeVal(self.container().oclAsType(UseCase).title, self.description, "");
 	firedEvents := self.toFiredEvents();
 }
 
 query ProcessElement::isWorkflowElementInvokable(): Boolean {
-	if(self.previousElements->size() = 1 and self.previousElements->first()->oclisTypeOf(StartEvent)) then { // allow XOR as first element??
+	if(self.previousElements->size() = 1 and self.previousElements->first().sourceProcessFlowElement.oclIsTypeOf(ProcessStartEvent)) then { // allow XOR as first element??
 		return true;
 	} endif;
 	return false;
 }
 
-helper ProcessElement::toFiredEvents(): Collection(FiredEventEntry) {
+helper ProcessElement::toFiredEvents(): Collection(FireEventEntry) {
 	if(self.getNextProcessElements()->size() = 0) then {
 		// No follower -> end process
 		return self.map toEndEvent();
@@ -74,40 +74,40 @@ query ProcessElement::getNextProcessElements(): Collection(ProcessElement) {
 		return Set {};
 	} endif;
 	
-	var result : Collection(ProcessElement) := OrderedSet {};
+	var collect : Collection(ProcessElement) := OrderedSet {};
 	
 	// TODO Error process flows?
-	self.nextElements.targetElement->forEach(elem) {
+	self.nextElements.targetProcessFlowElement->forEach(elem) {
 		if(self.oclIsKindOf(ProcessElement)) then {
-			result += elem.oclAsType(ProcessElement);
+			collect += elem.oclAsType(ProcessElement);
 		} else {
 			// Else no real process element, e.g. end, xor, datasource -> get transitive follower
-			result += elem.getNextProcessElements();
+			collect += elem.oclAsType(ProcessElement).getNextProcessElements();
 		} endif;
 	};
 
-	return result;
+	return collect;
 }
 
-mapping ProcessElement::toFiredEvent(origin : ProcessElement): FiredEventEntry {
+mapping ProcessElement::toFiredEvent(origin : ProcessElement): FireEventEntry {
 	event := origin.resolveone(WorkflowEvent);
 	startedWorkflowElement := self;
 	endWorkflow := false;
 }
 
-mapping ProcessElement::toEndEvent(): FiredEventEntry {
+mapping ProcessElement::toEndEvent(): FireEventEntry {
 	event := self.resolveone(WorkflowEvent);
 	endWorkflow := true;
 }
 
 helper Model::toApps(): Collection(App) {
-	self.roles->map toApp(); // TODO existiert attribut und ist gesetzt?
+	return self.roles->map toApp(); // TODO existiert attribut und ist gesetzt?
 }
 
 mapping Role::toApp(): App {
-	name := safeVal(self.projectName, DEFAULT_PROJECT_NAME).toFirstUpper() + "_" + safeVal(role.name);
+	name := safeVal(self.projectName, DEFAULT_PROJECT_NAME).toFirstUpper() + "_" + safeVal(self.name);
 	workflowElements := self.getWorkflowElements()->map toWorkflowElementReference();
-	defaultConnection
+	defaultConnection := null; // TODO
 	appName := safeVal(self.projectName, DEFAULT_PROJECT_NAME).toFirstUpper() + " (" + safeVal(role.name) + ")"
 }
 
@@ -119,7 +119,7 @@ mapping WorkflowElement::toWorkflowElementReference(): WorkflowElementReference 
 	workflowElementReference := self;
 	startable := self.isStartable();
 	if(self.isStartable()) then {
-		alias := safeVal(self.getUseCase().description);
+		alias := safeVal(self.getUseCase().title);
 	} endif;
 }
 
@@ -127,7 +127,7 @@ query WorkflowElement::isStartable(): Boolean {
 	return true; //TODO
 }
 
-query WorkflowElement::getUseCase()
+query WorkflowElement::getUseCase(): UseCase {
 	var pe : ProcessElement := self.invresolveone(ProcessElement);
-	return pe.container();
+	return pe.container().oclAsType(UseCase);
 }

@@ -57,7 +57,7 @@ mapping DataType::toEnum(): MD2::Enum {
 	name := self.metaClassName().toFirstUpper();
 }
 
-helper MAMLdata::Attribute::toPrimitiveOrComplexAttribute(): MD2::Attribute {
+helper Property::toPrimitiveOrComplexAttribute(): MD2::Attribute {
 	log("...toPrimitiveOrComplexAttributeType: Attribute " + self.name);
 	
 	return self.map toAttribute();
@@ -201,7 +201,7 @@ mapping MD2::ModelElement::toReferencedType(isCollection : Boolean): ReferencedT
 }
 
 
-mapping MAMLdata::Attribute::toAttribute(): MD2::Attribute {
+mapping MAMLdata::Property::toAttribute(): MD2::Attribute {
 	log("...toAttribute: " + self.name.toFirstLower());
 	
 	name := self.name.toFirstLower();

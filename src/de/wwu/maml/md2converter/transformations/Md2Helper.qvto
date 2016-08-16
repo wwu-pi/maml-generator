@@ -47,6 +47,26 @@ query safeVal(value : String, fallbackValue : String, defaultValue : String): St
 	return value;
 }
 
+query Collection(String)::join(): String {
+	return self->join(", ");
+}
+
+query Collection(String)::join(delimiter : String): String {
+	var output : String;
+	
+	var counter : Integer := 0;
+	self->forEach(elem){
+		output := output + elem;
+		counter := counter + 1;
+		
+		if(counter < self->size()) then {
+			output := output + delimiter;
+		} endif;
+	};
+	
+	return output;
+}
+
 // DEBUG
 query _debug(s : String) : String {
 	log(s);

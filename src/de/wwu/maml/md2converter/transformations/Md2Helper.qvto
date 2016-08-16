@@ -20,11 +20,11 @@ helper MAML::Model::getRemoteConnection(name : String): RemoteConnection {
 
 // String helper functions
 helper String::toFirstUpper():String {
-	return self; // TODO
+	return self.characters()->first().toUpperCase() + self.characters()->subSequence(2, self.characters()->size())->join();
 }
 
 helper String::toFirstLower():String {
-	return self; // TODO
+	return self.characters()->first().toLowerCase() + self.characters()->subSequence(2, self.characters()->size())->join();
 }
 
 query safeVal(value : String):String {
@@ -48,7 +48,7 @@ query safeVal(value : String, fallbackValue : String, defaultValue : String): St
 }
 
 query Collection(String)::join(): String {
-	return self->join(", ");
+	return self->join("");
 }
 
 query Collection(String)::join(delimiter : String): String {
@@ -65,6 +65,10 @@ query Collection(String)::join(delimiter : String): String {
 	};
 	
 	return output;
+}
+
+query String::noWhiteSpace(): String {
+	return self.tokenize(" ")->toFirstUpper()->join("");
 }
 
 // DEBUG

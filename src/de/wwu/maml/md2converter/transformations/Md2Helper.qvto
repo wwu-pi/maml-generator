@@ -20,7 +20,7 @@ helper MAML::Model::getRemoteConnection(name : String): RemoteConnection {
 
 // String helper functions
 helper String::toFirstUpper():String {
-	return self.characters()->first().toUpperCase() + self.characters()->subSequence(2, self.characters()->size())->join();
+	return self.firstToUpper();//self.characters()->first().toUpperCase() + self.characters()->subSequence(2, self.characters()->size())->join();
 }
 
 helper String::toFirstLower():String {
@@ -69,6 +69,10 @@ query Collection(String)::join(delimiter : String): String {
 
 query String::noWhiteSpace(): String {
 	return self.tokenize(" ")->toFirstUpper()->join("");
+}
+
+query String::toName(): String {
+	return self.noWhiteSpace().toFirstUpper();
 }
 
 // DEBUG

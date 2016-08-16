@@ -24,9 +24,9 @@ helper Model::distinctWorkflowElements(): Collection(WorkflowElement) {
 }
 
 mapping ProcessElement::toWorkflowEvent(): WorkflowEvent {
-	log("..toWorkflowEvent: " + self.description.noWhiteSpace());
+	log("..toWorkflowEvent: " + self.description.toName());
 	
-	name := self.description.noWhiteSpace() + "Event";
+	name := self.description.toName() + "Event";
 }
 
 helper ProcessFlowElement::toWorkflowElement(): WorkflowElement {
@@ -40,40 +40,40 @@ helper ProcessFlowElement::toWorkflowElement(): WorkflowElement {
 }
 
 mapping SelectEntity::toWorkflowElement(): WorkflowElement {
-	log("..toWorkflowElement: " + self.description);
+	log("..toWorkflowElement: " + self.description.toName());
 	// TODO
-	name := self.metaClassName().toFirstUpper().addSuffixNumber();
+	name := self.description.toName().addSuffixNumber();
 	initActions := self.map toInitAction(); //TODO
 	actions := self.map toInitAction(); //TODO
 	processChain := self.map toProcessChain(); //TODO
-	invoke := null; //TODO
+	invoke := null; // Not explicitly modelled in MAML
 	defaultProcessChain := self.map toProcessChain(); //TODO	
 }
 
 mapping ShowEntity::toWorkflowElement(): WorkflowElement {
-	log("..toWorkflowElement: " + self.description);
+	log("..toWorkflowElement: " + self.description.toName());
 	// TODO
-	name := self.metaClassName().toFirstUpper().addSuffixNumber();
+	name := self.description.toName().addSuffixNumber();
 	initActions := self.map toInitAction(); //TODO
 	actions := self.map toInitAction(); //TODO
 	processChain := self.map toProcessChain(); //TODO
-	invoke := null; //TODO
+	invoke := null; // Not explicitly modelled in MAML
 	defaultProcessChain := self.map toProcessChain(); //TODO	
 }
 
 mapping ProcessElement::toProcessChain(): ProcessChain {
 	log("...toProcessChain");
 	
-	name := self.metaClassName().toFirstUpper() + "ProcessChain".addSuffixNumber();
+	name := self.description.toName() + "ProcessChain".addSuffixNumber();
 	processChainSteps := self.map toProcessChainSteps(); // TODO
 }
 
 mapping ProcessElement::toProcessChainSteps(): ProcessChainStep {
 	log("...toProcessChainSteps");
 	
-	name := self.metaClassName().toFirstUpper() + "ProcessChain".addSuffixNumber();
+	name := self.description.toName() + "Step".addSuffixNumber();
 	view := self.lookupOrCreateViewElement().map toReferencedType();// TODO
-	gotos := null; // TODO
+	gotos := null; // Done via workflow events
 	message := null; // Not explicitly modelled in MAML
 }
 

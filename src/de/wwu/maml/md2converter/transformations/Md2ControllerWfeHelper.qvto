@@ -85,7 +85,7 @@ mapping ProcessElement::toInitAction(): CustomAction {
 }
 
 mapping ProcessElement::toEventBindingTask(): EventBindingTask {
-	actions := self.map toFireEventAction().map toSimpleActionRef();
+	actions := self.map toFireEventAction().toSimpleActionRef();
 	events := Set { object GlobalEventRef { GlobalEventType::ON_CONNECTION_LOST } }; //TODO
 }
 
@@ -93,6 +93,33 @@ mapping ProcessElement::toFireEventAction(): FireEventAction {
 	workflowEvent := self.map toWorkflowEvent();
 }
 
-mapping MD2::SimpleAction::toSimpleActionRef(): SimpleActionRef {
-	action := self;
+helper DataType::toContentProviderOperationActionCreateUpdate(): ContentProviderOperationAction {
+	return object ContentProviderOperationAction { 
+		operation := AllowedOperation::CREATE_OR_UPDATE; 
+		contentProvider := self.resolveone(ContentProvider).toContentProviderReference(); //TODO check
+	};
+}
+
+helper DataType::toContentProviderOperationActionRead(): ContentProviderOperationAction {
+	return object ContentProviderOperationAction { 
+		operation := AllowedOperation::READ; 
+		contentProvider := self.resolveone(ContentProvider).toContentProviderReference(); //TODO check
+	};
+}
+
+helper DataType::toContentProviderOperationActionDelete(): ContentProviderOperationAction {
+	return object ContentProviderOperationAction { 
+		operation := AllowedOperation::DELETE; 
+		contentProvider := self.resolveone(ContentProvider).toContentProviderReference(); //TODO check
+	};
+}
+
+helper DataType::toContentProviderResetAction(): ContentProviderResetAction {
+	return object ContentProviderResetAction { 
+		contentProvider := self.resolveone(ContentProvider).toContentProviderReference(); //TODO check
+	};
+}
+
+helper MD2::SimpleAction::toSimpleActionRef(): SimpleActionRef {
+	return object SimpleActionRef { action := self; };
 }

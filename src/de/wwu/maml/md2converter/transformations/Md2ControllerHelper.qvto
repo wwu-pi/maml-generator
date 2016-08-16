@@ -19,7 +19,7 @@ helper Model::distinctContentProviders(): Collection(ContentProvider) {
 	return resolve(ContentProvider);
 }
 
-mapping MD2::Entity::toContentProvider(rootModel : Model): ContentProvider {
+mapping MD2::Entity::toContentProvider(rootModel : Model): ContentProvider { // TODO mapping schlecht
 	log(".toContentProvider: " + self.name);
 
 	type := self.map toReferencedModelType(false);
@@ -45,4 +45,10 @@ mapping MD2::ModelElement::toContentProviderPathTail(attribute : ParameterConnec
 	log("CP path wrong!");
 	
 	attributeRef := self.oclAsType(Entity).attributes->first(); // TODO wrong
+}
+
+helper ContentProvider::toContentProviderReference(): ContentProviderReference {
+	return object ContentProviderReference { 
+		contentProvider := self;
+	};
 }

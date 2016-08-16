@@ -210,11 +210,13 @@ mapping MAMLdata::Property::toAttribute(): MD2::Attribute {
 	description := null; // Not explicitly modelled in MAML
 }
 
-mapping MD2::Entity::toReferencedModelType(isCollection : Boolean): ReferencedModelType{
+helper MD2::Entity::toReferencedModelType(isCollection : Boolean): ReferencedModelType {
 	log("....toDataType");
 	
-	many := isCollection;
-	entity := self;
+	return object ReferencedModelType {
+		many := isCollection;
+		entity := self;
+	}
 }
 
 helper DataTypeLiteral::toCustomType(): CustomType {

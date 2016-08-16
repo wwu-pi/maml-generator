@@ -30,14 +30,12 @@ mapping Model::toWorkflow(): Workflow {
 }
 
 helper Model::toWorkflowElementEntries(): Collection(WorkflowElementEntry) {
-	log(".toWorkflowElementEntries");
-	
 	var entries: Collection(WorkflowElementEntry) := Set {};
 	
 	self.distinctWorkflowElements(); // initialize controller layer
 
 	self.useCases.processFlowElements->forEach(elem) {
-		if(elem.oclIsTypeOf(ProcessElement)) then {
+		if(elem.oclIsKindOf(ProcessElement)) then {
 			entries += elem.oclAsType(ProcessElement).map toWorkflowElementEntry();
 		} endif;
 	};
@@ -46,9 +44,11 @@ helper Model::toWorkflowElementEntries(): Collection(WorkflowElementEntry) {
 }
 
 mapping ProcessElement::toWorkflowElementEntry(): WorkflowElementEntry {
-	workflowElement := resolveone(elem : WorkflowElement | elem.name = self.description);
+	log(".toWorkflowElementEntry: " + self.description);
+	
+	workflowElement := self.resolveone(elem : WorkflowElement);
 	invokable := self.isWorkflowElementInvokable();
-	eventDesc := safeVal(self.container().oclAsType(UseCase).title, self.description, "");
+	eventDesc := if(self.isWorkflowElementInvokable()) then { safeVal(self.container().oclAsType(UseCase).title, self.description, "") } endif;
 	firedEvents := self.toFiredEvents();
 }
 
@@ -60,6 +60,8 @@ query ProcessElement::isWorkflowElementInvokable(): Boolean {
 }
 
 helper ProcessElement::toFiredEvents(): Collection(FireEventEntry) {
+	log("..toFiredEvents: " + self.getNextProcessElements()->size().toString() + " events");
+	
 	if(self.getNextProcessElements()->size() = 0) then {
 		// No follower -> end process
 		return Set { self.map toEndEvent() };
@@ -69,33 +71,36 @@ helper ProcessElement::toFiredEvents(): Collection(FireEventEntry) {
 	} endif;
 }
 
-query ProcessElement::getNextProcessElements(): Collection(ProcessElement) {
+query ProcessFlowElement::getNextProcessElements(): Collection(ProcessElement) {
 	if(self.nextElements->size() = 0) then {
 		return Set {};
 	} endif;
 	
 	var collect : Collection(ProcessElement) := OrderedSet {};
 	
-	// TODO Error process flows?
+	// TODO include Error process flows and special events
 	self.nextElements.targetProcessFlowElement->forEach(elem) {
-		if(self.oclIsKindOf(ProcessElement)) then {
+		if(elem.oclIsKindOf(ProcessElement)) then {
 			collect += elem.oclAsType(ProcessElement);
 		} else {
-			// Else no real process element, e.g. end, xor, datasource -> get transitive follower
-			collect += elem.oclAsType(ProcessElement).getNextProcessElements();
+			// Else no real process element, e.g. end, xor, datasource -> get transitive followers
+			collect += elem.getNextProcessElements();
 		} endif;
 	};
-
 	return collect;
 }
 
 mapping ProcessElement::toFiredEvent(origin : ProcessElement): FireEventEntry {
+	log("...toFiredEvent");
+	
 	event := origin.resolveone(WorkflowEvent);
-	startedWorkflowElement := resolveone(elem : WorkflowElement | elem.name = self.description);
+	startedWorkflowElement := self.resolveone(WorkflowElement);
 	endWorkflow := false;
 }
 
 mapping ProcessElement::toEndEvent(): FireEventEntry {
+	log("...toEndEvent");
+	//log(self.resolve(WorkflowEvent).toString()->join());
 	event := self.resolveone(WorkflowEvent);
 	endWorkflow := true;
 }
@@ -105,10 +110,12 @@ helper Model::toApps(): Collection(App) {
 }
 
 query Model::getDistinctRoles(): Collection(Role) {
-	return Set{}; // TODO
+	return self.useCases.roles->asSet();
 }
 
 mapping Role::toApp(): App {
+	log(".toApp");
+	
 	name := safeVal(self.container().container().oclAsType(Model).projectName, DEFAULT_PROJECT_NAME).toFirstUpper() + "_" + safeVal(self.name);
 	workflowElements := self.getWorkflowElements()->map toWorkflowElementReference();
 	defaultConnection := self.container().container().oclAsType(Model).getRemoteConnection(self.container().container().oclAsType(Model).getDefaultConnectionName());
@@ -116,7 +123,12 @@ mapping Role::toApp(): App {
 }
 
 query Role::getWorkflowElements(): Collection(WorkflowElement) {
-	return null; //TODO
+	var outcome : Collection(WorkflowElement) := Set{};
+	
+	self.container().container().oclAsType(Model).useCases.processFlowElements[ProcessElement]->forEach(elem){
+		outcome += elem.resolveone(WorkflowElement);
+	};
+	return outcome;
 }
 
 mapping WorkflowElement::toWorkflowElementReference(): WorkflowElementReference {
@@ -128,7 +140,7 @@ mapping WorkflowElement::toWorkflowElementReference(): WorkflowElementReference 
 }
 
 query WorkflowElement::isStartable(): Boolean {
-	return true; //TODO
+	return invresolveone(ProcessElement).isWorkflowElementInvokable(); //TODO check
 }
 
 query WorkflowElement::getUseCase(): UseCase {

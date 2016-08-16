@@ -18,19 +18,21 @@ helper Model::distinctWorkflowElements(): Collection(WorkflowElement) {
 	// One MD2-WFE and WFEvent for each MAML-PFE
 	self.useCases.processFlowElements[ProcessElement]->forEach(elem){
 		elem.toWorkflowElement();
-		elem.map toWorkflowEvent();
 	};
 	
 	return resolve(WorkflowElement);
 }
 
 mapping ProcessElement::toWorkflowEvent(): WorkflowEvent {
-	name := "Event".addSuffixNumber();
+	log("..toWorkflowEvent: " + self.description.noWhiteSpace());
+	
+	name := self.description.noWhiteSpace() + "Event";
 }
 
 helper ProcessFlowElement::toWorkflowElement(): WorkflowElement {
 	switch {
 		case (self.oclIsKindOf(SelectEntity)) return self.oclAsType(SelectEntity).map toWorkflowElement();
+		case (self.oclIsKindOf(ShowEntity)) return self.oclAsType(ShowEntity).map toWorkflowElement();
 		// TODO others
 		// Skip Start/End Events and data sources
 	};
@@ -42,7 +44,18 @@ mapping SelectEntity::toWorkflowElement(): WorkflowElement {
 	// TODO
 	name := self.metaClassName().toFirstUpper().addSuffixNumber();
 	initActions := self.map toInitAction(); //TODO
-	actions := null; //TODO
+	actions := self.map toInitAction(); //TODO
+	processChain := self.map toProcessChain(); //TODO
+	invoke := null; //TODO
+	defaultProcessChain := self.map toProcessChain(); //TODO	
+}
+
+mapping ShowEntity::toWorkflowElement(): WorkflowElement {
+	log("..toWorkflowElement: " + self.description);
+	// TODO
+	name := self.metaClassName().toFirstUpper().addSuffixNumber();
+	initActions := self.map toInitAction(); //TODO
+	actions := self.map toInitAction(); //TODO
 	processChain := self.map toProcessChain(); //TODO
 	invoke := null; //TODO
 	defaultProcessChain := self.map toProcessChain(); //TODO	
@@ -64,8 +77,22 @@ mapping ProcessElement::toProcessChainSteps(): ProcessChainStep {
 	message := null; // Not explicitly modelled in MAML
 }
 
-mapping ProcessElement::toInitAction(): Action {
+mapping ProcessElement::toInitAction(): CustomAction {
 	log("...toProcessChainSteps");
 	
-	name := "testAction"; // TODO
+	name := "testAction".addSuffixNumber(); // TODO
+	codeFragments := Set { self.map toEventBindingTask() };
+}
+
+mapping ProcessElement::toEventBindingTask(): EventBindingTask {
+	actions := self.map toFireEventAction().map toSimpleActionRef();
+	events := Set { object GlobalEventRef { GlobalEventType::ON_CONNECTION_LOST } }; //TODO
+}
+
+mapping ProcessElement::toFireEventAction(): FireEventAction {
+	workflowEvent := self.map toWorkflowEvent();
+}
+
+mapping MD2::SimpleAction::toSimpleActionRef(): SimpleActionRef {
+	action := self;
 }

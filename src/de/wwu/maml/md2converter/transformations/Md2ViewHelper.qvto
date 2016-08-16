@@ -121,7 +121,7 @@ mapping ProcessElement::toTable(attributes : Collection(ParameterConnector)): MD
 	log("...toTable");
 	
 	name := "table".addSuffixNumber();
-	textProposition := self.dataType.lookupOrCreate().map toContentProviderPath(attributes->asOrderedSet()->first()); // TODO fix
+	textProposition := self.dataType.lookupOrCreate().toContentProviderPath(attributes->asOrderedSet()->first()); // TODO fix
 }
 
 mapping ParameterConnector::toReadAttribute(): FlowLayoutPane {

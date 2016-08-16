@@ -65,32 +65,38 @@ mapping ProcessElement::toProcessChain(): ProcessChain {
 	log("...toProcessChain");
 	
 	name := self.description.toName() + "ProcessChain".addSuffixNumber();
-	processChainSteps := self.map toProcessChainSteps(); // TODO
+	processChainSteps := self.toProcessChainSteps();
 }
 
-mapping ProcessElement::toProcessChainSteps(): ProcessChainStep {
+helper ProcessElement::toProcessChainSteps(): ProcessChainStep {
 	log("...toProcessChainSteps");
 	
-	name := self.description.toName() + "Step".addSuffixNumber();
-	view := self.lookupOrCreateViewElement().map toReferencedType();// TODO
-	gotos := null; // Done via workflow events
-	message := null; // Not explicitly modelled in MAML
+	return object ProcessChainStep {
+		name := self.description.toName() + "Step".addSuffixNumber();
+		view := self.lookupOrCreateViewElement().map toReferencedType();// TODO
+		gotos := null; // Done via workflow events
+		message := null; // Not explicitly modelled in MAML
+	};
 }
 
 mapping ProcessElement::toInitAction(): CustomAction {
 	log("...toProcessChainSteps");
 	
 	name := "testAction".addSuffixNumber(); // TODO
-	codeFragments := Set { self.map toEventBindingTask() };
+	codeFragments := Set { self.toEventBindingTask() };
 }
 
-mapping ProcessElement::toEventBindingTask(): EventBindingTask {
-	actions := self.map toFireEventAction().toSimpleActionRef();
-	events := Set { object GlobalEventRef { GlobalEventType::ON_CONNECTION_LOST } }; //TODO
+helper ProcessElement::toEventBindingTask(): EventBindingTask {
+	return object EventBindingTask {
+		actions := self.map toFireEventAction().toSimpleActionRef();
+		events := Set { object GlobalEventRef { GlobalEventType::ON_CONNECTION_LOST } }; //TODO
+	}
 }
 
-mapping ProcessElement::toFireEventAction(): FireEventAction {
-	workflowEvent := self.map toWorkflowEvent();
+helper ProcessElement::toFireEventAction(): FireEventAction {
+	return object FireEventAction {
+		workflowEvent := self.map toWorkflowEvent();
+	}
 }
 
 helper DataType::toContentProviderOperationActionCreateUpdate(): ContentProviderOperationAction {

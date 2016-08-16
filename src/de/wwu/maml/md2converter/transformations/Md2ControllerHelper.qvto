@@ -12,17 +12,17 @@ helper Model::distinctContentProviders(): Collection(ContentProvider) {
 	// initialize data model
 	self.distinctModelElements();
 	
-	resolve(Entity)->forEach(entity) {
+	self.useCases.dataTypes[CustomType]->forEach(entity) {
 		entity.map toContentProvider(self);
 	};
 	
 	return resolve(ContentProvider);
 }
 
-mapping MD2::Entity::toContentProvider(rootModel : Model): ContentProvider { // TODO mapping schlecht
+mapping CustomType::toContentProvider(rootModel : Model): ContentProvider { // TODO mapping schlecht
 	log(".toContentProvider: " + self.name);
 
-	type := self.map toReferencedModelType(false);
+	type := self.resolveone(Entity).toReferencedModelType(false); //TODO check
 	name := self.name.toFirstUpper() + "Provider";
 	_default := false; // Not explicitly modelled in MAML
 	local:= false; // TODO
@@ -33,18 +33,21 @@ mapping MD2::Entity::toContentProvider(rootModel : Model): ContentProvider { // 
 	_readonly := false; // Not explicitly modelled in MAML
 }
 
-mapping MD2::ModelElement::toContentProviderPath(attribute : ParameterConnector): ContentProviderPath {
+helper MD2::ModelElement::toContentProviderPath(attribute : ParameterConnector): ContentProviderPath {
 	log("...toContentProviderPath: " + self.name);
 	
-	contentProviderRef := resolveone(cp : ContentProvider | cp.type.oclAsType(ReferencedModelType).entity.name = self.oclAsType(Entity).name);
-	
-	tail := self.map toContentProviderPathTail(attribute);
+	return object ContentProviderPath {
+		contentProviderRef := resolveone(cp : ContentProvider | cp.type.oclAsType(ReferencedModelType).entity.name = self.oclAsType(Entity).name);
+		tail := self.toContentProviderPathTail(attribute);
+	}
 }
 
-mapping MD2::ModelElement::toContentProviderPathTail(attribute : ParameterConnector): PathTail {
+helper MD2::ModelElement::toContentProviderPathTail(attribute : ParameterConnector): PathTail {
 	log("CP path wrong!");
 	
-	attributeRef := self.oclAsType(Entity).attributes->first(); // TODO wrong
+	return object PathTail {
+		attributeRef := self.oclAsType(Entity).attributes->first(); // TODO wrong
+	}
 }
 
 helper ContentProvider::toContentProviderReference(): ContentProviderReference {

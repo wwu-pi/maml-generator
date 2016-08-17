@@ -52,13 +52,6 @@ mapping ProcessElement::toWorkflowElementEntry(): WorkflowElementEntry {
 	firedEvents := self.toFiredEvents();
 }
 
-query ProcessElement::isWorkflowElementInvokable(): Boolean {
-	if(self.previousElements->size() = 1 and self.previousElements->first().sourceProcessFlowElement.oclIsTypeOf(ProcessStartEvent)) then { // allow XOR as first element??
-		return true;
-	} endif;
-	return false;
-}
-
 helper ProcessElement::toFiredEvents(): Collection(FireEventEntry) {
 	log("..toFiredEvents: " + self.getNextProcessElements()->size().toString() + " events");
 	
@@ -87,6 +80,47 @@ mapping ProcessElement::toEndEvent(): FireEventEntry {
 	endWorkflow := true;
 }
 
+helper Model::toApps(): Collection(App) {
+	return self.getDistinctRoles()->map toApp(); // TODO existiert attribut und ist gesetzt?
+}
+
+mapping Role::toApp(): App {
+	log(".toApp");
+	
+	name := safeVal(self.container().container().oclAsType(Model).projectName, DEFAULT_PROJECT_NAME).toFirstUpper() + "_" + safeVal(self.name);
+	workflowElements := self.getWorkflowElements()->toWorkflowElementReference();
+	defaultConnection := self.container().container().oclAsType(Model).getRemoteConnection(self.container().container().oclAsType(Model).getDefaultConnectionName());
+	appName := safeVal(self.container().container().oclAsType(Model).projectName, DEFAULT_PROJECT_NAME).toFirstUpper() + " (" + safeVal(self.name) + ")"
+}
+
+helper MD2::WorkflowElement::toWorkflowElementReference(): WorkflowElementReference {
+	return object WorkflowElementReference {
+		workflowElementReference := self;
+		startable := self.isStartable();
+		if(self.isStartable()) then {
+			alias := safeVal(self.getUseCase().title);
+		} endif;
+	}
+}
+
+//////////////////////////////////////////////////////////////////////
+///////// Queries ////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+
+// Is the process element the first element within the process
+query ProcessElement::isWorkflowElementInvokable(): Boolean { // TODO make transitive to skip first datasource etc.
+	if(self.previousElements->size() = 1 and self.previousElements->first().sourceProcessFlowElement.oclIsTypeOf(ProcessStartEvent)) then { // allow XOR as first element??
+		return true;
+	} endif;
+	return false;
+}
+
+// Inverse to isWorkflowElementInvokable from MD2::WFE perspective
+query MD2::WorkflowElement::isStartable(): Boolean {
+	return invresolveone(ProcessElement).isWorkflowElementInvokable(); //TODO check
+}
+
+// Get the following ProcessElement (i.e. find transitive followers through Events, XORs, ...)
 query ProcessFlowElement::getNextProcessElements(): Collection(ProcessElement) {
 	if(self.nextElements->size() = 0) then {
 		return Set {};
@@ -106,46 +140,22 @@ query ProcessFlowElement::getNextProcessElements(): Collection(ProcessElement) {
 	return collect;
 }
 
-helper Model::toApps(): Collection(App) {
-	return self.getDistinctRoles()->map toApp(); // TODO existiert attribut und ist gesetzt?
-}
-
+// Get a distinct set of roles across multiple use cases
 query Model::getDistinctRoles(): Collection(Role) {
-	return self.useCases.roles->asSet();
+	return self.useCases.roles->asSet(); // TODO check uniqueness
 }
 
-mapping Role::toApp(): App {
-	log(".toApp");
-	
-	name := safeVal(self.container().container().oclAsType(Model).projectName, DEFAULT_PROJECT_NAME).toFirstUpper() + "_" + safeVal(self.name);
-	workflowElements := self.getWorkflowElements()->toWorkflowElementReference();
-	defaultConnection := self.container().container().oclAsType(Model).getRemoteConnection(self.container().container().oclAsType(Model).getDefaultConnectionName());
-	appName := safeVal(self.container().container().oclAsType(Model).projectName, DEFAULT_PROJECT_NAME).toFirstUpper() + " (" + safeVal(self.name) + ")"
-}
-
+// Get all WFE for a given role across multiple use cases
 query Role::getWorkflowElements(): Collection(WorkflowElement) {
 	var outcome : Collection(WorkflowElement) := Set{};
 	
 	self.container().container().oclAsType(Model).useCases.processFlowElements[ProcessElement]->forEach(elem){
-		outcome += elem.resolveone(WorkflowElement);
+		outcome += elem.resolveone(WorkflowElement); // TODO check that role is assigned to this PE
 	};
 	return outcome;
 }
 
-helper MD2::WorkflowElement::toWorkflowElementReference(): WorkflowElementReference {
-	return object WorkflowElementReference {
-		workflowElementReference := self;
-		startable := self.isStartable();
-		if(self.isStartable()) then {
-			alias := safeVal(self.getUseCase().title);
-		} endif;
-	}
-}
-
-query MD2::WorkflowElement::isStartable(): Boolean {
-	return invresolveone(ProcessElement).isWorkflowElementInvokable(); //TODO check
-}
-
+// Retrieve inverse use case for WFE
 query MD2::WorkflowElement::getUseCase(): MAML::UseCase {
 	var pe : ProcessElement := self.invresolveone(ProcessElement);
 	return pe.container().oclAsType(UseCase);

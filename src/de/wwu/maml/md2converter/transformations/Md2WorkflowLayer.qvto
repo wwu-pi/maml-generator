@@ -26,7 +26,7 @@ mapping Model::toPackage(): PackageDefinition {
 
 mapping Model::toWorkflow(): Workflow {
 	workflowElementEntries := self.toWorkflowElementEntries();
-	apps := self.toApps();
+	apps := self.getDistinctRoles()->map toApp();
 }
 
 helper Model::toWorkflowElementEntries(): Collection(WorkflowElementEntry) {
@@ -78,10 +78,6 @@ mapping ProcessElement::toEndEvent(): FireEventEntry {
 	
 	event := self.resolveone(WorkflowEvent);
 	endWorkflow := true;
-}
-
-helper Model::toApps(): Collection(App) {
-	return self.getDistinctRoles()->map toApp(); // TODO existiert attribut und ist gesetzt?
 }
 
 mapping Role::toApp(): App {
@@ -139,14 +135,10 @@ query ProcessFlowElement::getNextProcessElements(): Collection(ProcessElement) {
 	};
 	return collect;
 }
-intermediate class A { id : String };
-constructor A::A(_id : String) { result.id := _id; }
 
 // Get a distinct set of roles across multiple use cases
 query Model::getDistinctRoles(): Collection(Role) {
-log("LALA"+distinct(self.useCases.roles, self.useCases.roles.name)->oclAsType(Role).name->join());
 	return distinct(self.useCases.roles, self.useCases.roles.name)->oclAsType(Role);
-	//return self.useCases.roles->asSet(); // TODO check uniqueness
 }
 
 // Get all WFE for a given role across multiple use cases

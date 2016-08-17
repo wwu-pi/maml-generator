@@ -99,9 +99,7 @@ query distinct(elems: Collection(OclAny), byDistinctValue: Collection(OclAny)): 
 	var output : Set(OclAny);
 
 	Sequence{1..input->size()}->forEach(index){
-//	log(currentDistinctValues->union(Set {  input.second->at(index) }). join(","));
-//	log(currentDistinctValues->union(Set {  input.second->at(index) })->isUnique(elem : OclAny | elem));
-		if(currentDistinctValues->union(Set {  input.second->at(index) })->isUnique(elem : OclAny | elem)) then {
+		if(currentDistinctValues->size() < currentDistinctValues->union(Set {  input.second->at(index) })->size()) then {
 			currentDistinctValues += input.second->at(index);
 			output += input.first->at(index);
 		} endif;

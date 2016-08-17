@@ -64,7 +64,7 @@ mapping ShowEntity::toWorkflowElement(): WorkflowElement {
 mapping ProcessElement::toProcessChain(): ProcessChain {
 	log("...toProcessChain");
 	
-	name := self.description.toName() + "ProcessChain".addSuffixNumber();
+	name := "ProcessChain" + self.description.toName();
 	processChainSteps := self.toProcessChainSteps();
 }
 
@@ -72,24 +72,28 @@ helper ProcessElement::toProcessChainSteps(): ProcessChainStep {
 	log("...toProcessChainSteps");
 	
 	return object ProcessChainStep {
-		name := self.description.toName() + "Step".addSuffixNumber();
-		view := self.lookupOrCreateViewElement().map toReferencedType();// TODO
+		name := "Step" + self.description.toName();
+		view := self.lookupOrCreateViewElement().toReferencedType();// TODO
 		gotos := null; // Done via workflow events
 		message := null; // Not explicitly modelled in MAML
 	};
 }
 
 mapping ProcessElement::toInitAction(): CustomAction {
-	log("...toProcessChainSteps");
+	log("...toInitAction");
 	
-	name := "testAction".addSuffixNumber(); // TODO
+	name := "initAction" + self.description.toName();
 	codeFragments := Set { self.toEventBindingTask() };
 }
 
 helper ProcessElement::toEventBindingTask(): EventBindingTask {
 	return object EventBindingTask {
 		actions := self.map toFireEventAction().toSimpleActionRef();
-		events := Set { object GlobalEventRef { GlobalEventType::ON_CONNECTION_LOST } }; //TODO
+		events := Set { object ViewElementEventRef {
+						referencedField := self.resolveone(Button).toReferencedType();
+						event := ElementEventType::ON_CLICK;
+					} 
+		};
 	}
 }
 

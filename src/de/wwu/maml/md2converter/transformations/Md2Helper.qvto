@@ -80,6 +80,36 @@ query String::toAttributeName(): String {
 	return self.noWhiteSpace().toFirstLower();
 }
 
+// Collection helper functions
+query toMap(firsts: Sequence(OclAny), seconds: Sequence(OclAny)): Sequence(Tuple(first: OclAny, second:OclAny)) {
+	assert error (firsts->size() = seconds->size());
+	
+	var output : Sequence(Tuple(first: OclAny, second:OclAny));
+	
+	Sequence{1..firsts->size()}->forEach(index){
+		output += Tuple{first=firsts->at(index), second=seconds->at(index)};
+	};
+	
+	return output;
+}
+
+query distinct(elems: Collection(OclAny), byDistinctValue: Collection(OclAny)): Collection(OclAny) {
+	var input : Sequence(Tuple(first: OclAny, second:OclAny)) := toMap(elems->asSequence(), byDistinctValue->asSequence());
+	var currentDistinctValues : Set(OclAny);
+	var output : Set(OclAny);
+
+	Sequence{1..input->size()}->forEach(index){
+//	log(currentDistinctValues->union(Set {  input.second->at(index) }). join(","));
+//	log(currentDistinctValues->union(Set {  input.second->at(index) })->isUnique(elem : OclAny | elem));
+		if(currentDistinctValues->union(Set {  input.second->at(index) })->isUnique(elem : OclAny | elem)) then {
+			currentDistinctValues += input.second->at(index);
+			output += input.first->at(index);
+		} endif;
+	};
+	
+	return output;
+}
+
 // DEBUG
 query _debug(s : String) : String {
 	log(s);

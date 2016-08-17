@@ -139,10 +139,14 @@ query ProcessFlowElement::getNextProcessElements(): Collection(ProcessElement) {
 	};
 	return collect;
 }
+intermediate class A { id : String };
+constructor A::A(_id : String) { result.id := _id; }
 
 // Get a distinct set of roles across multiple use cases
 query Model::getDistinctRoles(): Collection(Role) {
-	return self.useCases.roles->asSet(); // TODO check uniqueness
+log("LALA"+distinct(self.useCases.roles, self.useCases.roles.name)->oclAsType(Role).name->join());
+	return distinct(self.useCases.roles, self.useCases.roles.name)->oclAsType(Role);
+	//return self.useCases.roles->asSet(); // TODO check uniqueness
 }
 
 // Get all WFE for a given role across multiple use cases

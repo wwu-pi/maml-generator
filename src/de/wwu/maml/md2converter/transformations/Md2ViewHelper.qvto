@@ -54,10 +54,12 @@ helper MD2::ViewElementType::toReferencedType(): AbstractViewGUIElementRef {
 
 helper ProcessElement::toViewElementContent(): Collection(ViewGUIElement){
 	// Different representation per ProcessElement type //TODO switch selectEntity...
-	switch {
-		case (self.oclIsTypeOf(SelectEntity)) return self.oclAsType(SelectEntity).map toViewElementContent();
-	};
-	return null;//self.getAttachedParameters()->toContentElement(); 
+//	switch {
+//		case (self.oclIsTypeOf(SelectEntity)) return self.oclAsType(SelectEntity).map toViewElementContent();
+//	};
+	// The real stuff happens in the more specific toViewElementContent methods
+	log("ERROR: Unhandled process element type: " + self.metaClassName() + "(" + self.description + ")");
+	return null;//self.getAttachedParameters()->toContentElement();
 }
 
 helper SelectEntity::toViewElementContent(): Collection(ViewGUIElement){
@@ -81,7 +83,7 @@ helper ParameterConnector::toViewElements(): Collection(ViewGUIElement){
 	switch {
 		case (self.targetElement.oclIsTypeOf(Label)) return OrderedSet { self.map toLabel() };
 		case (self.targetElement.oclIsTypeOf(Attribute) and self.accessType = AccessType::READ) return OrderedSet { self.map toReadAttribute() };
-		case (self.targetElement.oclIsTypeOf(Attribute) and self.accessType = AccessType::WRITE) return OrderedSet { self.map toWriteAttribute() }->flatten();
+		case (self.targetElement.oclIsTypeOf(Attribute) and self.accessType = AccessType::WRITE) return OrderedSet { self.targetElement.oclAsType(MAMLgui::Attribute).map toWriteAttribute() }->flatten();
 		// TODO more variants: label, computed, ...
 	};
 	
@@ -127,7 +129,7 @@ mapping ProcessElement::toTable(attributes : Collection(ParameterConnector)): MD
 	log("...toTable");
 	
 	name := "table".addSuffixNumber();
-	textProposition := self.dataType.lookupOrCreate().toContentProviderPath(attributes->asOrderedSet()->first()); // TODO fix
+	textProposition := self.dataType.lookupOrCreate().toContentProviderPath(attributes->asOrderedSet()->first().targetElement.oclAsType(Attribute)); // TODO fix
 }
 
 mapping ParameterConnector::toReadAttribute(): FlowLayoutPane {
@@ -152,8 +154,8 @@ mapping ParameterConnector::toReadAttributeField(): MD2::Label {
 	style := null; // TODO label style?
 }
 
-helper ParameterConnector::toWriteAttribute(): OrderedSet(ViewGUIElement) {
-	var attribute : MAMLgui::Attribute := self.targetElement.oclAsType(MAMLgui::Attribute); 
+helper MAMLgui::Attribute::toWriteAttribute(): OrderedSet(ViewGUIElement) {
+	var attribute := self;// MAMLgui::Attribute := self.targetElement.oclAsType(MAMLgui::Attribute); 
 	
 	switch {
 		//TODO more

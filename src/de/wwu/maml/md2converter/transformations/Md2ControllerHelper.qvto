@@ -33,7 +33,7 @@ mapping CustomType::toContentProvider(rootModel : Model): ContentProvider { // T
 	_readonly := false; // Not explicitly modelled in MAML
 }
 
-helper MD2::ModelElement::toContentProviderPath(attribute : ParameterConnector): ContentProviderPath {
+helper MD2::ModelElement::toContentProviderPath(attribute : Attribute): ContentProviderPath {
 	log("...toContentProviderPath: " + self.name);
 	
 	return object ContentProviderPath {
@@ -42,9 +42,18 @@ helper MD2::ModelElement::toContentProviderPath(attribute : ParameterConnector):
 	}
 }
 
-helper MD2::ModelElement::toContentProviderPathTail(attribute : ParameterConnector): PathTail {
+//helper MD2::ModelElement::toContentProviderPath(attribute : ParameterConnector): ContentProviderPath {
+//	log("...toContentProviderPath: " + self.name);
+//	
+//	return object ContentProviderPath {
+//		contentProviderRef := resolveone(cp : ContentProvider | cp.type.oclAsType(ReferencedModelType).entity.name = self.oclAsType(Entity).name);
+//		tail := self.toContentProviderPathTail(attribute);
+//	}
+//}
+
+helper MD2::ModelElement::toContentProviderPathTail(attribute : Attribute): PathTail {
 	log("CP path wrong!");
-	
+	// TODO path from to
 	return object PathTail {
 		attributeRef := self.oclAsType(Entity).attributes->first(); // TODO wrong
 	}

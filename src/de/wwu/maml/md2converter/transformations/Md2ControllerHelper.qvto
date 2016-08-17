@@ -37,22 +37,13 @@ helper MD2::Entity::toContentProviderPath(attribute : MAMLgui::Attribute): Conte
 	log("...toContentProviderPath: From " + self.toString() + " to " + attribute.description);
 	
 	var provider := resolveone(cp : ContentProvider | cp.type.oclAsType(ReferencedModelType).entity.name = self.oclAsType(Entity).name);
-	var providerTail := provider.getPathToAttribute(attribute.getAttribute())->toContentProviderPathTail(); 
+	var providerEntity := provider.type.oclAsType(ReferencedModelType).entity.oclAsType(Entity); 
 	
 	return object ContentProviderPath {
 		contentProviderRef := provider;
-		tail := providerTail;
+		tail := providerEntity.getPathToAttribute(attribute.getAttribute())->toContentProviderPathTail();
 	}
 }
-
-//helper MD2::ModelElement::toContentProviderPath(attribute : ParameterConnector): ContentProviderPath {
-//	log("...toContentProviderPath: " + self.name);
-//	
-//	return object ContentProviderPath {
-//		contentProviderRef := resolveone(cp : ContentProvider | cp.type.oclAsType(ReferencedModelType).entity.name = self.oclAsType(Entity).name);
-//		tail := self.toContentProviderPathTail(attribute);
-//	}
-//}
 
 helper Sequence(MD2::Attribute)::toContentProviderPathTail(): PathTail {
 	if(self->size() > 1) then {
@@ -66,14 +57,6 @@ helper Sequence(MD2::Attribute)::toContentProviderPathTail(): PathTail {
 		};
 	} endif;
 }
-
-//helper MD2::ModelElement::toContentProviderPathTail(attribute : Attribute): PathTail {
-//	log("CP path wrong!");
-//	// TODO path from to
-//	return object PathTail {
-//		attributeRef := self.oclAsType(Entity).attributes->first(); // TODO wrong
-//	}
-//}
 
 helper ContentProvider::toContentProviderReference(): ContentProviderReference {
 	return object ContentProviderReference { 

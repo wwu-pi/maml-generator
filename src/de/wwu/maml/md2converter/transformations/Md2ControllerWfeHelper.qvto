@@ -111,19 +111,10 @@ helper ProcessElement::toFieldMappingTasks(): Collection(MappingTask) {
 	fieldAttributes->forEach(elem){
 		elem.invresolve(Attribute).map toFieldMappingTask(elem, self);
 	};
-//	self.getAttachedAttributes()->forEach(elem){
-//		self.map toFieldMappingTask(elem);
-//	};
-//	
+	
 	return self.resolve(MappingTask);
 }
 
-//mapping ProcessElement::toFieldMappingTask(attribute : ParameterConnector): MappingTask {
-//	log("....toFieldMappingTask: " + attribute.toString());
-//
-//	referencedViewField := attribute.targetElement.oclAsType(Attribute).toWriteAttribute()->first().toReferencedType();
-//	pathDefinition := self.dataType.resolveone(MD2::Entity).toContentProviderPath(attribute);
-//}
 mapping Attribute::toFieldMappingTask(field : ViewGUIElement, referencedBy : ProcessElement): MappingTask {
 	log("....toFieldMappingTask: " + self.toString());
 

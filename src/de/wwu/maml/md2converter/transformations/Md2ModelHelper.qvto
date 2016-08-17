@@ -224,25 +224,30 @@ helper DataTypeLiteral::toCustomType(): CustomType {
 	return resolveone(type : CustomType | type.name.equalsIgnoreCase(self.identifier));
 }
 
+//////////////////////////////////////////////////////////////////////
+///////// Queries ////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+
+// get data model property from GUI attribute
 query MAMLgui::Attribute::getProperty(): Property {
 	var rootModel : MAML::Model := self.container().container().oclAsType(Model);
 
 	return rootModel.allSubobjectsOfKind(Property)->any(elem | elem.name = self.description and elem.type.metaClassName() = self.type);
 }
 
+// Resolve MD2 attribute from MAML GUI attribute
 query MAMLgui::Attribute::getAttribute(): MD2::Attribute {
 	return self.getProperty().resolveone(MD2::Attribute);	
 }
 
-query ContentProvider::getPathToAttribute(attribute : MD2::Attribute): Sequence(MD2::Attribute) {
-	var startEntity : Entity := self.type.oclAsType(ReferencedModelType).entity.oclAsType(Entity); // TODO traverse
-	
-	var outcome := startEntity._getRecursivePathToAttribute(attribute, Sequence{});
+// Find the path from a content provider to a GUI attribute
+query  MD2::Entity::getPathToAttribute(attribute : MD2::Attribute): Sequence(MD2::Attribute) {
+	var outcome := self._getRecursivePathToAttribute(attribute, Sequence{});
 	return outcome;
 }
 
 query MD2::Entity::_getRecursivePathToAttribute(attribute : MD2::Attribute, steps: Sequence(MD2::Attribute)): Sequence(MD2::Attribute) {
-	log("....recursivePath: From " + self.toString() + " to " + attribute.name);
+	log("....recursivePath: " + self.name + " -> " + attribute.name);
 	
 	// Break after 4 steps of nesting
 	if(steps->size() > 3) then {

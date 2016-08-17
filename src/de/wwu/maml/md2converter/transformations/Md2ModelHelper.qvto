@@ -4,6 +4,7 @@ import Md2Helper;
 
 modeltype MAML "strict" uses "http://de/wwu/md2dot0";
 modeltype MAMLdata "strict" uses "http://de/wwu/md2dot0data";
+modeltype MAMLgui "strict" uses "http://de/wwu/md2dot0gui";
 modeltype MD2 "strict" uses "http://www.wwu.de/md2/framework/MD2";
 
 helper Model::distinctModelElements(): Set(ModelElement) {
@@ -221,4 +222,42 @@ helper MD2::Entity::toReferencedModelType(isCollection : Boolean): ReferencedMod
 
 helper DataTypeLiteral::toCustomType(): CustomType {
 	return resolveone(type : CustomType | type.name.equalsIgnoreCase(self.identifier));
+}
+
+query MAMLgui::Attribute::getProperty(): Property {
+	var rootModel : MAML::Model := self.container().container().oclAsType(Model);
+
+	return rootModel.allSubobjectsOfKind(Property)->any(elem | elem.name = self.description and elem.type.metaClassName() = self.type);
+}
+
+query MAMLgui::Attribute::getAttribute(): MD2::Attribute {
+	return self.getProperty().resolveone(MD2::Attribute);	
+}
+
+query ContentProvider::getPathToAttribute(attribute : MD2::Attribute): Sequence(MD2::Attribute) {
+	var startEntity : Entity := self.type.oclAsType(ReferencedModelType).entity.oclAsType(Entity); // TODO traverse
+	
+	var outcome := startEntity._getRecursivePathToAttribute(attribute, Sequence{});
+	return outcome;
+}
+
+query MD2::Entity::_getRecursivePathToAttribute(attribute : MD2::Attribute, steps: Sequence(MD2::Attribute)): Sequence(MD2::Attribute) {
+	log("....recursivePath: From " + self.toString() + " to " + attribute.name);
+	
+	// Break after 4 steps of nesting
+	if(steps->size() > 3) then {
+		return Sequence{};
+	} endif;
+	
+	self.attributes->forEach(nestedItem){
+		if (nestedItem.name = attribute.name and nestedItem.type = attribute.type) then {
+			// Found a match
+			return steps->append(attribute);
+		} elif(nestedItem.type.oclIsKindOf(Entity)) then {
+			// Continue nesting
+			return nestedItem.oclAsType(Entity)._getRecursivePathToAttribute(attribute, steps->append(nestedItem));
+		} endif;
+	};
+	
+	log ("ERROR:getRecursivePathToAttribute"); return null;
 }

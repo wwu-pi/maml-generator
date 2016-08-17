@@ -33,12 +33,15 @@ mapping CustomType::toContentProvider(rootModel : Model): ContentProvider { // T
 	_readonly := false; // Not explicitly modelled in MAML
 }
 
-helper MD2::ModelElement::toContentProviderPath(attribute : Attribute): ContentProviderPath {
-	log("...toContentProviderPath: " + self.name);
+helper MD2::Entity::toContentProviderPath(attribute : MAMLgui::Attribute): ContentProviderPath {
+	log("...toContentProviderPath: From " + self.toString() + " to " + attribute.description);
+	
+	var provider := resolveone(cp : ContentProvider | cp.type.oclAsType(ReferencedModelType).entity.name = self.oclAsType(Entity).name);
+	var providerTail := provider.getPathToAttribute(attribute.getAttribute())->toContentProviderPathTail(); 
 	
 	return object ContentProviderPath {
-		contentProviderRef := resolveone(cp : ContentProvider | cp.type.oclAsType(ReferencedModelType).entity.name = self.oclAsType(Entity).name);
-		tail := self.toContentProviderPathTail(attribute);
+		contentProviderRef := provider;
+		tail := providerTail;
 	}
 }
 
@@ -51,13 +54,26 @@ helper MD2::ModelElement::toContentProviderPath(attribute : Attribute): ContentP
 //	}
 //}
 
-helper MD2::ModelElement::toContentProviderPathTail(attribute : Attribute): PathTail {
-	log("CP path wrong!");
-	// TODO path from to
-	return object PathTail {
-		attributeRef := self.oclAsType(Entity).attributes->first(); // TODO wrong
-	}
+helper Sequence(MD2::Attribute)::toContentProviderPathTail(): PathTail {
+	if(self->size() > 1) then {
+		return object PathTail {
+			attributeRef := self->first();
+			tail := self->excluding(self->first())->toContentProviderPathTail();
+		};
+	} else {
+		return object PathTail {
+			attributeRef := self->first();
+		};
+	} endif;
 }
+
+//helper MD2::ModelElement::toContentProviderPathTail(attribute : Attribute): PathTail {
+//	log("CP path wrong!");
+//	// TODO path from to
+//	return object PathTail {
+//		attributeRef := self.oclAsType(Entity).attributes->first(); // TODO wrong
+//	}
+//}
 
 helper ContentProvider::toContentProviderReference(): ContentProviderReference {
 	return object ContentProviderReference { 

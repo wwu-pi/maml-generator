@@ -17,7 +17,11 @@
   <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="BOOLEAN" name="Boolean" primitive="true"/>
   <dataTypes xsi:type="de.wwu.md2dot0data:CustomType" name="TypeOne">
 	<attributes xsi:type="de.wwu.md2dot0data:Property" name="oneTest">
-		<type xsi:type="de.wwu.md2dot0data:String" value=""/>
+		<type xsi:type="de.wwu.md2dot0data:CustomType" name="OneInner">
+		<attributes xsi:type="de.wwu.md2dot0data:Property" name="oneInnerTest">
+		  <type xsi:type="de.wwu.md2dot0data:String" value=""/>
+		</attributes>
+			  </type>
 	</attributes>
   </dataTypes>
   <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="URL" name="Url" primitive="true"/>
@@ -32,12 +36,8 @@
   <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="DATETIME" name="DateTime" primitive="true"/>
   <dataTypes xsi:type="de.wwu.md2dot0data:CustomType" name="Buch">
     <attributes name="buchTest">
-		  <type xsi:type="de.wwu.md2dot0data:CustomType" name="BuchInner">
-		<attributes xsi:type="de.wwu.md2dot0data:Property" name="buchInnerTest">
 		  <type xsi:type="de.wwu.md2dot0data:String" value=""/>
-		</attributes>
-	  </type>
 	 </attributes>
   </dataTypes>
-  <attributes xsi:type="de.wwu.md2dot0gui:Attribute" description="titel" type="String"/>
+  <attributes xsi:type="de.wwu.md2dot0gui:Attribute" description="buchTest" type="String"/>
 </de.wwu.md2dot0:UseCase>

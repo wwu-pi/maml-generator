@@ -3,7 +3,7 @@ library Md2Helper;
 modeltype MAML "strict" uses "http://de/wwu/md2dot0";
 modeltype MD2 "strict" uses "http://www.wwu.de/md2/framework/MD2";
 
-property DEFAULT_PROJECT_NAME : String = "mamlProject";
+property DEFAULT_PROJECT_NAME : String = "MamlProject";
 property DEFAULT_BUTTON_TEXT : String = "Weiter";
 
 // MD2-specific helpers	
@@ -13,6 +13,10 @@ helper MAML::Model::getDefaultConnectionName():String {
 	} endif;
 	
 	return self.projectName.toFirstUpper() + "Connection";
+}
+
+helper MAML::Model::getRemoteConnection(): RemoteConnection {
+	return self.getRemoteConnection(self.getDefaultConnectionName());
 }
 
 helper MAML::Model::getRemoteConnection(name : String): RemoteConnection {

@@ -1,4 +1,5 @@
 import Md2Helper;
+import Md2ControllerLayer;
 import Md2ControllerHelper;
 import Md2ControllerWfeHelper;
 
@@ -32,7 +33,7 @@ mapping Model::toWorkflow(): Workflow {
 helper Model::toWorkflowElementEntries(): Collection(WorkflowElementEntry) {
 	var entries: Collection(WorkflowElementEntry) := Set {};
 	
-	self.distinctWorkflowElements(); // initialize controller layer
+	self.map toController(); // initialize controller layer
 
 	self.useCases.processFlowElements->forEach(elem) {
 		if(elem.oclIsKindOf(ProcessElement)) then {
@@ -84,9 +85,9 @@ mapping Role::toApp(): App {
 	log(".toApp");
 	
 	name := safeVal(self.container().container().oclAsType(Model).projectName, DEFAULT_PROJECT_NAME).toFirstUpper() + "_" + safeVal(self.name);
+	appName := safeVal(self.container().container().oclAsType(Model).projectName, DEFAULT_PROJECT_NAME).toFirstUpper() + " (" + safeVal(self.name) + ")";
 	workflowElements := self.getWorkflowElements()->toWorkflowElementReference();
-	defaultConnection := self.container().container().oclAsType(Model).getRemoteConnection(self.container().container().oclAsType(Model).getDefaultConnectionName());
-	appName := safeVal(self.container().container().oclAsType(Model).projectName, DEFAULT_PROJECT_NAME).toFirstUpper() + " (" + safeVal(self.name) + ")"
+	defaultConnection := self.container().container().oclAsType(Model).getRemoteConnection();
 }
 
 helper MD2::WorkflowElement::toWorkflowElementReference(): WorkflowElementReference {

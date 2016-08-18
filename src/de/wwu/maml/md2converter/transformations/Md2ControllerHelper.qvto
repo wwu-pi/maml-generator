@@ -34,7 +34,7 @@ mapping CustomType::toContentProvider(rootModel : Model): ContentProvider { // T
 }
 
 helper MD2::Entity::toContentProviderPath(attribute : MAMLgui::Attribute): ContentProviderPath {
-	log("...toContentProviderPath: From " + self.toString() + " to " + attribute.description);
+	log("...toContentProviderPath: From " + self.name + " to " + attribute.description);
 	
 	var provider := resolveone(cp : ContentProvider | cp.type.oclAsType(ReferencedModelType).entity.name = self.oclAsType(Entity).name);
 	var providerEntity := provider.type.oclAsType(ReferencedModelType).entity.oclAsType(Entity); 

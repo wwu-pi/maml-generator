@@ -45,8 +45,8 @@ mapping Model::toValidator(): Validator {
 mapping Model::toMain(): Main {
 	log(".toMain");
 	
-	appVersion := "1.0.0"; // Not explicitly modelled in MAML
-	modelVersion := "1.0.0"; // Not explicitly modelled in MAML
+	appVersion := "1.0"; // Not explicitly modelled in MAML // Android needs int conversion
+	modelVersion := "1.0"; // Not explicitly modelled in MAML // Android needs int conversion
 	workflowManager := self.getRemoteConnection(self.getDefaultConnectionName()); // Not explicitly modelled in MAML
 	defaultConnection := self.getRemoteConnection(self.getDefaultConnectionName()); // Not explicitly modelled in MAML
 	fileUploadConnection := self.getRemoteConnection(self.getDefaultConnectionName()); // Not explicitly modelled in MAML

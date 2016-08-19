@@ -61,7 +61,7 @@ mapping Model::toRemoteConnection(): RemoteConnection {
 	password := null; 
 	user := null;
 	key := null;
-	storagePath := null;
+	storagePath := "http://localhost:8080/" + safeVal(self.projectName, DEFAULT_PROJECT_NAME).toFirstUpper() + ".backend/upload/";
 }
 
 helper Model::distinctWebServiceCalls(): Set(WebServiceCall) {

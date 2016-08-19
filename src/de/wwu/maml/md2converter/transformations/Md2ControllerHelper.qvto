@@ -13,17 +13,21 @@ helper Model::distinctContentProviders(): Collection(ContentProvider) {
 	self.distinctModelElements();
 	
 	self.useCases.dataTypes[CustomType]->forEach(entity) {
-		entity.map toContentProvider(self);
+		entity.map toContentProvider(self, false); // prepare a single-element CP
+		entity.map toContentProvider(self, true); // prepare a multi-element CP 
 	};
 	
 	return resolve(ContentProvider);
 }
 
-mapping CustomType::toContentProvider(rootModel : Model): ContentProvider { // TODO mapping schlecht
+mapping CustomType::toContentProvider(rootModel : Model, multivalued : Boolean): ContentProvider { // TODO mapping schlecht
 	log(".toContentProvider: " + self.name);
-
-	type := self.resolveone(Entity).toReferencedModelType(false); //TODO check
-	name := self.name.toFirstUpper() + "Provider";
+	
+	var nameExt := "";
+	if(multivalued = true) then { nameExt := "Many" } endif;
+	
+	type := self.resolveone(Entity).toReferencedModelType(multivalued);
+	name := self.name.toFirstUpper() + "Provider" + nameExt;
 	_default := false; // Not explicitly modelled in MAML
 	local:= false; // TODO
 	connection := resolveone(conn : RemoteConnection | conn.name = rootModel.getDefaultConnectionName());

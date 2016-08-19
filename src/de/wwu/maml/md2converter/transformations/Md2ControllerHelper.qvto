@@ -20,7 +20,7 @@ helper Model::distinctContentProviders(): Collection(ContentProvider) {
 	return resolve(ContentProvider);
 }
 
-mapping CustomType::toContentProvider(rootModel : Model, multivalued : Boolean): ContentProvider { // TODO mapping schlecht
+mapping CustomType::toContentProvider(rootModel : Model, multivalued : Boolean): ContentProvider {
 	log(".toContentProvider: " + self.name);
 	
 	var nameExt := "";

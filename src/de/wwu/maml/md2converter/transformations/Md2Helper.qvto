@@ -5,6 +5,7 @@ modeltype MD2 "strict" uses "http://www.wwu.de/md2/framework/MD2";
 
 property DEFAULT_PROJECT_NAME : String = "MamlProject";
 property DEFAULT_BUTTON_TEXT : String = "Weiter";
+property DEFAULT_BUTTON_FINISH : String = "Fertig";
 
 // MD2-specific helpers	
 helper MAML::Model::getDefaultConnectionName():String {

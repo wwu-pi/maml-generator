@@ -118,7 +118,7 @@ helper createSpacer(): Spacer {
 
 mapping ProcessElement::toContinueButton(): MD2::Button {
 	log("...toContinueButton");
-	
+	log("" + self.getContinueButtonText(1));
 	name := "buttonContinue";
 	text := self.getContinueButtonText(1);
 	width := 100;
@@ -296,9 +296,69 @@ helper ProcessElement::getAttachedAbstractAttributes(): Set(MAML::ParameterConne
 }
 
 helper ProcessElement::getContinueButtonText(atPosition : Integer): String {
-	if(self.nextElements->size() >= atPosition){
-		return safeVal(self.nextElements->at(atPosition).description, DEFAULT_BUTTON_TEXT);
+	// TODO single/multi result events
+	if(atPosition = 0 or self.getAmountOfContinueButtons() < atPosition) then {
+		return null;
 	} endif;
-	return null;
-	// TODO Finish at last step
+	
+	if(self.getAmountOfContinueButtons() = 1) then {
+		// Is last element?
+		if(self.isFinishNext()) then {
+			return safeVal(self.nextElements->first().description, DEFAULT_BUTTON_FINISH);
+		} endif;
+		
+		// take directly following caption 
+		return safeVal(self.nextElements->first().description, DEFAULT_BUTTON_TEXT);
+	} else {
+		// Search splitting point
+		var searchXor := self.nextElements->first();
+		while(not searchXor.oclIsTypeOf(Xor)) {
+			searchXor := searchXor.targetProcessFlowElement.nextElements->first();
+		};
+		// Select from multiple continues 
+		return searchXor.targetProcessFlowElement.nextElements->at(atPosition).description;
+	} endif;
+	return null; // Should never occur
+}
+
+//////////////////////////////////////////////////////////////////////
+///////// Queries ////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+
+query ProcessFlowElement::getAmountOfContinueButtons(): Integer {
+	// TODO single/multi result events
+	if(self.nextElements->size() = 0) then {
+		return -1;
+	} elif(self.nextElements->size() > 1) then {
+		// XOR check automatic or manual
+		if(self.oclIsTypeOf(MAML::Xor) and self.parameters->size() = 0) then {
+			return self.nextElements->size();
+		} else {
+			return 1; // Automatic Xor -> default continue
+		} endif;
+	} else {
+		if(self.nextElements->first().targetProcessFlowElement.oclIsKindOf(ProcessElement)) then {
+			return 1;
+		} elif(self.nextElements->first().targetProcessFlowElement.oclIsTypeOf(ProcessEndEvent)) then {
+			return 1;
+		} else {
+			return self.nextElements->first().targetProcessFlowElement.getAmountOfContinueButtons();
+		} endif;
+	} endif;
+}
+
+query ProcessFlowElement::isFinishNext(): Boolean {
+	if(self.nextElements->size() = 0) then {
+		return true; // Bug in model -> end
+	} elif(self.nextElements->size() > 1) then {
+		return false; // XOR
+	} else {
+		if(self.nextElements->first().targetProcessFlowElement.oclIsKindOf(ProcessEndEvent)) then {
+			return true; // found an end
+		} elif(self.nextElements->first().targetProcessFlowElement.oclIsKindOf(ProcessElement)) then {
+			return false; 
+		} else {
+			return self.nextElements->first().targetProcessFlowElement.isFinishNext();
+		} endif;
+	} endif;
 }

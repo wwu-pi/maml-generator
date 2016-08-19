@@ -137,7 +137,7 @@ mapping Attribute::toFieldMappingTask(field : ViewGUIElement, referencedBy : Pro
 	log("....toFieldMappingTask: " + self.toString());
 
 	referencedViewField := field.toReferencedType();
-	pathDefinition := referencedBy.dataType.resolveone(MD2::Entity).toContentProviderPath(self);
+	pathDefinition := referencedBy.dataType.resolveone(MD2::Entity).toContentProviderPath(self, false);
 }
 
 helper DataType::toContentProviderOperationActionCreateUpdate(): ContentProviderOperationAction {

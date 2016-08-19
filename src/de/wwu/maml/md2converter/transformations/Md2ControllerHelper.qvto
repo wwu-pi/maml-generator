@@ -37,10 +37,10 @@ mapping CustomType::toContentProvider(rootModel : Model, multivalued : Boolean):
 	_readonly := false; // Not explicitly modelled in MAML
 }
 
-helper MD2::Entity::toContentProviderPath(attribute : MAMLgui::Attribute): ContentProviderPath {
+helper MD2::Entity::toContentProviderPath(attribute : MAMLgui::Attribute, multivalued : Boolean): ContentProviderPath {
 	log("...toContentProviderPath: From " + self.name + " to " + attribute.description);
 	
-	var provider := resolveone(cp : ContentProvider | cp.type.oclAsType(ReferencedModelType).entity.name = self.oclAsType(Entity).name);
+	var provider := resolveone(cp : ContentProvider | cp.type.oclAsType(ReferencedModelType).entity.name = self.oclAsType(Entity).name and cp.type.many = multivalued);
 	var providerEntity := provider.type.oclAsType(ReferencedModelType).entity.oclAsType(Entity); 
 	
 	return object ContentProviderPath {

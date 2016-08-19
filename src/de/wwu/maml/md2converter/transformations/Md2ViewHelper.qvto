@@ -66,14 +66,16 @@ helper SelectEntity::toViewElementContent(): Collection(ViewGUIElement){
 	var content : OrderedSet(ViewGUIElement) := OrderedSet { self.map toTitle() }; // Title 
 	content += self.getAttachedLabels().map toLabel(); // Labels
 	content += self->map toTable(self.getAttachedAttributes()); // Table (ideally)
-	content += OrderedSet { createSpacer(), self.map toContinueButton() }; // Button
+	content += OrderedSet { createSpacer() }; // Spacer between content and button block
+	content += self.toContinueButtons(); // Buttons
 	return content;
 }
 
 helper ShowEntity::toViewElementContent(): Collection(ViewGUIElement){
 	var content : OrderedSet(ViewGUIElement) := OrderedSet { self.map toTitle() }; // Title 
 	content += self.getAttachedParameters().toViewElements(); // Fields
-	content += OrderedSet { createSpacer(), self.map toContinueButton() }; // Button
+	content += OrderedSet { createSpacer() }; // Spacer between content and button block
+	content += self.toContinueButtons(); // Buttons
 	return content->flatten();
 }
 
@@ -116,11 +118,21 @@ helper createSpacer(): Spacer {
 	return object Spacer {};
 }
 
-mapping ProcessElement::toContinueButton(): MD2::Button {
-	log("...toContinueButton");
-	log("" + self.getContinueButtonText(1));
-	name := "buttonContinue";
-	text := self.getContinueButtonText(1);
+helper ProcessElement::toContinueButtons(): OrderedSet(MD2::Button){
+	var buttons : OrderedSet(Button) := OrderedSet{};
+	
+	Sequence{1..self.getAmountOfContinueButtons()}->forEach(index) { 
+		buttons += self.map toContinueButton(index);
+	};
+	
+	return buttons;
+}
+
+mapping ProcessElement::toContinueButton(index : Integer): MD2::Button {
+	log("...toContinueButton: " + self.getContinueButtonText(index));
+	
+	name := "buttonContinue".addSuffixNumber();
+	text := self.getContinueButtonText(index);
 	width := 100;
 	style := null; // TODO button style?
 } 

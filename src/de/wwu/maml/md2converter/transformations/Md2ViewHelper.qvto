@@ -53,11 +53,7 @@ helper MD2::ViewElementType::toReferencedType(): AbstractViewGUIElementRef {
 }
 
 helper ProcessElement::toViewElementContent(): Collection(ViewGUIElement){
-	// Different representation per ProcessElement type //TODO switch selectEntity...
-//	switch {
-//		case (self.oclIsTypeOf(SelectEntity)) return self.oclAsType(SelectEntity).map toViewElementContent();
-//	};
-	// The real stuff happens in the more specific toViewElementContent methods
+	// The real stuff happens in the subtype specific toViewElementContent methods
 	log("ERROR: Unhandled process element type: " + self.metaClassName() + "(" + self.description + ")");
 	return null;//self.getAttachedParameters()->toContentElement();
 }
@@ -96,7 +92,7 @@ helper CreateEntity::toViewElementContent(): Collection(ViewGUIElement){
 }
 
 helper ParameterConnector::toViewElements(): Collection(ViewGUIElement){
-	log("...toTitle");
+	log("...toViewElements");
 	
 	switch {
 		case (self.targetElement.oclIsTypeOf(Label)) return OrderedSet { self.map toLabel() };

@@ -9,8 +9,8 @@
   <processFlowConnections xsi:type="de.wwu.md2dot0:ProcessConnector" sourceProcessFlowElement="//@processFlowElements.2" targetProcessFlowElement="//@processFlowElements.3"/>
   <processFlowConnections xsi:type="de.wwu.md2dot0:ProcessConnector" sourceProcessFlowElement="//@processFlowElements.3" targetProcessFlowElement="//@processFlowElements.1"/>
   <processFlowConnections xsi:type="de.wwu.md2dot0:ProcessConnector" sourceProcessFlowElement="//@processFlowElements.1" targetProcessFlowElement="//@processFlowElements.4"/>
-  <processFlowConnections xsi:type="de.wwu.md2dot0:ParameterConnector" targetElement="//@attributes.0" order="1" sourceElement="//@processFlowElements.3" accessType="WRITE"/>
-  <processFlowConnections xsi:type="de.wwu.md2dot0:ParameterConnector" targetElement="//@attributes.0" order="1" sourceElement="//@processFlowElements.1"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ParameterConnector" targetElement="//@attributes.0" order="1" sourceElement="//@processFlowElements.3"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ParameterConnector" targetElement="//@attributes.0" order="1" accessType="WRITE" sourceElement="//@processFlowElements.1"/>
   <roles processElements="//@processFlowElements.3 //@processFlowElements.1" name="Nutzer"/>
   <roles processElements="//@processFlowElements.3 //@processFlowElements.1" name="Nutzer"/>
   <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="STRING" name="String" primitive="true"/>

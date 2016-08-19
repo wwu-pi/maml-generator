@@ -30,12 +30,8 @@ mapping ProcessElement::toWorkflowEvent(): WorkflowEvent {
 }
 
 helper ProcessFlowElement::toWorkflowElement(): WorkflowElement {
-	switch {
-		case (self.oclIsKindOf(SelectEntity)) return self.oclAsType(SelectEntity).map toWorkflowElement();
-		case (self.oclIsKindOf(ShowEntity)) return self.oclAsType(ShowEntity).map toWorkflowElement();
-		// TODO others
-		// Skip Start/End Events and data sources
-	};
+	// The real stuff happens in the subtype specific toViewElementContent methods
+	log("ERROR: Unhandled process element type in toWorkflowElement: " + self.metaClassName());
 	return null;
 }
 
@@ -51,6 +47,28 @@ mapping SelectEntity::toWorkflowElement(): WorkflowElement {
 }
 
 mapping ShowEntity::toWorkflowElement(): WorkflowElement {
+	log("..toWorkflowElement: " + self.description.toName());
+	// TODO
+	name := self.description.toName().addSuffixNumber();
+	initActions := self.map toInitAction(); //TODO
+	actions := self.map toInitAction(); //TODO
+	processChain := self.map toProcessChain(); //TODO
+	invoke := null; // Not explicitly modelled in MAML
+	defaultProcessChain := self.map toProcessChain(); //TODO	
+}
+
+mapping UpdateEntity::toWorkflowElement(): WorkflowElement {
+	log("..toWorkflowElement: " + self.description.toName());
+	// TODO
+	name := self.description.toName().addSuffixNumber();
+	initActions := self.map toInitAction(); //TODO
+	actions := self.map toInitAction(); //TODO
+	processChain := self.map toProcessChain(); //TODO
+	invoke := null; // Not explicitly modelled in MAML
+	defaultProcessChain := self.map toProcessChain(); //TODO	
+}
+
+mapping CreateEntity::toWorkflowElement(): WorkflowElement {
 	log("..toWorkflowElement: " + self.description.toName());
 	// TODO
 	name := self.description.toName().addSuffixNumber();

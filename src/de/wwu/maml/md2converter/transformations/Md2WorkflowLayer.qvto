@@ -105,16 +105,22 @@ helper MD2::WorkflowElement::toWorkflowElementReference(): WorkflowElementRefere
 //////////////////////////////////////////////////////////////////////
 
 // Is the process element the first element within the process
-query ProcessElement::isWorkflowElementInvokable(): Boolean { // TODO make transitive to skip first datasource etc.
-	if(self.previousElements->size() = 1 and self.previousElements->first().sourceProcessFlowElement.oclIsTypeOf(ProcessStartEvent)) then { // allow XOR as first element??
+query ProcessFlowElement::isWorkflowElementInvokable(): Boolean { // TODO make transitive to skip first datasource etc.
+	if(self.previousElements->size() != 1) then {
+		return false;
+	} elif (self.previousElements->first().sourceProcessFlowElement.oclIsTypeOf(ProcessStartEvent)) then { //TODO allow XOR as first element??
 		return true;
+	} elif (self.previousElements->first().sourceProcessFlowElement.oclIsKindOf(InteractionProcessElement)) then {
+		// there is some visible screen before -> not startable
+		return false;
+	} else {
+		return self.previousElements->first().sourceProcessFlowElement.isWorkflowElementInvokable();
 	} endif;
-	return false;
 }
 
 // Inverse to isWorkflowElementInvokable from MD2::WFE perspective
 query MD2::WorkflowElement::isStartable(): Boolean {
-	return invresolveone(ProcessElement).isWorkflowElementInvokable(); //TODO check
+	return self.invresolveone(ProcessElement).isWorkflowElementInvokable();
 }
 
 // Get the following ProcessElement (i.e. find transitive followers through Events, XORs, ...)

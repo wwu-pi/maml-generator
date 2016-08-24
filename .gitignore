@@ -1,5 +1,4 @@
 # Directories #
-/build/
 /bin/
 target/
 /src-gen/
@@ -77,3 +76,8 @@ hs_err_pid*
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
+######################
+# Gradle
+######################
+build/
+gradle/wrapper/gradle-wrapper.properties

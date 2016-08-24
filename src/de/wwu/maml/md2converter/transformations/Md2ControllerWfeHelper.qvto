@@ -107,7 +107,7 @@ mapping ProcessElement::toInitAction(): CustomAction {
 
 helper ProcessElement::toEventBindingTask(): EventBindingTask {
 	log("....toEventBindingTask: " + self.toString());
-	
+
 	return object EventBindingTask {
 		actions := self.map toFireEventAction().toSimpleActionRef();
 		events := Set { object ViewElementEventRef {
@@ -126,11 +126,15 @@ helper ProcessElement::toFireEventAction(): FireEventAction {
 
 helper ProcessElement::toFieldMappingTasks(): Collection(MappingTask) {
 	var fieldAttributes := self.resolveoneIn(ProcessElement::toViewElement).allSubobjectsOfKind(InputElement);
+	//var fieldAttributes : Collection(ParameterConnector) := self.getAttachedAttributes();
+	var fieldMappings : Collection(MappingTask) = Set {};
+	
 	fieldAttributes->forEach(elem){
 		elem.invresolve(Attribute).map toFieldMappingTask(elem, self);
+	 	//fieldMappings += elem.oclAsType(ParameterConnector).targetElement.oclAsType(Attribute).map toFieldMappingTask(self.resolveone(gui : ViewGUIElement | gui.name=elem.oclAsType(ParameterConnector).targetElement.description) , self);
 	};
 	
-	return self.resolve(MappingTask);
+	return fieldMappings;
 }
 
 mapping Attribute::toFieldMappingTask(field : ViewGUIElement, referencedBy : ProcessElement): MappingTask {

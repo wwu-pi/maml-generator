@@ -93,7 +93,7 @@ public class XmiToMd2Converter {
 		Injector injector = new MD2StandaloneSetup().createInjectorAndDoEMFRegistration();
 		XtextResourceSet resourceSet = injector.getInstance(XtextResourceSet.class);
 		resourceSet.addLoadOption(XtextResource.OPTION_RESOLVE_ALL, Boolean.TRUE);
-		Resource resourceMd2 = resourceSet.createResource(URI.createURI(outputUri));
+		Resource resourceMd2 = resourceSet.createResource(URI.createFileURI(outputUri));
 
 		// Copy content
 		resourceMd2.getContents().addAll(output);

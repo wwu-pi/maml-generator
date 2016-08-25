@@ -1,6 +1,8 @@
 package de.wwu.maml.md2converter;
 
+import java.io.File;
 import java.io.OutputStreamWriter;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -34,15 +36,20 @@ import de.wwu.md2.framework.mD2.View;
 import de.wwu.md2.framework.mD2.Workflow;
 import md2dot0.Md2dot0Factory;
 import md2dot0.UseCase;
+import de.wwu.md2.framework.generator.Main;
 
 public class MD2ConverterStandalone {
 
 	private static final String DEFAULT_PROJECT_NAME = "mamlProject";
-
+	private static final String OUTPUT_BASE_PATH = Paths.get(".").resolve("src-gen/").toAbsolutePath().normalize().toString();//"platform:/resource/de.wwu.maml/src-gen/";
+	private static final String OUTPUT_PATH_RELATIVE = "src-gen/";
+	
 	public static void main(String[] args) {
 		// Register Xtext Resource Factory
 		XmiToMd2Converter.init();
-
+		
+		checkArgs(args);
+		
 		Injector injector = new MD2StandaloneSetup().createInjectorAndDoEMFRegistration();
 		XtextResourceSet resourceSetXtext = injector.getInstance(XtextResourceSet.class);
 		resourceSetXtext.addLoadOption(XtextResource.OPTION_RESOLVE_ALL, Boolean.TRUE);
@@ -56,7 +63,7 @@ public class MD2ConverterStandalone {
 		// TODO crawl folders to find all .maml files
 		ResourceSet resourceSet = new ResourceSetImpl();
 		ArrayList<URI> modelSources = new ArrayList<URI>();
-		modelSources.add(URI.createURI("platform:/resource/de.wwu.maml/resources/SimpleExample.md2dot0"));
+		modelSources.add(URI.createURI(args[0]));
 
 		for (URI modelSource : modelSources) {
 			Resource inResource = resourceSet.getResource(modelSource, true);
@@ -85,6 +92,9 @@ public class MD2ConverterStandalone {
 		transformMamlToMd2(allObjects, MD2Factory.eINSTANCE.createView());
 		transformMamlToMd2(allObjects, MD2Factory.eINSTANCE.createWorkflow());
 
+		// Run MD2 code generation
+		Main.main(new String[]{OUTPUT_PATH_RELATIVE + getProjectName(allObjects)});
+		
 		System.out.println("Done");
 	}
 
@@ -113,46 +123,44 @@ public class MD2ConverterStandalone {
 		context.setLog(log);
 
 		// Human readable model project name
-		String projectName = DEFAULT_PROJECT_NAME;
-		if (((md2dot0.Model) EcoreUtil.getRootContainer(modelObjects.get(0))).getProjectName() != null) {
-			projectName = ((md2dot0.Model) EcoreUtil.getRootContainer(modelObjects.get(0))).getProjectName();
-		}
+		String projectName = getProjectName(modelObjects);
 
 		// run the transformation assigned to the executor with the given
 		// input and output and execution context -> ChangeTheWorld(in, out)
 		ExecutionDiagnostic result = null;
-		String outputFile = "platform:/resource/de.wwu.maml/src-gen/";
+		String outputFile = OUTPUT_BASE_PATH;
 		if (layer instanceof Model) {
-			URI transformationURI = URI.createURI(
-					"platform:/resource/de.wwu.maml/src/de/wwu/maml/md2converter/transformations/Md2ModelLayer.qvto");
-
+			URI transformationURI = URI.createFileURI(Paths.get(".").resolve(
+					"src/de/wwu/maml/md2converter/transformations/Md2ModelLayer.qvto").toAbsolutePath().normalize().toString());
+			//URI.createURI("platform:/resource/de.wwu.maml/src/de/wwu/maml/md2converter/transformations/Md2ModelLayer.qvto");
+			
 			TransformationExecutor executor = new TransformationExecutor(transformationURI);
 			result = executor.execute(context, input, output);
-			outputFile += projectName + "/models/" + projectName + "Model.md2";
+			outputFile += "/" + projectName + "/models/" + projectName + "Model.md2";
 
 		} else if (layer instanceof View) {
-			URI transformationURI = URI.createURI(
-					"platform:/resource/de.wwu.maml/src/de/wwu/maml/md2converter/transformations/Md2ViewLayer.qvto");
+			URI transformationURI = URI.createFileURI(Paths.get(".").resolve(
+					"src/de/wwu/maml/md2converter/transformations/Md2ViewLayer.qvto").toAbsolutePath().normalize().toString());
 
 			TransformationExecutor executor = new TransformationExecutor(transformationURI);
 			result = executor.execute(context, input, output);
-			outputFile += projectName + "/views/" + projectName + "View.md2";
+			outputFile += "/" + projectName + "/views/" + projectName + "View.md2";
 
 		} else if (layer instanceof Controller) {
-			URI transformationURI = URI.createURI(
-					"platform:/resource/de.wwu.maml/src/de/wwu/maml/md2converter/transformations/Md2ControllerLayer.qvto");
+			URI transformationURI = URI.createFileURI(Paths.get(".").resolve(
+					"src/de/wwu/maml/md2converter/transformations/Md2ControllerLayer.qvto").toAbsolutePath().normalize().toString());
 
 			TransformationExecutor executor = new TransformationExecutor(transformationURI);
 			result = executor.execute(context, input, output);
-			outputFile += projectName + "/controllers/" + projectName + "Controller.md2";
+			outputFile += "/" + projectName + "/controllers/" + projectName + "Controller.md2";
 
 		} else if (layer instanceof Workflow) {
-			URI transformationURI = URI.createURI(
-					"platform:/resource/de.wwu.maml/src/de/wwu/maml/md2converter/transformations/Md2WorkflowLayer.qvto");
+			URI transformationURI = URI.createFileURI(Paths.get(".").resolve(
+					"src/de/wwu/maml/md2converter/transformations/Md2WorkflowLayer.qvto").toAbsolutePath().normalize().toString());
 
 			TransformationExecutor executor = new TransformationExecutor(transformationURI);
 			result = executor.execute(context, input, output);
-			outputFile += projectName + "/workflows/" + projectName + "Workflow.md2";
+			outputFile += "/" + projectName + "/workflows/" + projectName + "Workflow.md2";
 
 		} else {
 			throw new RuntimeException("Unsupported MD2 layer encountered!");
@@ -164,6 +172,27 @@ public class MD2ConverterStandalone {
 			XmiToMd2Converter.writeToMd2(output.getContents(), outputFile);
 		} else {
 			throw new RuntimeException("Transformation failed. " + result.toString());
+		}
+	}
+	
+	public static String getProjectName(EList<EObject> modelObjects){
+		String projectName = DEFAULT_PROJECT_NAME;
+		if (((md2dot0.Model) EcoreUtil.getRootContainer(modelObjects.get(0))).getProjectName() != null) {
+			projectName = ((md2dot0.Model) EcoreUtil.getRootContainer(modelObjects.get(0))).getProjectName();
+		}
+		return projectName;
+	}
+	
+	private static void checkArgs(String[] args) {
+		if (args.length==0) {
+			System.err.println("Aborting: no model provided!");
+			System.exit(1);
+		} else {
+			File folder = new File(args[0]);
+			if(!(folder.exists())) {
+				System.err.println("Source file " + folder.getAbsolutePath() + " not found.");
+				System.exit(1);
+			}
 		}
 	}
 }

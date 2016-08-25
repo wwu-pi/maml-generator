@@ -9,6 +9,8 @@ Gradle project for MAML build
 
 Project name: ${project.name}"""
 
+defaultTasks 'generate'
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -32,6 +34,7 @@ dependencies {
 	compile 'org.eclipse.ocl:org.eclipse.ocl.ecore:3.3.+' // current Neon 3.6
 	compile 'org.eclipse.xtext:org.eclipse.xtext:2.10.+'
 	compile 'org.eclipse.xtext:org.eclipse.xtext.common.types:2.10.+'
+	//compile 'org.eclipse.xtext:org.eclipse.xtext.generator:2.10.+'
 	compile 'com.google.inject.extensions:guice-multibindings:4.+'
 	compile 'com.google.inject:guice:4.+'
 	
@@ -69,16 +72,22 @@ sourceSets {
      }
 }
 
-/*
-jar {
-  manifest { 
-    attributes 'Main-Class': 'de.wwu.maml.md2converter.MD2ConverterStandalone' 
-  }
+// Start the full generation process
+task generate (dependsOn: 'runMd2Transform') << {
+	// run will build the MAML project and perform the QVT-transformation
+	
+	// Run md2-framework conversion
+	/*javaexec { 
+		main="-jar"; args 'libs/md2-framework.jar' // ../src-gen/mamlProject/'
+	}*/
+	
+	// build android project
+	// TODO
 } 
 
-task hello {
-  doLast {
-    println 'Hello Gradle'
-  }
-} 
-*/
+task runMd2Transform (type: JavaExec) {//, dependsOn: 'run') {
+	classpath = sourceSets.main.runtimeClasspath
+	main = '-jar'
+	//args 'libs/md2-framework.jar'// ../src-gen/mamlProject/'
+	args 'libs/md2-framework.jar'// ../src-gen/mamlProject/'
+}

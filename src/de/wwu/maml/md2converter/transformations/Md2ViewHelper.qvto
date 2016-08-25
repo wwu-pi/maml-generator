@@ -28,19 +28,17 @@ mapping ProcessElement::toViewElement(): FlowLayoutPane {
 	log("..toViewElement: " + self.metaClassName() + "View");
 	
 	name := self.metaClassName() + "View".addSuffixNumber();
-	params := map getFlowDirectionParam(true);
+	params := getFlowDirectionParam(true);
 	elements := self.toViewElementContent();
 }
 
-mapping getFlowDirectionParam(vertical : Boolean): FlowLayoutPaneFlowDirectionParam {
-	init {
-		var direction : FlowDirection := FlowDirection::VERTICAL;
-		if(not vertical) then {
-			direction := FlowDirection::HORIZONTAL;
-		} endif;
-	}
+helper getFlowDirectionParam(vertical : Boolean): FlowLayoutPaneFlowDirectionParam {
+	var direction : FlowDirection := FlowDirection::VERTICAL;
+	if(not vertical) then {
+		direction := FlowDirection::HORIZONTAL;
+	} endif;
 	
-	object result: FlowLayoutPaneFlowDirectionParam {
+	return object FlowLayoutPaneFlowDirectionParam {
 		flowDirection := direction;
 	}
 }
@@ -161,7 +159,7 @@ mapping ParameterConnector::toReadAttribute(): FlowLayoutPane {
 	
 	name := "attributePane".addSuffixNumber();
 	elements := OrderedSet { self.map toAttributeLabel() , self.map toReadAttributeField() };
-	params := map getFlowDirectionParam(false);
+	params := getFlowDirectionParam(false);
 }
 
 mapping ParameterConnector::toAttributeLabel(): MD2::Label {

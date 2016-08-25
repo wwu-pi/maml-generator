@@ -48,8 +48,8 @@ mapping ProcessElement::toWorkflowElementEntry(): WorkflowElementEntry {
 	log(".toWorkflowElementEntry: " + self.description);
 	
 	workflowElement := self.resolveone(elem : WorkflowElement);
-	invokable := self.isWorkflowElementInvokable();
-	eventDesc := if(self.isWorkflowElementInvokable()) then { safeVal(self.container().oclAsType(UseCase).title, self.description, "") } endif;
+	invokable := false;
+	eventDesc := null; // Not explcitely modeled in MAML
 	firedEvents := self.toFiredEvents();
 }
 
@@ -95,7 +95,7 @@ helper MD2::WorkflowElement::toWorkflowElementReference(): WorkflowElementRefere
 		workflowElementReference := self;
 		startable := self.isStartable();
 		if(self.isStartable()) then {
-			alias := safeVal(self.getUseCase().title);
+			alias := safeVal(self.getUseCase().title, self.name, "");
 		} endif;
 	}
 }
@@ -105,7 +105,7 @@ helper MD2::WorkflowElement::toWorkflowElementReference(): WorkflowElementRefere
 //////////////////////////////////////////////////////////////////////
 
 // Is the process element the first element within the process
-query ProcessFlowElement::isWorkflowElementInvokable(): Boolean { // TODO make transitive to skip first datasource etc.
+query ProcessFlowElement::isWorkflowElementStartable(): Boolean { // TODO make transitive to skip first datasource etc.
 	if(self.previousElements->size() != 1) then {
 		return false;
 	} elif (self.previousElements->first().sourceProcessFlowElement.oclIsTypeOf(ProcessStartEvent)) then { //TODO allow XOR as first element??
@@ -114,13 +114,13 @@ query ProcessFlowElement::isWorkflowElementInvokable(): Boolean { // TODO make t
 		// there is some visible screen before -> not startable
 		return false;
 	} else {
-		return self.previousElements->first().sourceProcessFlowElement.isWorkflowElementInvokable();
+		return self.previousElements->first().sourceProcessFlowElement.isWorkflowElementStartable();
 	} endif;
 }
 
 // Inverse to isWorkflowElementInvokable from MD2::WFE perspective
 query MD2::WorkflowElement::isStartable(): Boolean {
-	return self.invresolveone(ProcessElement).isWorkflowElementInvokable();
+	return self.invresolveone(ProcessElement).isWorkflowElementStartable();
 }
 
 // Get the following ProcessElement (i.e. find transitive followers through Events, XORs, ...)

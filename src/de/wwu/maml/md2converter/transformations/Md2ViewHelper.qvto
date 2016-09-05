@@ -117,8 +117,8 @@ mapping ParameterConnector::toLabel(): MD2::Label {
 	log("...toLabel");
 	
 	object result: MD2::Label {
-		name := "label".addSuffixNumber();
-		text := self.description;
+		name := "labelElement".addSuffixNumber();
+		text := safeVal(self.targetElement.description);
 		width := 100;
 		style := null; // TODO label style?
 	}

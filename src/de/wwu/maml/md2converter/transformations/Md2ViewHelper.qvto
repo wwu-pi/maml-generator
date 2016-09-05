@@ -181,22 +181,23 @@ helper MAMLgui::Attribute::toWriteAttribute(): OrderedSet(ViewGUIElement) {
 	
 	switch {
 		//TODO more
-		case (attribute.type.oclIsTypeOf(_String)) return OrderedSet { attribute.map toTextInput() };
-		case (attribute.type.oclIsTypeOf(_Integer)) return OrderedSet { attribute.map toIntegerInput() };		
-		case (attribute.type.oclIsTypeOf(Float)) return OrderedSet { attribute.map toNumberInput() };
-		case (attribute.type.oclIsTypeOf(_Boolean)) return OrderedSet { attribute.map toBooleanInput() };
-		case (attribute.type.oclIsTypeOf(Date)) return OrderedSet { attribute.map toDateInput() };
-		case (attribute.type.oclIsTypeOf(Time)) return OrderedSet { attribute.map toTimeInput() };
-		case (attribute.type.oclIsTypeOf(DateTime)) return OrderedSet { attribute.map toDateTimeInput() };
-		case (attribute.type.oclIsTypeOf(File)) return OrderedSet { attribute.map toFileInput() };
+		// TODO currently as String -> bad!
+		case (attribute.type.equalsIgnoreCase("String") or attribute.type.oclIsTypeOf(_String)) return OrderedSet { attribute.map toTextInput() };
+		case (attribute.type.equalsIgnoreCase("Integer") or attribute.type.oclIsTypeOf(_Integer)) return OrderedSet { attribute.map toIntegerInput() };		
+		case (attribute.type.equalsIgnoreCase("Float") or attribute.type.oclIsTypeOf(Float)) return OrderedSet { attribute.map toNumberInput() };
+		case (attribute.type.equalsIgnoreCase("Boolean") or attribute.type.oclIsTypeOf(_Boolean)) return OrderedSet { attribute.map toBooleanInput() };
+		case (attribute.type.equalsIgnoreCase("Date") or attribute.type.oclIsTypeOf(Date)) return OrderedSet { attribute.map toDateInput() };
+		case (attribute.type.equalsIgnoreCase("Time") or attribute.type.oclIsTypeOf(Time)) return OrderedSet { attribute.map toTimeInput() };
+		case (attribute.type.equalsIgnoreCase("DateTime") or attribute.type.oclIsTypeOf(DateTime)) return OrderedSet { attribute.map toDateTimeInput() };
+		case (attribute.type.equalsIgnoreCase("File") or attribute.type.oclIsTypeOf(File)) return OrderedSet { attribute.map toFileInput() };
 		// MAML primitives to MD2 non-primitives
-		case (attribute.type.oclIsTypeOf(PhoneNumber)) return OrderedSet { attribute.map toTextInput() };
-		case (attribute.type.oclIsTypeOf(Url)) return OrderedSet { attribute.map toTextInput() };
-		case (attribute.type.oclIsTypeOf(Email)) return OrderedSet { attribute.map toTextInput() };
+		case (attribute.type.equalsIgnoreCase("PhoneNumber") or attribute.type.oclIsTypeOf(PhoneNumber)) return OrderedSet { attribute.map toTextInput() };
+		case (attribute.type.equalsIgnoreCase("Url") or attribute.type.oclIsTypeOf(Url)) return OrderedSet { attribute.map toTextInput() };
+		case (attribute.type.equalsIgnoreCase("Email") or attribute.type.oclIsTypeOf(Email)) return OrderedSet { attribute.map toTextInput() };
 		// Complex types
 	//	case (self.oclIsTypeOf(CustomType)) return self.oclAsType(CustomType).toReferencedType(isCollection); // TODO nested type
 	//	case (self.oclIsTypeOf(_Collection)) return self.oclAsType(_Collection).type.toPrimitiveOrComplexAttributeType(true); // TODO multiple
-		case (attribute.type.oclIsTypeOf(Enum)) return OrderedSet { attribute.map toOptionInput() };
+		case (attribute.type.equalsIgnoreCase("Enum") or attribute.type.oclIsTypeOf(Enum)) return OrderedSet { attribute.map toOptionInput() };
 		
 		else return OrderedSet { attribute.map toTextInput() };
 	};
@@ -285,6 +286,8 @@ mapping MAMLgui::Attribute::toOptionInput(): OptionInput {
 }
 
 mapping MAMLgui::Attribute::toFileInput(): FileUpload {
+	log("..toFileInput");
+	
 	name := "writeAttribute".addSuffixNumber();
 	width := 100;
 	labelText := self.description;

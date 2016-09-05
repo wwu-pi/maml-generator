@@ -336,12 +336,13 @@ helper ProcessElement::getContinueButtonText(atPosition : Integer): String {
 		return safeVal(self.nextElements->first().description, DEFAULT_BUTTON_TEXT);
 	} else {
 		// Search splitting point
-		var searchXor := self.nextElements->first();
+		var searchXor := self.nextElements->first().targetProcessFlowElement;
+		
 		while(not searchXor.oclIsTypeOf(Xor)) {
-			searchXor := searchXor.targetProcessFlowElement.nextElements->first();
+			searchXor := searchXor.nextElements->first().targetProcessFlowElement;
 		};
 		// Select from multiple continues 
-		return searchXor.targetProcessFlowElement.nextElements->at(atPosition).description;
+		return searchXor.nextElements->at(atPosition).description;
 	} endif;
 	return null; // Should never occur
 }

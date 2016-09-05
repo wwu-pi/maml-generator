@@ -50,13 +50,13 @@ helper MD2::ViewElementType::toReferencedType(): AbstractViewGUIElementRef {
 	}
 }
 
-helper ProcessElement::toViewElementContent(): Collection(ViewGUIElement){
+helper ProcessElement::toViewElementContent(): OrderedSet(ViewGUIElement){
 	// The real stuff happens in the subtype specific toViewElementContent methods
 	log("ERROR: Unhandled process element type: " + self.metaClassName() + "(" + self.description + ")");
 	return null;//self.getAttachedParameters()->toContentElement();
 }
 
-helper SelectEntity::toViewElementContent(): Collection(ViewGUIElement){
+helper SelectEntity::toViewElementContent(): OrderedSet(ViewGUIElement){
 	var content : OrderedSet(ViewGUIElement) := OrderedSet { self.map toTitle() }; // Title 
 	content += self.getAttachedLabels().map toLabel(); // Labels
 	content += self->map toTable(self.getAttachedAttributes()); // Table (ideally)
@@ -65,41 +65,41 @@ helper SelectEntity::toViewElementContent(): Collection(ViewGUIElement){
 	return content;
 }
 
-helper ShowEntity::toViewElementContent(): Collection(ViewGUIElement){
+helper ShowEntity::toViewElementContent(): OrderedSet(ViewGUIElement){
 	var content : OrderedSet(ViewGUIElement) := OrderedSet { self.map toTitle() }; // Title 
 	content += self.getAttachedParameters().toViewElements(); // Fields
 	content += OrderedSet { createSpacer() }; // Spacer between content and button block
 	content += self.toContinueButtons(); // Buttons
-	return content->flatten();
+	return content;
 }
 
-helper UpdateEntity::toViewElementContent(): Collection(ViewGUIElement){
+helper UpdateEntity::toViewElementContent(): OrderedSet(ViewGUIElement){
 	var content : OrderedSet(ViewGUIElement) := OrderedSet { self.map toTitle() }; // Title 
 	content += self.getAttachedParameters().toViewElements(); // Fields
 	content += OrderedSet { createSpacer() }; // Spacer between content and button block
 	content += self.toContinueButtons(); // Buttons
-	return content->flatten();
+	return content;
 }
 
-helper CreateEntity::toViewElementContent(): Collection(ViewGUIElement){
+helper CreateEntity::toViewElementContent(): OrderedSet(ViewGUIElement){
 	var content : OrderedSet(ViewGUIElement) := OrderedSet { self.map toTitle() }; // Title 
 	content += self.getAttachedParameters().toViewElements(); // Fields
 	content += OrderedSet { createSpacer() }; // Spacer between content and button block
 	content += self.toContinueButtons(); // Buttons
-	return content->flatten();
+	return content;
 }
 
-helper ParameterConnector::toViewElements(): Collection(ViewGUIElement){
+helper ParameterConnector::toViewElements(): OrderedSet(ViewGUIElement){
 	log("...toViewElements");
 	
 	switch {
 		case (self.targetElement.oclIsTypeOf(Label)) return OrderedSet { self.map toLabel() };
 		case (self.targetElement.oclIsTypeOf(Attribute) and self.accessType = AccessType::READ) return OrderedSet { self.map toReadAttribute() };
-		case (self.targetElement.oclIsTypeOf(Attribute) and self.accessType = AccessType::WRITE) return OrderedSet { self.targetElement.oclAsType(MAMLgui::Attribute).map toWriteAttribute(self) }->flatten();
+		case (self.targetElement.oclIsTypeOf(Attribute) and self.accessType = AccessType::WRITE) return  self.targetElement.oclAsType(MAMLgui::Attribute).map toWriteAttribute(self);
 		// TODO computed attributes...
 	};
 	
-	return Set {};
+	return OrderedSet {};
 }
 
 mapping ProcessElement::toTitle(): MD2::Label {

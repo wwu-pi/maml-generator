@@ -40,7 +40,7 @@ import de.wwu.md2.framework.generator.Main;
 
 public class MD2ConverterStandalone {
 
-	private static final String DEFAULT_PROJECT_NAME = "mamlProject";
+	private static final String DEFAULT_PROJECT_NAME = "MAMLProject";
 	private static final String OUTPUT_BASE_PATH = Paths.get(".").resolve("src-gen/").toAbsolutePath().normalize().toString();//"platform:/resource/de.wwu.maml/src-gen/";
 	private static final String OUTPUT_PATH_RELATIVE = "src-gen/";
 	
@@ -136,7 +136,7 @@ public class MD2ConverterStandalone {
 			
 			TransformationExecutor executor = new TransformationExecutor(transformationURI);
 			result = executor.execute(context, input, output);
-			outputFile += "/" + projectName + "/models/" + projectName + "Model.md2";
+			outputFile += "/" + projectName + "/src/" + projectName + "/models/" + projectName + "Model.md2";
 
 		} else if (layer instanceof View) {
 			URI transformationURI = URI.createFileURI(Paths.get(".").resolve(
@@ -144,7 +144,7 @@ public class MD2ConverterStandalone {
 
 			TransformationExecutor executor = new TransformationExecutor(transformationURI);
 			result = executor.execute(context, input, output);
-			outputFile += "/" + projectName + "/views/" + projectName + "View.md2";
+			outputFile += "/" + projectName + "/src/" + projectName + "/views/" + projectName + "View.md2";
 
 		} else if (layer instanceof Controller) {
 			URI transformationURI = URI.createFileURI(Paths.get(".").resolve(
@@ -152,7 +152,7 @@ public class MD2ConverterStandalone {
 
 			TransformationExecutor executor = new TransformationExecutor(transformationURI);
 			result = executor.execute(context, input, output);
-			outputFile += "/" + projectName + "/controllers/" + projectName + "Controller.md2";
+			outputFile += "/" + projectName + "/src/" + projectName + "/controllers/" + projectName + "Controller.md2";
 
 		} else if (layer instanceof Workflow) {
 			URI transformationURI = URI.createFileURI(Paths.get(".").resolve(
@@ -160,7 +160,7 @@ public class MD2ConverterStandalone {
 
 			TransformationExecutor executor = new TransformationExecutor(transformationURI);
 			result = executor.execute(context, input, output);
-			outputFile += "/" + projectName + "/workflows/" + projectName + "Workflow.md2";
+			outputFile += "/" + projectName + "/src/" + projectName + "/workflows/" + projectName + "Workflow.md2";
 
 		} else {
 			throw new RuntimeException("Unsupported MD2 layer encountered!");

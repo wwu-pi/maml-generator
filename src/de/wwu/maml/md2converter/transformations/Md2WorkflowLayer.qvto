@@ -36,7 +36,7 @@ helper Model::toWorkflowElementEntries(): Collection(WorkflowElementEntry) {
 	self.map toController(); // initialize controller layer
 
 	self.useCases.processFlowElements->forEach(elem) {
-		if(elem.oclIsKindOf(ProcessElement)) then {
+		if(elem.oclIsKindOf(ProcessElement) and not elem.oclIsKindOf(Transform)) then {
 			entries += elem.oclAsType(ProcessElement).map toWorkflowElementEntry();
 		} endif;
 	};
@@ -133,7 +133,10 @@ query ProcessFlowElement::getNextProcessElements(): Collection(ProcessElement) {
 	
 	// TODO include Error process flows and special events
 	self.nextElements.targetProcessFlowElement->forEach(elem) {
-		if(elem.oclIsKindOf(ProcessElement)) then {
+		if(elem.oclIsKindOf(Transform)) then {
+			// Skip transform and get next real process element
+			collect += elem.getNextProcessElements();
+		} elif(elem.oclIsKindOf(ProcessElement)) then {
 			collect += elem.oclAsType(ProcessElement);
 		} else {
 			// Else no real process element, e.g. end, xor, datasource -> get transitive followers
@@ -153,7 +156,10 @@ query Role::getWorkflowElements(): Collection(WorkflowElement) {
 	var outcome : Collection(WorkflowElement) := Set{};
 	
 	self.container().container().oclAsType(Model).useCases.processFlowElements[ProcessElement]->forEach(elem){
-		outcome += elem.resolveone(WorkflowElement); // TODO check that role is assigned to this PE
+		var wfe : WorkflowElement := elem.resolveone(WorkflowElement); 
+		if(not (wfe = null)) then { // TODO check that role is assigned to this PE
+			outcome += wfe;
+		} endif;
 	};
 	return outcome;
 }

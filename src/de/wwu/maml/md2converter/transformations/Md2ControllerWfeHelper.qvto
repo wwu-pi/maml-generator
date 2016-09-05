@@ -35,6 +35,11 @@ helper ProcessFlowElement::toWorkflowElement(): WorkflowElement {
 	return null;
 }
 
+helper Transform::toWorkflowElement(): WorkflowElement {
+	// Transform has no workflow elements
+	return null;
+}
+
 mapping SelectEntity::toWorkflowElement(): WorkflowElement {
 	log("..toWorkflowElement: " + self.description.toName());
 	// TODO

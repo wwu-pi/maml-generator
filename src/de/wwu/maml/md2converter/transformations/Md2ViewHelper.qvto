@@ -95,7 +95,7 @@ helper ParameterConnector::toViewElements(): Collection(ViewGUIElement){
 	switch {
 		case (self.targetElement.oclIsTypeOf(Label)) return OrderedSet { self.map toLabel() };
 		case (self.targetElement.oclIsTypeOf(Attribute) and self.accessType = AccessType::READ) return OrderedSet { self.map toReadAttribute() };
-		case (self.targetElement.oclIsTypeOf(Attribute) and self.accessType = AccessType::WRITE) return OrderedSet { self.targetElement.oclAsType(MAMLgui::Attribute).map toWriteAttribute() }->flatten();
+		case (self.targetElement.oclIsTypeOf(Attribute) and self.accessType = AccessType::WRITE) return OrderedSet { self.targetElement.oclAsType(MAMLgui::Attribute).map toWriteAttribute(self) }->flatten();
 		// TODO computed attributes...
 	};
 	
@@ -176,122 +176,122 @@ mapping ParameterConnector::toReadAttributeField(): MD2::Label {
 	style := null; // TODO label style?
 }
 
-helper MAMLgui::Attribute::toWriteAttribute(): OrderedSet(ViewGUIElement) {
+helper MAMLgui::Attribute::toWriteAttribute(connector : ParameterConnector): OrderedSet(ViewGUIElement) {
 	var attribute := self;// MAMLgui::Attribute := self.targetElement.oclAsType(MAMLgui::Attribute); 
 	
 	switch {
 		//TODO more
 		// TODO currently as String -> bad!
-		case (attribute.type.equalsIgnoreCase("String") or attribute.type.oclIsTypeOf(_String)) return OrderedSet { attribute.map toTextInput() };
-		case (attribute.type.equalsIgnoreCase("Integer") or attribute.type.oclIsTypeOf(_Integer)) return OrderedSet { attribute.map toIntegerInput() };		
-		case (attribute.type.equalsIgnoreCase("Float") or attribute.type.oclIsTypeOf(Float)) return OrderedSet { attribute.map toNumberInput() };
-		case (attribute.type.equalsIgnoreCase("Boolean") or attribute.type.oclIsTypeOf(_Boolean)) return OrderedSet { attribute.map toBooleanInput() };
-		case (attribute.type.equalsIgnoreCase("Date") or attribute.type.oclIsTypeOf(Date)) return OrderedSet { attribute.map toDateInput() };
-		case (attribute.type.equalsIgnoreCase("Time") or attribute.type.oclIsTypeOf(Time)) return OrderedSet { attribute.map toTimeInput() };
-		case (attribute.type.equalsIgnoreCase("DateTime") or attribute.type.oclIsTypeOf(DateTime)) return OrderedSet { attribute.map toDateTimeInput() };
-		case (attribute.type.equalsIgnoreCase("File") or attribute.type.oclIsTypeOf(File)) return OrderedSet { attribute.map toFileInput() };
+		case (attribute.type.equalsIgnoreCase("String") or attribute.type.oclIsTypeOf(_String)) return OrderedSet { attribute.map toTextInput(connector) };
+		case (attribute.type.equalsIgnoreCase("Integer") or attribute.type.oclIsTypeOf(_Integer)) return OrderedSet { attribute.map toIntegerInput(connector) };		
+		case (attribute.type.equalsIgnoreCase("Float") or attribute.type.oclIsTypeOf(Float)) return OrderedSet { attribute.map toNumberInput(connector) };
+		case (attribute.type.equalsIgnoreCase("Boolean") or attribute.type.oclIsTypeOf(_Boolean)) return OrderedSet { attribute.map toBooleanInput(connector) };
+		case (attribute.type.equalsIgnoreCase("Date") or attribute.type.oclIsTypeOf(Date)) return OrderedSet { attribute.map toDateInput(connector) };
+		case (attribute.type.equalsIgnoreCase("Time") or attribute.type.oclIsTypeOf(Time)) return OrderedSet { attribute.map toTimeInput(connector) };
+		case (attribute.type.equalsIgnoreCase("DateTime") or attribute.type.oclIsTypeOf(DateTime)) return OrderedSet { attribute.map toDateTimeInput(connector) };
+		case (attribute.type.equalsIgnoreCase("File") or attribute.type.oclIsTypeOf(File)) return OrderedSet { attribute.map toFileInput(connector) };
 		// MAML primitives to MD2 non-primitives
-		case (attribute.type.equalsIgnoreCase("PhoneNumber") or attribute.type.oclIsTypeOf(PhoneNumber)) return OrderedSet { attribute.map toTextInput() };
-		case (attribute.type.equalsIgnoreCase("Url") or attribute.type.oclIsTypeOf(Url)) return OrderedSet { attribute.map toTextInput() };
-		case (attribute.type.equalsIgnoreCase("Email") or attribute.type.oclIsTypeOf(Email)) return OrderedSet { attribute.map toTextInput() };
+		case (attribute.type.equalsIgnoreCase("PhoneNumber") or attribute.type.oclIsTypeOf(PhoneNumber)) return OrderedSet { attribute.map toTextInput(connector) };
+		case (attribute.type.equalsIgnoreCase("Url") or attribute.type.oclIsTypeOf(Url)) return OrderedSet { attribute.map toTextInput(connector) };
+		case (attribute.type.equalsIgnoreCase("Email") or attribute.type.oclIsTypeOf(Email)) return OrderedSet { attribute.map toTextInput(connector) };
 		// Complex types
 	//	case (self.oclIsTypeOf(CustomType)) return self.oclAsType(CustomType).toReferencedType(isCollection); // TODO nested type
 	//	case (self.oclIsTypeOf(_Collection)) return self.oclAsType(_Collection).type.toPrimitiveOrComplexAttributeType(true); // TODO multiple
-		case (attribute.type.equalsIgnoreCase("Enum") or attribute.type.oclIsTypeOf(Enum)) return OrderedSet { attribute.map toOptionInput() };
+		case (attribute.type.equalsIgnoreCase("Enum") or attribute.type.oclIsTypeOf(Enum)) return OrderedSet { attribute.map toOptionInput(connector) };
 		
-		else return OrderedSet { attribute.map toTextInput() };
+		else return OrderedSet { attribute.map toTextInput(connector) };
 	};
 	return OrderedSet{};
 }
 
-mapping MAMLgui::Attribute::toTextInput(): TextInput {
+mapping MAMLgui::Attribute::toTextInput(connector : ParameterConnector): TextInput {
 	name := "writeAttribute".addSuffixNumber();
 	width := 100;
-	labelText := self.description;
-	tooltipText := self.description; // TODO makes sense for Android?
+	labelText := connector.getLabelText();
+	tooltipText := connector.getLabelText(); // Hint for Android (used as placeholder)
 	isDisabled := false;
 	type := TextInputType::INPUT; //TODO textarea
 	defaultValue := "";
 } 
 
-mapping MAMLgui::Attribute::toIntegerInput(): IntegerInput {
+mapping MAMLgui::Attribute::toIntegerInput(connector : ParameterConnector): IntegerInput {
 	name := "writeAttribute".addSuffixNumber();
 	width := 100;
-	labelText := self.description;
-	tooltipText := self.description; // TODO makes sense for Android?
+	labelText := connector.getLabelText();
+	tooltipText := connector.getLabelText(); // Hint for Android (used as placeholder)
 	isDisabled := false;
 	type := IntegerInputType::DEFAULT;
 	defaultValue := 0;
 }
 
-mapping MAMLgui::Attribute::toNumberInput(): NumberInput {
+mapping MAMLgui::Attribute::toNumberInput(connector : ParameterConnector): NumberInput {
 	name := "writeAttribute".addSuffixNumber();
 	width := 100;
-	labelText := self.description;
-	tooltipText := self.description; // TODO makes sense for Android?
+	labelText := connector.getLabelText();
+	tooltipText := connector.getLabelText(); // Hint for Android (used as placeholder)
 	isDisabled := false;
 	type := NumberInputType::DEFAULT;
 	defaultValue := 0;
 }
 
-mapping MAMLgui::Attribute::toBooleanInput(): BooleanInput {
+mapping MAMLgui::Attribute::toBooleanInput(connector : ParameterConnector): BooleanInput {
 	name := "writeAttribute".addSuffixNumber();
 	width := 100;
-	labelText := self.description;
-	tooltipText := self.description; // TODO makes sense for Android?
+	labelText := connector.getLabelText();
+	tooltipText := connector.getLabelText(); // Hint for Android (used as placeholder)
 	isDisabled := false;
 	type := BooleanInputType::DEFAULT;
 	defaultValue := 'false';
 }
 
-mapping MAMLgui::Attribute::toDateInput(): DateInput {
+mapping MAMLgui::Attribute::toDateInput(connector : ParameterConnector): DateInput {
 	name := "writeAttribute".addSuffixNumber();
 	width := 100;
-	labelText := self.description;
-	tooltipText := self.description; // TODO makes sense for Android?
+	labelText := connector.getLabelText();
+	tooltipText := connector.getLabelText(); // Hint for Android (used as placeholder)
 	isDisabled := false;
 	type := DateInputType::DEFAULT;
 	defaultValue := null;
 }
 
-mapping MAMLgui::Attribute::toTimeInput(): TimeInput {
+mapping MAMLgui::Attribute::toTimeInput(connector : ParameterConnector): TimeInput {
 	name := "writeAttribute".addSuffixNumber();
 	width := 100;
-	labelText := self.description;
-	tooltipText := self.description; // TODO makes sense for Android?
+	labelText := connector.getLabelText();
+	tooltipText := connector.getLabelText(); // Hint for Android (used as placeholder)
 	isDisabled := false;
 	type := TimeInputType::DEFAULT;
 	defaultValue := null;
 }
 
-mapping MAMLgui::Attribute::toDateTimeInput(): DateTimeInput {
+mapping MAMLgui::Attribute::toDateTimeInput(connector : ParameterConnector): DateTimeInput {
 	name := "writeAttribute".addSuffixNumber();
 	width := 100;
-	labelText := self.description;
-	tooltipText := self.description; // TODO makes sense for Android?
+	labelText := connector.getLabelText();
+	tooltipText := connector.getLabelText(); // Hint for Android (used as placeholder)
 	isDisabled := false;
 	type := DateTimeInputType::DEFAULT;
 	defaultValue := null;
 }
 
-mapping MAMLgui::Attribute::toOptionInput(): OptionInput {
+mapping MAMLgui::Attribute::toOptionInput(connector : ParameterConnector): OptionInput {
 	name := "writeAttribute".addSuffixNumber();
 	width := 100;
-	labelText := self.description;
-	tooltipText := self.description; // TODO makes sense for Android?
+	labelText := connector.getLabelText();
+	tooltipText := connector.getLabelText(); // Hint for Android (used as placeholder)
 	isDisabled := false;
 	type := OptionInputType::DEFAULT;
 	defaultValue := null;
 	enumReference := self.type.oclAsType(MAMLdata::Enum).resolveone(MD2::Enum);
 }
 
-mapping MAMLgui::Attribute::toFileInput(): FileUpload {
+mapping MAMLgui::Attribute::toFileInput(connector : ParameterConnector): FileUpload {
 	log("..toFileInput");
 	
 	name := "writeAttribute".addSuffixNumber();
 	width := 100;
-	labelText := self.description;
-	tooltipText := self.description; // TODO makes sense for Android?
+	labelText := connector.getLabelText();
+	tooltipText := connector.getLabelText(); // Hint for Android (used as placeholder)
 	isDisabled := false;
 	style := null; // TODO default style
 	buttonValueText := self.description;
@@ -345,6 +345,20 @@ helper ProcessElement::getContinueButtonText(atPosition : Integer): String {
 		return searchXor.nextElements->at(atPosition).description;
 	} endif;
 	return null; // Should never occur
+}
+
+helper ParameterConnector::getLabelText(): String {
+	var labelText : String := "";
+	
+	if(not (self.description = null) and self.description.length() > 0) then {
+		labelText := self.description;
+	} elif (not (self.targetElement = null) and not (self.targetElement.description = null)) then {
+		 // Alternative default representation for attributes 
+		 // TODO split from camelcase to words
+		 labelText := self.targetElement.description.toFirstUpper();
+	} endif;
+	
+	return labelText;
 }
 
 //////////////////////////////////////////////////////////////////////

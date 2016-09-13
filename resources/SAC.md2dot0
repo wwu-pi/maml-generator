@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<de.wwu.md2dot0:UseCase xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:de.wwu.md2dot0="http://de/wwu/md2dot0" xmlns:de.wwu.md2dot0data="http://de/wwu/md2dot0data" xmlns:de.wwu.md2dot0gui="http://de/wwu/md2dot0gui" title="Add publication">
+  <processFlowElements xsi:type="de.wwu.md2dot0:CreateEntity" parameters="//@processFlowConnections.8 //@processFlowConnections.9 //@processFlowConnections.10 //@processFlowConnections.20 //@processFlowConnections.21" nextElements="//@processFlowConnections.2" previousElements="//@processFlowConnections.1" dataType="//@dataTypes.0" description="Add publication" roles="//@roles.0 //@roles.1"/>
+  <processFlowElements xsi:type="de.wwu.md2dot0:ProcessStartEvent" nextElements="//@processFlowConnections.0"/>
+  <processFlowElements xsi:type="de.wwu.md2dot0:RemoteDataSource" nextElements="//@processFlowConnections.1" previousElements="//@processFlowConnections.0" dataType="//@dataTypes.0" typeName="Publication"/>
+  <processFlowElements xsi:type="de.wwu.md2dot0:UpdateEntity" parameters="//@processFlowConnections.11 //@processFlowConnections.22" nextElements="//@processFlowConnections.3" previousElements="//@processFlowConnections.2" dataType="//@dataTypes.0" description="Upload files" roles="//@roles.0 //@roles.1"/>
+  <processFlowElements xsi:type="de.wwu.md2dot0:Xor" nextElements="//@processFlowConnections.4 //@processFlowConnections.7" previousElements="//@processFlowConnections.3"/>
+  <processFlowElements xsi:type="de.wwu.md2dot0:Transform" nextElements="//@processFlowConnections.5" previousElements="//@processFlowConnections.4" dataType="//@dataTypes.14" description="input.author"/>
+  <processFlowElements xsi:type="de.wwu.md2dot0:UpdateEntity" parameters="//@processFlowConnections.12 //@processFlowConnections.13 //@processFlowConnections.14 //@processFlowConnections.15 //@processFlowConnections.18 //@processFlowConnections.19 //@processFlowConnections.24" nextElements="//@processFlowConnections.6" previousElements="//@processFlowConnections.5" dataType="//@dataTypes.14" description="Update author information" roles="//@roles.0"/>
+  <processFlowElements xsi:type="de.wwu.md2dot0:ProcessEndEvent" previousElements="//@processFlowConnections.23"/>
+  <processFlowElements xsi:type="de.wwu.md2dot0:Xor" nextElements="//@processFlowConnections.23" previousElements="//@processFlowConnections.6 //@processFlowConnections.7"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ProcessConnector" sourceProcessFlowElement="//@processFlowElements.1" targetProcessFlowElement="//@processFlowElements.2"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ProcessConnector" sourceProcessFlowElement="//@processFlowElements.2" targetProcessFlowElement="//@processFlowElements.0"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ProcessConnector" sourceProcessFlowElement="//@processFlowElements.0" targetProcessFlowElement="//@processFlowElements.3"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ProcessConnector" sourceProcessFlowElement="//@processFlowElements.3" targetProcessFlowElement="//@processFlowElements.4"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ProcessConnector" description="Update author" sourceProcessFlowElement="//@processFlowElements.4" targetProcessFlowElement="//@processFlowElements.5"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ProcessConnector" sourceProcessFlowElement="//@processFlowElements.5" targetProcessFlowElement="//@processFlowElements.6"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ProcessConnector" sourceProcessFlowElement="//@processFlowElements.6" targetProcessFlowElement="//@processFlowElements.8"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ProcessConnector" description="Skip author information" sourceProcessFlowElement="//@processFlowElements.4" targetProcessFlowElement="//@processFlowElements.8"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ParameterConnector" targetElement="//@attributes.0" accessType="WRITE" order="2" sourceElement="//@processFlowElements.0"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ParameterConnector" description="Date of publication" targetElement="//@attributes.1" accessType="WRITE" order="3" sourceElement="//@processFlowElements.0"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ParameterConnector" targetElement="//@attributes.2" accessType="WRITE" order="5" sourceElement="//@processFlowElements.0"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ParameterConnector" description="Submitted document(s)" targetElement="//@attributes.5" accessType="WRITE" order="2" sourceElement="//@processFlowElements.3"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ParameterConnector" targetElement="//@attributes.7" accessType="WRITE" order="6" sourceElement="//@processFlowElements.6"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ParameterConnector" targetElement="//@attributes.6" accessType="WRITE" order="7" sourceElement="//@processFlowElements.6"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ParameterConnector" description="First name" targetElement="//@attributes.3" accessType="WRITE" order="2" sourceElement="//@processFlowElements.6"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ParameterConnector" description="Last name" targetElement="//@attributes.4" accessType="WRITE" order="3" sourceElement="//@processFlowElements.6"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ParameterConnector" description="First name" targetElement="//@attributes.3" order="1" sourceElement="//@attributes.2"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ParameterConnector" description="Last name" targetElement="//@attributes.4" order="2" sourceElement="//@attributes.2"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ParameterConnector" targetElement="//@attributes.8" accessType="WRITE" order="4" sourceElement="//@processFlowElements.6"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ParameterConnector" description="Highest degree" targetElement="//@attributes.9" accessType="WRITE" order="5" sourceElement="//@processFlowElements.6"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ParameterConnector" targetElement="//@attributes.11" accessType="WRITE" order="4" sourceElement="//@processFlowElements.0"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ParameterConnector" targetElement="//@attributes.10" order="1" sourceElement="//@processFlowElements.0"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ParameterConnector" targetElement="//@attributes.12" order="1" sourceElement="//@processFlowElements.3"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ProcessConnector" sourceProcessFlowElement="//@processFlowElements.8" targetProcessFlowElement="//@processFlowElements.7"/>
+  <processFlowConnections xsi:type="de.wwu.md2dot0:ParameterConnector" targetElement="//@attributes.13" order="1" sourceElement="//@processFlowElements.6"/>
+  <roles processElements="//@processFlowElements.0 //@processFlowElements.3 //@processFlowElements.6" name="Researcher"/>
+  <roles processElements="//@processFlowElements.0 //@processFlowElements.3" name="Assistant"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="PUBLICATION" name="Publication"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="STRING" name="String" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="BOOLEAN" name="Boolean" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="PHONENUMBER" name="PhoneNumber" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="URL" name="Url" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="EMAIL" name="Email" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="FILE" name="File" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="IMAGE" name="Image" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="LOCATION" name="Location" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="INTEGER" name="Integer" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="FLOAT" name="Float" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="DATE" name="Date" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="TIME" name="Time" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="DATETIME" name="DateTime" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="AUTHOR" name="Author"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="DEGREE" name="Degree"/>
+  <dataTypes xsi:type="de.wwu.md2dot0data:DataTypeLiteral" identifier="POSITION" name="Position"/>
+  <attributes xsi:type="de.wwu.md2dot0gui:Attribute" description="title" type="String"/>
+  <attributes xsi:type="de.wwu.md2dot0gui:Attribute" description="date" type="Date"/>
+  <attributes xsi:type="de.wwu.md2dot0gui:Attribute" parameters="//@processFlowConnections.16 //@processFlowConnections.17" description="author" type="Author" multiplicity="MANY"/>
+  <attributes xsi:type="de.wwu.md2dot0gui:Attribute" description="firstName" type="String"/>
+  <attributes xsi:type="de.wwu.md2dot0gui:Attribute" description="lastName" type="String"/>
+  <attributes xsi:type="de.wwu.md2dot0gui:Attribute" description="documents" type="File" multiplicity="MANY"/>
+  <attributes xsi:type="de.wwu.md2dot0gui:Attribute" description="position" type="Position"/>
+  <attributes xsi:type="de.wwu.md2dot0gui:Attribute" description="institute" type="String"/>
+  <attributes xsi:type="de.wwu.md2dot0gui:Attribute" description="birthday" type="Date"/>
+  <attributes xsi:type="de.wwu.md2dot0gui:Attribute" description="highestDegree" type="Degree"/>
+  <attributes xsi:type="de.wwu.md2dot0gui:Label" description="Please enter all relevant publication details" type="String"/>
+  <attributes xsi:type="de.wwu.md2dot0gui:Attribute" description="keywords" type="String" multiplicity="MANY"/>
+  <attributes xsi:type="de.wwu.md2dot0gui:Label" description="Now upload one or more submitted documents" type="String"/>
+  <attributes xsi:type="de.wwu.md2dot0gui:Label" description="Please update the author information" type="String"/>
+</de.wwu.md2dot0:UseCase>

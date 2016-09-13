@@ -297,7 +297,7 @@ mapping MAMLgui::Attribute::toFileInput(connector : ParameterConnector): FileUpl
 	buttonValueText := self.description;
 }
 
-helper ProcessElement::getAttachedParameters(): Set(MAML::ParameterConnector) {
+helper ProcessElement::getAttachedParameters(): OrderedSet(MAML::ParameterConnector) {
 	var useCase: UseCase := self.container().oclAsType(UseCase);
 	
 	return useCase.processFlowConnections[ParameterConnector]

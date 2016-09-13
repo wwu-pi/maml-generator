@@ -19,13 +19,13 @@ MAML resides in the namespace de.wwu.maml and has the following structure:
 ## MAML generation approach
 This is a sample use case modeled using the graphical MAML syntax.
 
-<img src="resources/MAML_example.png" width=750px">
+<img src="resources/MAML_example.png" width=1000px"><br><br>
 
 The framework is based on [MD²](http://wwu-pi.github.io/md2-web/), a textual DSL for Business Apps.
 Therefore, a MAML model is transformed to this syntax and reuses existing code generators for the generation of app sources.
 
-<img src="resources/MAML_process.png" width=550px">
+<img src="resources/MAML_process.png" width="300px"><br><br>
 
 As example output, the first two steps of the exemplary model result in the following two Android views:
 
-<img src="resources/app_result.png" width=550px">
+<img src="resources/app_result.png" width="550px"><br><br>

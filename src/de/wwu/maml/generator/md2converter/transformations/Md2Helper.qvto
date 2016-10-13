@@ -1,6 +1,6 @@
 library Md2Helper;
 
-modeltype MAML "strict" uses "http://de/wwu/md2dot0";
+modeltype MAML "strict" uses "http://de/wwu/maml/dsl/maml";
 modeltype MD2 "strict" uses "http://www.wwu.de/md2/framework/MD2";
 
 property DEFAULT_PROJECT_NAME : String = "MAMLProject";

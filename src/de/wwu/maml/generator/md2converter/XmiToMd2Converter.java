@@ -1,4 +1,4 @@
-package de.wwu.maml.md2converter;
+package de.wwu.maml.generator.md2converter;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -35,14 +35,14 @@ public class XmiToMd2Converter {
 		new org.eclipse.emf.mwe.utils.StandaloneSetup().setPlatformUri("../");
 
 		// Register MAML and MD2 meta models
-		if (!EPackage.Registry.INSTANCE.containsKey("http://de/wwu/md2dot0")) {
-			EPackage.Registry.INSTANCE.put("http://de/wwu/md2dot0", md2dot0.Md2dot0Package.eINSTANCE);
+		if (!EPackage.Registry.INSTANCE.containsKey("http://de/wwu/maml/dsl/maml")) {
+			EPackage.Registry.INSTANCE.put("http://de/wwu/maml/dsl/maml", de.wwu.maml.dsl.maml.MamlPackage.eINSTANCE);
 		}
-		if (!EPackage.Registry.INSTANCE.containsKey("http://de/wwu/md2dot0data")) {
-			EPackage.Registry.INSTANCE.put("http://de/wwu/md2dot0data", md2dot0data.Md2dot0dataPackage.eINSTANCE);
+		if (!EPackage.Registry.INSTANCE.containsKey("http://de/wwu/maml/dsl/mamldata")) {
+			EPackage.Registry.INSTANCE.put("http://de/wwu/maml/dsl/mamldata", de.wwu.maml.dsl.mamldata.MamldataPackage.eINSTANCE);
 		}
-		if (!EPackage.Registry.INSTANCE.containsKey("http://de/wwu/md2dot0gui")) {
-			EPackage.Registry.INSTANCE.put("http://de/wwu/md2dot0gui", md2dot0gui.Md2dot0guiPackage.eINSTANCE);
+		if (!EPackage.Registry.INSTANCE.containsKey("http://de/wwu/maml/dsl/mamlgui")) {
+			EPackage.Registry.INSTANCE.put("http://de/wwu/maml/dsl/mamlgui", de.wwu.maml.dsl.mamlgui.MamlguiPackage.eINSTANCE);
 		}
 		if (!EPackage.Registry.INSTANCE.containsKey("http://www.wwu.de/md2/framework/MD2")) {
 			EPackage.Registry.INSTANCE.put("http://www.wwu.de/md2/framework/MD2", MD2Package.eINSTANCE);

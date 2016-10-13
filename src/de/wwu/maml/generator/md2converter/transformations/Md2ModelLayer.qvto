@@ -1,8 +1,8 @@
 import Md2Helper;
 import Md2ModelHelper;
 
-modeltype MAML "strict" uses "http://de/wwu/md2dot0";
-modeltype MAMLdata "strict" uses "http://de/wwu/md2dot0data";
+modeltype MAML "strict" uses "http://de/wwu/maml/dsl/maml";
+modeltype MAMLdata "strict" uses "http://de/wwu/maml/dsl/mamldata";
 modeltype MD2 "strict" uses "http://www.wwu.de/md2/framework/MD2";
 
 transformation Md2ModelLayerTransformation(in Source: MAML, out Target: MD2);

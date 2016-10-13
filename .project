@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>de.wwu.maml</name>
+	<name>de.wwu.maml.generator</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -23,6 +23,7 @@
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.pde.PluginNature</nature>
+		<nature>org.eclipse.m2m.qvt.oml.project.QVTONature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
 </projectDescription>

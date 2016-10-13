@@ -1,4 +1,4 @@
-package de.wwu.maml.md2converter;
+package de.wwu.maml.generator.md2converter;
 
 import java.io.File;
 import java.io.OutputStreamWriter;
@@ -27,6 +27,7 @@ import org.eclipse.m2m.qvt.oml.util.WriterLog;
 
 import com.google.inject.Injector;
 
+import de.wwu.maml.dsl.maml.MamlFactory;
 import de.wwu.md2.framework.MD2StandaloneSetup;
 import de.wwu.md2.framework.mD2.Controller;
 import de.wwu.md2.framework.mD2.MD2Factory;
@@ -34,8 +35,7 @@ import de.wwu.md2.framework.mD2.MD2ModelLayer;
 import de.wwu.md2.framework.mD2.Model;
 import de.wwu.md2.framework.mD2.View;
 import de.wwu.md2.framework.mD2.Workflow;
-import md2dot0.Md2dot0Factory;
-import md2dot0.UseCase;
+import de.wwu.maml.dsl.maml.UseCase;
 import de.wwu.md2.framework.generator.Main;
 
 public class MD2ConverterStandalone {
@@ -55,7 +55,7 @@ public class MD2ConverterStandalone {
 		resourceSetXtext.addLoadOption(XtextResource.OPTION_RESOLVE_ALL, Boolean.TRUE);
 
 		// Define the common MD2Root element
-		md2dot0.Model modelRoot = Md2dot0Factory.eINSTANCE.createModel();
+		de.wwu.maml.dsl.maml.Model modelRoot = MamlFactory.eINSTANCE.createModel();
 		EList<EObject> allObjects = new BasicEList<EObject>();
 		allObjects.add(modelRoot);
 
@@ -131,7 +131,7 @@ public class MD2ConverterStandalone {
 		String outputFile = OUTPUT_BASE_PATH;
 		if (layer instanceof Model) {
 			URI transformationURI = URI.createFileURI(Paths.get(".").resolve(
-					"src/de/wwu/maml/md2converter/transformations/Md2ModelLayer.qvto").toAbsolutePath().normalize().toString());
+					"src/de/wwu/maml/generator/md2converter/transformations/Md2ModelLayer.qvto").toAbsolutePath().normalize().toString());
 			//URI.createURI("platform:/resource/de.wwu.maml/src/de/wwu/maml/md2converter/transformations/Md2ModelLayer.qvto");
 			
 			TransformationExecutor executor = new TransformationExecutor(transformationURI);
@@ -140,7 +140,7 @@ public class MD2ConverterStandalone {
 
 		} else if (layer instanceof View) {
 			URI transformationURI = URI.createFileURI(Paths.get(".").resolve(
-					"src/de/wwu/maml/md2converter/transformations/Md2ViewLayer.qvto").toAbsolutePath().normalize().toString());
+					"src/de/wwu/maml/generator/md2converter/transformations/Md2ViewLayer.qvto").toAbsolutePath().normalize().toString());
 
 			TransformationExecutor executor = new TransformationExecutor(transformationURI);
 			result = executor.execute(context, input, output);
@@ -148,7 +148,7 @@ public class MD2ConverterStandalone {
 
 		} else if (layer instanceof Controller) {
 			URI transformationURI = URI.createFileURI(Paths.get(".").resolve(
-					"src/de/wwu/maml/md2converter/transformations/Md2ControllerLayer.qvto").toAbsolutePath().normalize().toString());
+					"src/de/wwu/maml/generator/md2converter/transformations/Md2ControllerLayer.qvto").toAbsolutePath().normalize().toString());
 
 			TransformationExecutor executor = new TransformationExecutor(transformationURI);
 			result = executor.execute(context, input, output);
@@ -156,7 +156,7 @@ public class MD2ConverterStandalone {
 
 		} else if (layer instanceof Workflow) {
 			URI transformationURI = URI.createFileURI(Paths.get(".").resolve(
-					"src/de/wwu/maml/md2converter/transformations/Md2WorkflowLayer.qvto").toAbsolutePath().normalize().toString());
+					"src/de/wwu/maml/generator/md2converter/transformations/Md2WorkflowLayer.qvto").toAbsolutePath().normalize().toString());
 
 			TransformationExecutor executor = new TransformationExecutor(transformationURI);
 			result = executor.execute(context, input, output);
@@ -177,8 +177,8 @@ public class MD2ConverterStandalone {
 	
 	public static String getProjectName(EList<EObject> modelObjects){
 		String projectName = DEFAULT_PROJECT_NAME;
-		if (((md2dot0.Model) EcoreUtil.getRootContainer(modelObjects.get(0))).getProjectName() != null) {
-			projectName = ((md2dot0.Model) EcoreUtil.getRootContainer(modelObjects.get(0))).getProjectName();
+		if (((de.wwu.maml.dsl.maml.Model) EcoreUtil.getRootContainer(modelObjects.get(0))).getProjectName() != null) {
+			projectName = ((de.wwu.maml.dsl.maml.Model) EcoreUtil.getRootContainer(modelObjects.get(0))).getProjectName();
 		}
 		return projectName;
 	}

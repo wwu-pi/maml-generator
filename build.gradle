@@ -14,11 +14,12 @@ defaultTasks 'generate'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-mainClassName = "de.wwu.maml.md2converter.MD2ConverterStandalone"
+mainClassName = "de.wwu.maml.generator.md2converter.MD2ConverterStandalone"
 
 repositories {
 	jcenter()
 	//mavenCentral()
+	mavenLocal()
 	
 	//maven { url "https://jitpack.io" } // For Github repositories
 	// compile 'com.github.wwu-pi:md2-framework:-SNAPSHOT' //example for github repository dependency
@@ -37,6 +38,7 @@ dependencies {
 	//compile 'org.eclipse.xtext:org.eclipse.xtext.generator:2.10.+'
 	compile 'com.google.inject.extensions:guice-multibindings:4.+'
 	compile 'com.google.inject:guice:4.+'
+	compile 'de.wwu:de.wwu.maml.dsl:0.1'
 	
 	// provided as jar because not available otherwise:
 	// md2dot0

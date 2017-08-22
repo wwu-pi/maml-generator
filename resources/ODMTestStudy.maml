@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<de.wwu.maml.dsl:UseCase xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:de.wwu.maml.dsl="http://de/wwu/maml/dsl/maml" xmlns:de.wwu.maml.dsl_1="http://de/wwu/maml/dsl/mamldata" xmlns:de.wwu.maml.dsl_2="http://de/wwu/maml/dsl/mamlgui" title="ODM Test Study">
+  <processFlowElements xsi:type="de.wwu.maml.dsl:ProcessStartEvent" nextElements="//@processFlowConnections.7"/>
+  <processFlowElements xsi:type="de.wwu.maml.dsl:ProcessEndEvent" previousElements="//@processFlowConnections.12"/>
+  <processFlowElements xsi:type="de.wwu.maml.dsl:LocalDataSource" nextElements="//@processFlowConnections.8" previousElements="//@processFlowConnections.7" dataType="//@dataTypes.0" typeName="ODMTest"/>
+  <processFlowElements xsi:type="de.wwu.maml.dsl:CreateEntity" parameters="//@processFlowConnections.0 //@processFlowConnections.1" nextElements="//@processFlowConnections.9" previousElements="//@processFlowConnections.8" dataType="//@dataTypes.0" description="Page 1"/>
+  <processFlowElements xsi:type="de.wwu.maml.dsl:UpdateEntity" parameters="//@processFlowConnections.2 //@processFlowConnections.3" nextElements="//@processFlowConnections.10" previousElements="//@processFlowConnections.9" dataType="//@dataTypes.0" description="Page 2"/>
+  <processFlowElements xsi:type="de.wwu.maml.dsl:UpdateEntity" parameters="//@processFlowConnections.4 //@processFlowConnections.5 //@processFlowConnections.6" nextElements="//@processFlowConnections.11" previousElements="//@processFlowConnections.10" dataType="//@dataTypes.0" description="Page 3"/>
+  <processFlowElements xsi:type="de.wwu.maml.dsl:UpdateEntity" parameters="//@processFlowConnections.13 //@processFlowConnections.14 //@processFlowConnections.15 //@processFlowConnections.16" nextElements="//@processFlowConnections.12" previousElements="//@processFlowConnections.11" dataType="//@dataTypes.0" description="Page 4"/>
+  <processFlowConnections xsi:type="de.wwu.maml.dsl:ParameterConnector" description="Willingness to participate" targetElement="//@attributes.0" accessType="WRITE" order="1" sourceElement="//@processFlowElements.3"/>
+  <processFlowConnections xsi:type="de.wwu.maml.dsl:ParameterConnector" targetElement="//@attributes.1" accessType="WRITE" order="2" sourceElement="//@processFlowElements.3"/>
+  <processFlowConnections xsi:type="de.wwu.maml.dsl:ParameterConnector" targetElement="//@attributes.2" accessType="WRITE" order="1" sourceElement="//@processFlowElements.4"/>
+  <processFlowConnections xsi:type="de.wwu.maml.dsl:ParameterConnector" targetElement="//@attributes.3" accessType="WRITE" order="2" sourceElement="//@processFlowElements.4"/>
+  <processFlowConnections xsi:type="de.wwu.maml.dsl:ParameterConnector" description="Diagnosis text" targetElement="//@attributes.4" accessType="WRITE" order="1" sourceElement="//@processFlowElements.5"/>
+  <processFlowConnections xsi:type="de.wwu.maml.dsl:ParameterConnector" description="Diagnosis code" targetElement="//@attributes.5" accessType="WRITE" order="2" sourceElement="//@processFlowElements.5"/>
+  <processFlowConnections xsi:type="de.wwu.maml.dsl:ParameterConnector" targetElement="//@attributes.6" accessType="WRITE" order="3" sourceElement="//@processFlowElements.5"/>
+  <processFlowConnections xsi:type="de.wwu.maml.dsl:ProcessConnector" sourceProcessFlowElement="//@processFlowElements.0" targetProcessFlowElement="//@processFlowElements.2"/>
+  <processFlowConnections xsi:type="de.wwu.maml.dsl:ProcessConnector" sourceProcessFlowElement="//@processFlowElements.2" targetProcessFlowElement="//@processFlowElements.3"/>
+  <processFlowConnections xsi:type="de.wwu.maml.dsl:ProcessConnector" sourceProcessFlowElement="//@processFlowElements.3" targetProcessFlowElement="//@processFlowElements.4"/>
+  <processFlowConnections xsi:type="de.wwu.maml.dsl:ProcessConnector" sourceProcessFlowElement="//@processFlowElements.4" targetProcessFlowElement="//@processFlowElements.5"/>
+  <processFlowConnections xsi:type="de.wwu.maml.dsl:ProcessConnector" sourceProcessFlowElement="//@processFlowElements.5" targetProcessFlowElement="//@processFlowElements.6"/>
+  <processFlowConnections xsi:type="de.wwu.maml.dsl:ProcessConnector" sourceProcessFlowElement="//@processFlowElements.6" targetProcessFlowElement="//@processFlowElements.1"/>
+  <processFlowConnections xsi:type="de.wwu.maml.dsl:ParameterConnector" description="Time of lab value" targetElement="//@attributes.7" accessType="WRITE" order="1" sourceElement="//@processFlowElements.6"/>
+  <processFlowConnections xsi:type="de.wwu.maml.dsl:ParameterConnector" targetElement="//@attributes.8" accessType="WRITE" order="2" sourceElement="//@processFlowElements.6"/>
+  <processFlowConnections xsi:type="de.wwu.maml.dsl:ParameterConnector" targetElement="//@attributes.9" accessType="WRITE" order="3" sourceElement="//@processFlowElements.6"/>
+  <processFlowConnections xsi:type="de.wwu.maml.dsl:ParameterConnector" targetElement="//@attributes.10" accessType="WRITE" order="4" sourceElement="//@processFlowElements.6"/>
+  <roles name="Participant"/>
+  <dataTypes xsi:type="de.wwu.maml.dsl_1:DataTypeLiteral" identifier="ODMTEST" name="ODMTest"/>
+  <dataTypes xsi:type="de.wwu.maml.dsl_1:DataTypeLiteral" identifier="STRING" name="String" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.maml.dsl_1:DataTypeLiteral" identifier="BOOLEAN" name="Boolean" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.maml.dsl_1:DataTypeLiteral" identifier="PHONENUMBER" name="PhoneNumber" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.maml.dsl_1:DataTypeLiteral" identifier="URL" name="Url" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.maml.dsl_1:DataTypeLiteral" identifier="EMAIL" name="Email" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.maml.dsl_1:DataTypeLiteral" identifier="FILE" name="File" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.maml.dsl_1:DataTypeLiteral" identifier="IMAGE" name="Image" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.maml.dsl_1:DataTypeLiteral" identifier="LOCATION" name="Location" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.maml.dsl_1:DataTypeLiteral" identifier="INTEGER" name="Integer" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.maml.dsl_1:DataTypeLiteral" identifier="FLOAT" name="Float" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.maml.dsl_1:DataTypeLiteral" identifier="DATE" name="Date" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.maml.dsl_1:DataTypeLiteral" identifier="TIME" name="Time" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.maml.dsl_1:DataTypeLiteral" identifier="DATETIME" name="DateTime" primitive="true"/>
+  <dataTypes xsi:type="de.wwu.maml.dsl_1:Enum" name="Gender">
+    <values value="male"/>
+    <values value="female"/>
+    <values value="unknown"/>
+  </dataTypes>
+  <dataTypes xsi:type="de.wwu.maml.dsl_1:DataTypeLiteral" identifier="GENDER" name="Gender"/>
+  <attributes xsi:type="de.wwu.maml.dsl_2:Attribute" description="willingness" type="Boolean"/>
+  <attributes xsi:type="de.wwu.maml.dsl_2:Attribute" description="age" type="Integer"/>
+  <attributes xsi:type="de.wwu.maml.dsl_2:Attribute" description="gender" type="Gender"/>
+  <attributes xsi:type="de.wwu.maml.dsl_2:Attribute" description="birthDate" type="Date"/>
+  <attributes xsi:type="de.wwu.maml.dsl_2:Attribute" description="diagnosis" type="String"/>
+  <attributes xsi:type="de.wwu.maml.dsl_2:Attribute" description="diagnosisCode" type="String"/>
+  <attributes xsi:type="de.wwu.maml.dsl_2:Attribute" description="creatinine" type="Integer"/>
+  <attributes xsi:type="de.wwu.maml.dsl_2:Attribute" description="timeOfLab" type="Time"/>
+  <attributes xsi:type="de.wwu.maml.dsl_2:Attribute" description="dateOfLab" type="Date"/>
+  <attributes xsi:type="de.wwu.maml.dsl_2:Attribute" description="comment" type="String"/>
+  <attributes xsi:type="de.wwu.maml.dsl_2:Attribute" description="potassium" type="Integer"/>
+</de.wwu.maml.dsl:UseCase>

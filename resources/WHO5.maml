@@ -34,7 +34,7 @@
     <values value="Most of the time "/>
     <values value="All of the time "/>
   </dataTypes>
-  <dataTypes xsi:type="de.wwu.maml.dsl_1:CustomType" name="WELLBEINGINDEX">
+  <dataTypes xsi:type="de.wwu.maml.dsl_1:CustomType" name="WellBeingIndex">
     <attributes type="//@dataTypes.0" name="cheerful"/>
     <attributes type="//@dataTypes.0" name="calm"/>
     <attributes type="//@dataTypes.0" name="active"/>

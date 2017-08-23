@@ -219,7 +219,7 @@ mapping DataType::toReferencedType(isCollection : Boolean): ReferencedType {
 
 mapping MAMLdata::Property::toAttribute(): MD2::Attribute {
 	log("...toAttribute1: " + self.name.toFirstLower());
-	log(self.type.toPrimitiveOrComplexAttributeType().toString());
+	
 	name := self.name.toFirstLower();
 	type := self.type.toPrimitiveOrComplexAttributeType();
 	log(result.type.toString());

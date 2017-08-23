@@ -78,7 +78,20 @@ query String::noWhiteSpace(): String {
 }
 
 query String::toName(): String {
-	return self.noWhiteSpace().toFirstUpper();
+	return self.noWhiteSpace().toAlphanumeric().fixInitialDigit().toFirstUpper();
+}
+
+query String::toAlphanumeric(): String {
+	return self.characters()->replaceAll("[^a-zA-Z0-9]", "")->join("");
+}
+
+query String::fixInitialDigit(): String {
+	if(self.characters()->first() = "1" or self.characters()->first() = "2" or
+		self.characters()->first() = "3" or self.characters()->first() = "4" or
+		self.characters()->first() = "5" or self.characters()->first() = "6" or
+		self.characters()->first() = "7" or self.characters()->first() = "8" or
+		self.characters()->first() = "9" or self.characters()->first() = "0") return "_" + self;
+	return self; 
 }
 
 query String::toAttributeName(): String {

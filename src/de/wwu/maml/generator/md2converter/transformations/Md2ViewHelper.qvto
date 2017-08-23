@@ -1,6 +1,7 @@
 library Md2ViewHelper;
 
 import Md2Helper;
+import Md2ModelHelper;
 import Md2ControllerHelper;
 
 modeltype MAML "strict" uses "http://de/wwu/maml/dsl/maml";
@@ -177,6 +178,7 @@ mapping ParameterConnector::toReadAttributeField(): MD2::Label {
 }
 
 helper MAMLgui::Attribute::toWriteAttribute(connector : ParameterConnector): OrderedSet(ViewGUIElement) {
+	log("....toWriteAttribute: " + self.description + "(" + self.type.toString() + ")");
 	var attribute := self;// MAMLgui::Attribute := self.targetElement.oclAsType(MAMLgui::Attribute); 
 	
 	switch {
@@ -197,7 +199,7 @@ helper MAMLgui::Attribute::toWriteAttribute(connector : ParameterConnector): Ord
 		// Complex types
 	//	case (self.oclIsTypeOf(CustomType)) return self.oclAsType(CustomType).toReferencedType(isCollection); // TODO nested type
 	//	case (self.oclIsTypeOf(_Collection)) return self.oclAsType(_Collection).type.toPrimitiveOrComplexAttributeType(true); // TODO multiple
-		case (attribute.type.equalsIgnoreCase("Enum") or attribute.type.oclIsTypeOf(Enum)) return OrderedSet { attribute.map toOptionInput(connector) };
+		case (attribute.container().oclAsType(UseCase).dataTypes->exists(e | e.oclIsTypeOf(Enum) and e.oclAsType(Enum).name.equalsIgnoreCase(attribute.type))) return OrderedSet { attribute.map toOptionInput(connector) };
 		
 		else return OrderedSet { attribute.map toTextInput(connector) };
 	};
@@ -282,7 +284,7 @@ mapping MAMLgui::Attribute::toOptionInput(connector : ParameterConnector): Optio
 	isDisabled := false;
 	type := OptionInputType::DEFAULT;
 	defaultValue := null;
-	enumReference := self.type.oclAsType(MAMLdata::Enum).resolveone(MD2::Enum);
+	enumReference := self.container().oclAsType(UseCase).dataTypes->any(e | e.oclIsTypeOf(Enum) and e.oclAsType(Enum).name.equalsIgnoreCase(self.type)).oclAsType(Enum).map toEnum();
 }
 
 mapping MAMLgui::Attribute::toFileInput(connector : ParameterConnector): FileUpload {

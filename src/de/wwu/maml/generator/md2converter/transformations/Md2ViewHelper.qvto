@@ -182,24 +182,23 @@ helper MAMLgui::Attribute::toWriteAttribute(connector : ParameterConnector): Ord
 	var attribute := self;// MAMLgui::Attribute := self.targetElement.oclAsType(MAMLgui::Attribute); 
 	
 	switch {
-		//TODO more
-		// TODO currently as String -> bad!
-		case (attribute.type.equalsIgnoreCase("String") or attribute.type.oclIsTypeOf(_String)) return OrderedSet { attribute.map toTextInput(connector) };
-		case (attribute.type.equalsIgnoreCase("Integer") or attribute.type.oclIsTypeOf(_Integer)) return OrderedSet { attribute.map toIntegerInput(connector) };		
-		case (attribute.type.equalsIgnoreCase("Float") or attribute.type.oclIsTypeOf(Float)) return OrderedSet { attribute.map toNumberInput(connector) };
-		case (attribute.type.equalsIgnoreCase("Boolean") or attribute.type.oclIsTypeOf(_Boolean)) return OrderedSet { attribute.map toBooleanInput(connector) };
-		case (attribute.type.equalsIgnoreCase("Date") or attribute.type.oclIsTypeOf(Date)) return OrderedSet { attribute.map toDateInput(connector) };
-		case (attribute.type.equalsIgnoreCase("Time") or attribute.type.oclIsTypeOf(Time)) return OrderedSet { attribute.map toTimeInput(connector) };
-		case (attribute.type.equalsIgnoreCase("DateTime") or attribute.type.oclIsTypeOf(DateTime)) return OrderedSet { attribute.map toDateTimeInput(connector) };
-		case (attribute.type.equalsIgnoreCase("File") or attribute.type.oclIsTypeOf(File)) return OrderedSet { attribute.map toFileInput(connector) };
+		//TODO currency
+		case (attribute.type.oclIsTypeOf(_String)) return OrderedSet { attribute.map toTextInput(connector) };
+		case (attribute.type.oclIsTypeOf(_Integer)) return OrderedSet { attribute.map toIntegerInput(connector) };		
+		case (attribute.type.oclIsTypeOf(Float)) return OrderedSet { attribute.map toNumberInput(connector) };
+		case (attribute.type.oclIsTypeOf(_Boolean)) return OrderedSet { attribute.map toBooleanInput(connector) };
+		case (attribute.type.oclIsTypeOf(Date)) return OrderedSet { attribute.map toDateInput(connector) };
+		case (attribute.type.oclIsTypeOf(Time)) return OrderedSet { attribute.map toTimeInput(connector) };
+		case (attribute.type.oclIsTypeOf(DateTime)) return OrderedSet { attribute.map toDateTimeInput(connector) };
+		case (attribute.type.oclIsTypeOf(File)) return OrderedSet { attribute.map toFileInput(connector) };
 		// MAML primitives to MD2 non-primitives
-		case (attribute.type.equalsIgnoreCase("PhoneNumber") or attribute.type.oclIsTypeOf(PhoneNumber)) return OrderedSet { attribute.map toTextInput(connector) };
-		case (attribute.type.equalsIgnoreCase("Url") or attribute.type.oclIsTypeOf(Url)) return OrderedSet { attribute.map toTextInput(connector) };
-		case (attribute.type.equalsIgnoreCase("Email") or attribute.type.oclIsTypeOf(Email)) return OrderedSet { attribute.map toTextInput(connector) };
+		case (attribute.type.oclIsTypeOf(PhoneNumber)) return OrderedSet { attribute.map toTextInput(connector) };
+		case (attribute.type.oclIsTypeOf(Url)) return OrderedSet { attribute.map toTextInput(connector) };
+		case (attribute.type.oclIsTypeOf(Email)) return OrderedSet { attribute.map toTextInput(connector) };
 		// Complex types
 	//	case (self.oclIsTypeOf(CustomType)) return self.oclAsType(CustomType).toReferencedType(isCollection); // TODO nested type
 	//	case (self.oclIsTypeOf(_Collection)) return self.oclAsType(_Collection).type.toPrimitiveOrComplexAttributeType(true); // TODO multiple
-		case (attribute.container().oclAsType(UseCase).dataTypes->exists(e | e.oclIsTypeOf(Enum) and e.oclAsType(Enum).name.equalsIgnoreCase(attribute.type))) return OrderedSet { attribute.map toOptionInput(connector) };
+		case (attribute.container().oclAsType(UseCase).dataTypes->exists(e | e.oclIsTypeOf(Enum) and e.oclAsType(Enum).name.equalsIgnoreCase(attribute.type.toString()))) return OrderedSet { attribute.map toOptionInput(connector) };  // TODO probably incorrect to use toString
 		
 		else return OrderedSet { attribute.map toTextInput(connector) };
 	};
@@ -284,7 +283,7 @@ mapping MAMLgui::Attribute::toOptionInput(connector : ParameterConnector): Optio
 	isDisabled := false;
 	type := OptionInputType::DEFAULT;
 	defaultValue := null;
-	enumReference := self.container().oclAsType(UseCase).dataTypes->any(e | e.oclIsTypeOf(Enum) and e.oclAsType(Enum).name.equalsIgnoreCase(self.type)).oclAsType(Enum).map toEnum();
+	enumReference := self.container().oclAsType(UseCase).dataTypes->any(e | e.oclIsTypeOf(Enum) and e.oclAsType(Enum).name.equalsIgnoreCase(self.type.toString())).oclAsType(Enum).map toEnum(); // TODO probably incorrect to use toString
 }
 
 mapping MAMLgui::Attribute::toFileInput(connector : ParameterConnector): FileUpload {

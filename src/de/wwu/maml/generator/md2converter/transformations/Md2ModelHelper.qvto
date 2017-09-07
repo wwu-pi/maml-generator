@@ -26,6 +26,8 @@ helper DataType::lookupOrCreate(): ModelElement {
 }
 
 helper DataType::toModelElement(): ModelElement {
+	log("...toModelElement");
+	
 	var element : ModelElement;
 	
 	switch {
@@ -47,7 +49,7 @@ helper DataType::isValidEntity(): Boolean {
 	return true;
 }
 
-mapping CustomType::toEntity(): Entity when {self.attributes->size() > 0} {
+mapping CustomType::toEntity(): Entity when {self.attributes->size() >= 0} { // no attributes will fail in preprocessing but it is currently legitimate in DSL 
 	log("..toEntity: " + self.name.toFirstUpper());
 	
 	name := self.name.toFirstUpper();
@@ -230,8 +232,8 @@ mapping MAMLdata::Property::toAttribute(): MD2::Attribute {
 mapping MAMLgui::Attribute::toAttribute(): MD2::Attribute {
 	log("...toAttribute2: " + self.description.toFirstLower());
 	
-	name := self.type.toFirstLower();
-	type := object DataTypeLiteral { name := self.type }.toPrimitiveOrComplexAttributeType();
+	name := self.description.toFirstLower();
+	type := self.type.toPrimitiveOrComplexAttributeType();
 	extendedName := null; // Not explicitly modelled in MAML
 	description := null; // Not explicitly modelled in MAML
 }

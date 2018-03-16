@@ -1,15 +1,18 @@
 package de.wwu.maml.maml2md2.rules.view
 
 import org.eclipse.emf.ecore.resource.Resource
+import org.eclipse.emf.ecore.resource.ResourceSet
 import de.wwu.md2.framework.mD2.PackageDefinition
 import de.wwu.maml.maml2md2.rules.Elem2Elem
 import de.wwu.maml.maml2md2.rules.Maml2md2Transformation
+
+import static extension de.wwu.maml.maml2md2.util.ResourceHelper.*
 
 class Model2View extends Elem2Elem {
 	
 	public static final String ruleID = "Model->MD2Model[View]"
 	
-	new(Resource src, Resource trgt, Resource corr) {
+	new(ResourceSet src, ResourceSet trgt, Resource corr) {
 		super(src, trgt, corr)
 		
 	}
@@ -27,7 +30,7 @@ class Model2View extends Elem2Elem {
 				
 				val targetViewLayer = createTargetElement(targetPackage.view) as de.wwu.md2.framework.mD2.View
 				targetV.modelLayer = targetViewLayer
-				targetModel.contents += targetV
+				targetModel.getMD2ViewResource.contents += targetV
 			]
 	}
 	
@@ -36,7 +39,7 @@ class Model2View extends Elem2Elem {
 			.forEach[m |
 				val corr = m.getOrCreateCorrModelElement(ruleID)
 				val source = corr.getOrCreateSourceElem(sourcePackage.model)
-				sourceModel.contents += source
+//				sourceModel.contents += source
 			]
 	}
 	

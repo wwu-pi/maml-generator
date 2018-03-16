@@ -1,9 +1,12 @@
 package de.wwu.maml.maml2md2.rules.controller
 
 import org.eclipse.emf.ecore.resource.Resource
+import org.eclipse.emf.ecore.resource.ResourceSet
 import de.wwu.md2.framework.mD2.PackageDefinition
 import de.wwu.maml.maml2md2.rules.Elem2Elem
 import de.wwu.maml.maml2md2.rules.Maml2md2Transformation
+
+import static extension de.wwu.maml.maml2md2.util.ResourceHelper.*
 
 class Model2Controller extends Elem2Elem {
 	
@@ -11,7 +14,7 @@ class Model2Controller extends Elem2Elem {
 	public static final String ruleIDMD2Model = ruleID + "[MD2Model]"
 	public static final String ruleIDPackage = ruleID + "[Package]"
 	
-	new(Resource src, Resource trgt, Resource corr) {
+	new(ResourceSet src, ResourceSet trgt, Resource corr) {
 		super(src, trgt, corr)
 		
 	}
@@ -31,7 +34,7 @@ class Model2Controller extends Elem2Elem {
 				val corrControllerC = m.getOrCreateCorrModelElement(ruleID)
 				val targetControllerLayer = corrControllerC.getOrCreateTargetElem(targetPackage.controller) as de.wwu.md2.framework.mD2.Controller
 				targetC.modelLayer = targetControllerLayer
-				targetModel.contents += targetC
+				targetModel.getMD2ControllerResource.contents += targetC
 			]
 	}
 	

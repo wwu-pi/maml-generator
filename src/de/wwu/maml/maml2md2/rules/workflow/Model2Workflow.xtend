@@ -1,15 +1,18 @@
 package de.wwu.maml.maml2md2.rules.workflow
 
 import org.eclipse.emf.ecore.resource.Resource
+import org.eclipse.emf.ecore.resource.ResourceSet
 import de.wwu.md2.framework.mD2.PackageDefinition
 import de.wwu.maml.maml2md2.rules.Elem2Elem
 import de.wwu.maml.maml2md2.rules.Maml2md2Transformation
+
+import static extension de.wwu.maml.maml2md2.util.ResourceHelper.*
 
 class Model2Workflow extends Elem2Elem {
 	
 	public static final String ruleID = "Model->MD2Model[Workflow]"
 	
-	new(Resource src, Resource trgt, Resource corr) {
+	new(ResourceSet src, ResourceSet trgt, Resource corr) {
 		super(src, trgt, corr)
 		
 	}
@@ -27,7 +30,7 @@ class Model2Workflow extends Elem2Elem {
 				
 				val targetWorkflowLayer = createTargetElement(targetPackage.workflow) as de.wwu.md2.framework.mD2.Workflow
 				targetW.modelLayer = targetWorkflowLayer
-				targetModel.contents += targetW
+				targetModel.getMD2WorkflowResource.contents += targetW
 			]
 	}
 	
@@ -36,7 +39,7 @@ class Model2Workflow extends Elem2Elem {
 			.forEach[m |
 				val corr = m.getOrCreateCorrModelElement(ruleID)
 				val source = corr.getOrCreateSourceElem(sourcePackage.model)
-				sourceModel.contents += source
+//				sourceModel.contents += source
 			]
 	}
 	

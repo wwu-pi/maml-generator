@@ -65,7 +65,7 @@ public class Maml2md2Transformation {
 	}
 	
 	def void sourceToTarget() {
-		if (sourceModel.contents.size != 0)
+		if (sourceModel.resources.map[it.contents.size].reduce[r1, r2| r1 + r2] > 0)
 		for (Elem2Elem e : rules) {
 			e.sourceToTarget()
 		}
@@ -75,7 +75,7 @@ public class Maml2md2Transformation {
 	}
 	
 	def void targetToSource() {		
-		if (targetModel.contents.size != 0)
+		if (targetModel.resources.map[it.contents.size].reduce[r1, r2| r1 + r2] > 0)
 		for (Elem2Elem e: rules) {
 			e.targetToSource()
 		}

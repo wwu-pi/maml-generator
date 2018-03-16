@@ -13,6 +13,8 @@ import org.eclipse.emf.ecore.util.EcoreUtil
 import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl
 
 import static extension de.wwu.md2.framework.MD2StandaloneSetup.*
+import static extension de.wwu.maml.maml2md2.util.ResourceHelper.*
+
 import org.eclipse.emf.ecore.EPackage
 import de.wwu.md2.framework.mD2.MD2Package
 import de.wwu.maml.dsl.maml.UseCase
@@ -26,12 +28,10 @@ import de.wwu.md2.framework.mD2.MD2Factory
 
 class TransformationRunner {
 	
-	private ResourceSet set = new ResourceSetImpl();
-	private Resource source;
-	private Resource target;
+	private ResourceSet source = new ResourceSetImpl();
+	private ResourceSet target = new ResourceSetImpl();
 	private Resource corr;
 	private Maml2md2Transformation maml2md2;
-	
 	
 	private static final String RESULTPATH = "results/BXtend";
 	
@@ -42,59 +42,43 @@ class TransformationRunner {
 	 * to create a corresponding PersonRegister.
 	 */
 	def initiateSynchronisationDialogue() {
-		MD2StandaloneSetup.doSetup //createInjectorAndDoEMFRegistration();
-		//XtextResourceSet resourceSet = injector.getInstance(XtextResourceSet);
 		
-		init()
+		TransformationRunner.initEMFRegistration()
 //		set.getResourceFactoryRegistry().getExtensionToFactoryMap().put("maml", new EcoreResourceFactoryImpl());
 		//set.getResourceFactoryRegistry().getExtensionToFactoryMap().put("md2", new EcoreResourceFactoryImpl());
 //		set.getResourceFactoryRegistry().getExtensionToFactoryMap().put("corr", new EcoreResourceFactoryImpl());		
 		
-		source = set.createResource(URI.createURI("sourceModel.maml"));
-		target = set.createResource(URI.createURI("targetModel.md2"));
-		corr = set.createResource(URI.createURI("corrModel.corr"));
-		
-//		val mamlRoot = MamlFactory.eINSTANCE.createModel();
-//		source.getContents().add(mamlRoot);
-//		val mamlUseCase = MamlFactory.eINSTANCE.createUseCase();
-//		mamlRoot.useCases.add(mamlUseCase)
-//		val val resourceSet = new ResourceSetImpl();
-//		source = new ResourceSetImpl().getResource(URI.createURI(RESULTPATH + "/WHO5.maml"), true);
-		
-		// Define the common MD2Root element
+//		// Define the common MD2Root element
+		source.createResource(URI.createURI("sourceModel.maml"));
 		val mamlRoot = MamlFactory.eINSTANCE.createModel();
-		source.getContents().add(mamlRoot);
-//		val allObjects = new BasicEList<EObject>();
-//		allObjects.add(mamlRoot);
+		source.resources.get(0).getContents().add(mamlRoot);
 		
 		// Define the transformation input
 		// TODO crawl folders to find all .maml files
-		val resourceSet = new ResourceSetImpl();
-		val modelSources = newArrayList();
+		val modelSources = newArrayList(); // List of MAML use cases
 		modelSources.add(URI.createURI(RESULTPATH + "/WHO5.maml"));
 
 		for (URI modelSource : modelSources) {
-			val inResource = resourceSet.getResource(modelSource, true);
-
-			// Add to common model root
+			val inResource = new ResourceSetImpl().getResource(modelSource, true);
+			// Add use cases to common model root
 			if (inResource.getContents() === null || inResource.getContents().size() == 0) {
 				System.out.println("No content in model: " + modelSource.toPlatformString(true));
 			} else {
-
 				val useCaseRoot = EcoreUtil.getRootContainer(inResource.getContents().get(0));
 				if (useCaseRoot instanceof UseCase) {
-					// Add use case to model root
 					mamlRoot.getUseCases().add(useCaseRoot);
-					// Add all contained elements
-//					allObjects.addAll(mamlRoot.eAllContents().toList)
 				}
 			}
 		}
 		
+		// Create empty resources for target and correlation models 
+		target.createResource(URI.createURI("targetModel.md2"));
+		target.createResource(URI.createURI("targetView.md2"));
+		target.createResource(URI.createURI("targetController.md2"));
+		target.createResource(URI.createURI("targetWorkflow.md2"));
+		corr = new ResourceSetImpl().createResource(URI.createURI("corrModel.corr"));
 		
 		val maml2md2 = new Maml2md2Transformation(source, target, corr);
-		
-		// perform batch to establish consistent starting state
 		maml2md2.sourceToTarget();
 	}
 	
@@ -119,11 +103,11 @@ class TransformationRunner {
 		val resTargetC = set.createResource(trgURIC);
 		val resTargetW = set.createResource(trgURIW);
 		
-		resSource.getContents().add(EcoreUtil.copy(source.contents.get(0)));
-		resTargetM.getContents().add(EcoreUtil.copy(target.contents.filter[it instanceof MD2Model && (it as MD2Model).modelLayer instanceof Model]?.get(0)));
-		resTargetV.getContents().add(EcoreUtil.copy(target.contents.filter[it instanceof MD2Model && (it as MD2Model).modelLayer instanceof View]?.get(0)));
-		resTargetC.getContents().add(EcoreUtil.copy(target.contents.filter[it instanceof MD2Model && (it as MD2Model).modelLayer instanceof Controller]?.get(0)));
-		resTargetW.getContents().add(EcoreUtil.copy(target.contents.filter[it instanceof MD2Model && (it as MD2Model).modelLayer instanceof Workflow]?.get(0)));
+		resSource.getContents().add(EcoreUtil.copy(source.resources.get(0).contents.get(0)));
+		resTargetM.getContents().add(EcoreUtil.copy(target.MD2ModelResource.contents.filter[it instanceof MD2Model && (it as MD2Model).modelLayer instanceof Model]?.get(0)));
+		resTargetV.getContents().add(EcoreUtil.copy(target.MD2ViewResource.contents.filter[it instanceof MD2Model && (it as MD2Model).modelLayer instanceof View]?.get(0)));
+		resTargetC.getContents().add(EcoreUtil.copy(target.MD2ControllerResource.contents.filter[it instanceof MD2Model && (it as MD2Model).modelLayer instanceof Controller]?.get(0)));
+		resTargetW.getContents().add(EcoreUtil.copy(target.MD2WorkflowResource.contents.filter[it instanceof MD2Model && (it as MD2Model).modelLayer instanceof Workflow]?.get(0)));
 		
 		try {
 			resTargetM.save(null);
@@ -137,12 +121,15 @@ class TransformationRunner {
 	
 	def static void main(String[] args){
 		val runner = new TransformationRunner()
-		//runner.initiateSynchronisationDialogue()
-		runner.loadMd2()
+		runner.initiateSynchronisationDialogue()
+//		runner.loadMd2()
 		runner.saveModels("test")
 	}
 	
-	def static void init() {
+	def static void initEMFRegistration() {
+		MD2StandaloneSetup.doSetup //createInjectorAndDoEMFRegistration();
+		//XtextResourceSet resourceSet = injector.getInstance(XtextResourceSet);
+		
 		// Register Xtext Resource Factory
 		new org.eclipse.emf.mwe.utils.StandaloneSetup().setPlatformUri("../");
 
@@ -158,21 +145,22 @@ class TransformationRunner {
 		}
 		if (!EPackage.Registry.INSTANCE.containsKey("http://www.wwu.de/md2/framework/MD2")) {
 			EPackage.Registry.INSTANCE.put("http://www.wwu.de/md2/framework/MD2", MD2Package.eINSTANCE);
-		}	
+		}
+		
 	}
 	
 	def loadMd2(){
 		MD2StandaloneSetup.doSetup //createInjectorAndDoEMFRegistration();
 		//XtextResourceSet resourceSet = injector.getInstance(XtextResourceSet);
 		
-		init()
+		de.wwu.maml.maml2md2.TransformationRunner.initEMFRegistration()
 //		set.getResourceFactoryRegistry().getExtensionToFactoryMap().put("maml", new EcoreResourceFactoryImpl());
 		//set.getResourceFactoryRegistry().getExtensionToFactoryMap().put("md2", new EcoreResourceFactoryImpl());
 //		set.getResourceFactoryRegistry().getExtensionToFactoryMap().put("corr", new EcoreResourceFactoryImpl());		
 		
-		source = set.createResource(URI.createURI("sourceModel.maml"));
+		source.createResource(URI.createURI("sourceModel.maml"));
 //		target = set.createResource(URI.createURI("targetModel.md2"));
-		corr = set.createResource(URI.createURI("corrModel.corr"));
+		corr = new ResourceSetImpl().createResource(URI.createURI("corrModel.corr"));
 		
 //		val mamlRoot = MamlFactory.eINSTANCE.createModel();
 //		source.getContents().add(mamlRoot);

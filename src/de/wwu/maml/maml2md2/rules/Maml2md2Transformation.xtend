@@ -14,6 +14,7 @@ import de.wwu.maml.maml2md2.rules.view.Model2View
 import java.util.Map
 import de.wwu.maml.maml2md2.rules.controller.Model2Controller
 import de.wwu.maml.maml2md2.rules.workflow.Model2Workflow
+import de.wwu.maml.maml2md2.correspondence.maml2md2.Transformation
 
 public class Maml2md2Transformation {
 	
@@ -130,7 +131,7 @@ public class Maml2md2Transformation {
 	}
 	
 	def void logTransformations(Resource corrModel){
-		val groupedList = corrModel.contents.filter(Corr).groupBy[it.sourceElement]
+		val groupedList = corrModel.contents.filter(Transformation).get(0).correspondences.filter(Corr).groupBy[it.sourceElement]
 		
 		for(key : groupedList.keySet) {
 			println("Correspondence: " + key)

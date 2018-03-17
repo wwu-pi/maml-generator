@@ -10,7 +10,9 @@ import static extension de.wwu.maml.maml2md2.util.ResourceHelper.*
 
 class Model2View extends Elem2Elem {
 	
-	public static final String ruleID = "Model->MD2Model[View]"
+	public static final String ruleID = "Model->View"
+	public static final String ruleIDMD2Model = ruleID + "[MD2Model]"
+	public static final String ruleIDPackage = ruleID + "[Package]"
 	
 	new(ResourceSet src, ResourceSet trgt, Resource corr) {
 		super(src, trgt, corr)
@@ -20,14 +22,16 @@ class Model2View extends Elem2Elem {
 		sourceModel.allContents.filter(typeof(de.wwu.maml.dsl.maml.Model))
 			.forEach[m |
 				// Create view
-				val corrV = m.getOrCreateCorrModelElement(ruleID)
+				val corrV = m.getOrCreateCorrModelElement(ruleIDMD2Model)
 				val targetV = corrV.getOrCreateTargetElem(targetPackage.MD2Model) as de.wwu.md2.framework.mD2.MD2Model
 				
-				val targetPackageView = createTargetElement(targetPackage.packageDefinition) as PackageDefinition
+				val corrTargetPackageV = m.getOrCreateCorrModelElement(ruleIDPackage)
+				val targetPackageView = corrTargetPackageV.getOrCreateTargetElem(targetPackage.packageDefinition) as PackageDefinition
 				targetPackageView.pkgName = Maml2md2Transformation.PACKAGE_NAME + ".views"
 				targetV.package = targetPackageView
 				
-				val targetViewLayer = createTargetElement(targetPackage.view) as de.wwu.md2.framework.mD2.View
+				val corrLayerV = m.getOrCreateCorrModelElement(ruleID)
+				val targetViewLayer = corrLayerV.getOrCreateTargetElem(targetPackage.view) as de.wwu.md2.framework.mD2.View
 				targetV.modelLayer = targetViewLayer
 				targetModel.getMD2ViewResource.contents += targetV
 			]

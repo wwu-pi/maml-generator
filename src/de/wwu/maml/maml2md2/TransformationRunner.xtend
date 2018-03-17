@@ -39,9 +39,9 @@ class TransformationRunner {
 	 */	
 	def static void main(String[] args){
 		val runner = new TransformationRunner()
-//		runner.transformMAMLtoMD2()
-		runner.transformMD2toMAML()
-//		runner.saveModels("test")
+		runner.transformMAMLtoMD2()
+//		runner.transformMD2toMAML()
+		runner.saveModels("test")
 	}
 	
 	/**

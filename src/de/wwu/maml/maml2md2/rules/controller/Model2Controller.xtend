@@ -30,8 +30,8 @@ class Model2Controller extends Elem2Elem {
 				targetPackageController.pkgName = Maml2md2Transformation.PACKAGE_NAME + ".controllers"
 				targetC.package = targetPackageController
 				
-				val corrControllerC = m.getOrCreateCorrModelElement(ruleID)
-				val targetControllerLayer = corrControllerC.getOrCreateTargetElem(targetPackage.controller) as de.wwu.md2.framework.mD2.Controller
+				val corrLayerC = m.getOrCreateCorrModelElement(ruleID)
+				val targetControllerLayer = corrLayerC.getOrCreateTargetElem(targetPackage.controller) as de.wwu.md2.framework.mD2.Controller
 				targetC.modelLayer = targetControllerLayer
 				targetModel.getMD2ControllerResource.contents += targetC
 			]

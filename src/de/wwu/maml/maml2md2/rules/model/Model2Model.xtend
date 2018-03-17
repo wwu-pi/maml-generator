@@ -39,7 +39,8 @@ class Model2Model extends Elem2Elem {
 			.forEach[m |
 				val corr = m.getOrCreateCorrModelElement(ruleID)
 				val source = corr.findOrCreateSourceElemOfType(sourcePackage.model)
-//				sourceModel.contents += source
+				sourceModel.MAMLResource.contents += source
+				println("Correspondence: " + source + " | " + m)
 			]
 	}
 	

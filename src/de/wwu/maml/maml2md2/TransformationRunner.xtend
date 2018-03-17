@@ -36,19 +36,27 @@ class TransformationRunner {
 	private static final String RESULTPATH = "results/BXtend";
 	
 	/**
+	 * Main program
+	 */	
+	def static void main(String[] args){
+		val runner = new TransformationRunner()
+//		runner.transformMAMLtoMD2()
+		runner.transformMD2toMAML()
+//		runner.saveModels("test")
+	}
+	
+	/**
 	 * Initiates a synchronization between a source and a target model. The BXtend Transformation is
 	 * initialized and empty source, target and correspondence models are created.
 	 * Finally a FamilyRegister is added to the source model and an initial forward transformation is issued
 	 * to create a corresponding PersonRegister.
 	 */
-	def initiateSynchronisationDialogue() {
-		
+	def transformMAMLtoMD2() {
 		TransformationRunner.initEMFRegistration()
-//		set.getResourceFactoryRegistry().getExtensionToFactoryMap().put("maml", new EcoreResourceFactoryImpl());
-		//set.getResourceFactoryRegistry().getExtensionToFactoryMap().put("md2", new EcoreResourceFactoryImpl());
-//		set.getResourceFactoryRegistry().getExtensionToFactoryMap().put("corr", new EcoreResourceFactoryImpl());		
+
+		println("Start transformation: MAML -> MD2")
 		
-//		// Define the common MD2Root element
+		// Define the common MD2Root element
 		source.createResource(URI.createURI("sourceModel.maml"));
 		val mamlRoot = MamlFactory.eINSTANCE.createModel();
 		source.resources.get(0).getContents().add(mamlRoot);
@@ -82,48 +90,22 @@ class TransformationRunner {
 		maml2md2.sourceToTarget();
 	}
 	
-	/**
-	 * Allows to save the current state of the source and target models
-	 * 
-	 * @param name : Filename 
-	 */
-	def void saveModels(String name) {
-		val set = new ResourceSetImpl();
-		set.getResourceFactoryRegistry().getExtensionToFactoryMap().put(Resource.Factory.Registry.DEFAULT_EXTENSION, new EcoreResourceFactoryImpl());
+	def transformMD2toMAML(){
+		TransformationRunner.initEMFRegistration()
+
+		println("Start transformation: MD2 -> MAML")
+				
+		source.createResource(URI.createURI("sourceModel.maml"));
+		corr = new ResourceSetImpl().createResource(URI.createURI("corrModel.corr"));
 		
-		val srcURI = URI.createFileURI(RESULTPATH + "/" + name + "MAML.xmi");
-		val trgURIM = URI.createFileURI(RESULTPATH + "/" + name + "MD2Model.xmi"); // Todo serialize as MD2 models
-		val trgURIV = URI.createFileURI(RESULTPATH + "/" + name + "MD2View.xmi");
-		val trgURIC = URI.createFileURI(RESULTPATH + "/" + name + "MD2Controller.xmi");
-		val trgURIW = URI.createFileURI(RESULTPATH + "/" + name + "MD2Workflow.xmi");
+		//Load MD2
+		target.getResource(URI.createURI(RESULTPATH + "/testMD2Model.xmi"), true)
+		target.getResource(URI.createURI(RESULTPATH + "/testMD2View.xmi"), true)
+				
+		val maml2md2 = new Maml2md2Transformation(source, target, corr);
 		
-		val resSource = set.createResource(srcURI);
-		val resTargetM = set.createResource(trgURIM);
-		val resTargetV = set.createResource(trgURIV);
-		val resTargetC = set.createResource(trgURIC);
-		val resTargetW = set.createResource(trgURIW);
-		
-		resSource.getContents().add(EcoreUtil.copy(source.resources.get(0).contents.get(0)));
-		resTargetM.getContents().add(EcoreUtil.copy(target.MD2ModelResource.contents.filter[it instanceof MD2Model && (it as MD2Model).modelLayer instanceof Model]?.get(0)));
-		resTargetV.getContents().add(EcoreUtil.copy(target.MD2ViewResource.contents.filter[it instanceof MD2Model && (it as MD2Model).modelLayer instanceof View]?.get(0)));
-		resTargetC.getContents().add(EcoreUtil.copy(target.MD2ControllerResource.contents.filter[it instanceof MD2Model && (it as MD2Model).modelLayer instanceof Controller]?.get(0)));
-		resTargetW.getContents().add(EcoreUtil.copy(target.MD2WorkflowResource.contents.filter[it instanceof MD2Model && (it as MD2Model).modelLayer instanceof Workflow]?.get(0)));
-		
-		try {
-			resTargetM.save(null);
-			resTargetV.save(null);
-			resTargetC.save(null);
-			resTargetW.save(null);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}			
-	}
-	
-	def static void main(String[] args){
-		val runner = new TransformationRunner()
-		runner.initiateSynchronisationDialogue()
-//		runner.loadMd2()
-		runner.saveModels("test")
+		maml2md2.targetToSource();
+		val x = "dummy"
 	}
 	
 	def static void initEMFRegistration() {
@@ -145,42 +127,43 @@ class TransformationRunner {
 		}
 		if (!EPackage.Registry.INSTANCE.containsKey("http://www.wwu.de/md2/framework/MD2")) {
 			EPackage.Registry.INSTANCE.put("http://www.wwu.de/md2/framework/MD2", MD2Package.eINSTANCE);
-		}
-		
+		}	
 	}
 	
-	def loadMd2(){
-		MD2StandaloneSetup.doSetup //createInjectorAndDoEMFRegistration();
-		//XtextResourceSet resourceSet = injector.getInstance(XtextResourceSet);
+	/**
+	 * Allows to save the current state of the source and target models
+	 * 
+	 * @param name : Filename 
+	 */
+	def void saveModels(String name) {
+		val set = new ResourceSetImpl();
+		set.getResourceFactoryRegistry().getExtensionToFactoryMap().put(Resource.Factory.Registry.DEFAULT_EXTENSION, new EcoreResourceFactoryImpl());
 		
-		de.wwu.maml.maml2md2.TransformationRunner.initEMFRegistration()
-//		set.getResourceFactoryRegistry().getExtensionToFactoryMap().put("maml", new EcoreResourceFactoryImpl());
-		//set.getResourceFactoryRegistry().getExtensionToFactoryMap().put("md2", new EcoreResourceFactoryImpl());
-//		set.getResourceFactoryRegistry().getExtensionToFactoryMap().put("corr", new EcoreResourceFactoryImpl());		
+		val srcURI = URI.createFileURI(RESULTPATH + "/" + name + "MAML.xmi");
+		val trgURIM = URI.createFileURI(RESULTPATH + "/" + name + "MD2Model.xmi"); // Todo serialize as MD2 models
+		val trgURIV = URI.createFileURI(RESULTPATH + "/" + name + "MD2View.xmi");
+		val trgURIC = URI.createFileURI(RESULTPATH + "/" + name + "MD2Controller.xmi");
+		val trgURIW = URI.createFileURI(RESULTPATH + "/" + name + "MD2Workflow.xmi");
 		
-		source.createResource(URI.createURI("sourceModel.maml"));
-//		target = set.createResource(URI.createURI("targetModel.md2"));
-		corr = new ResourceSetImpl().createResource(URI.createURI("corrModel.corr"));
+		val resSource = set.createResource(srcURI);
+		val resTargetM = set.createResource(trgURIM);
+		val resTargetV = set.createResource(trgURIV);
+		val resTargetC = set.createResource(trgURIC);
+		val resTargetW = set.createResource(trgURIW);
 		
-//		val mamlRoot = MamlFactory.eINSTANCE.createModel();
-//		source.getContents().add(mamlRoot);
-//		val mamlUseCase = MamlFactory.eINSTANCE.createUseCase();
-//		mamlRoot.useCases.add(mamlUseCase)
-//		val val resourceSet = new ResourceSetImpl();
-//		source = new ResourceSetImpl().getResource(URI.createURI(RESULTPATH + "/WHO5.maml"), true);
+		resSource.getContents().add(EcoreUtil.copy(source.getMAMLResource.contents.get(0)));
+		resTargetM.getContents().add(EcoreUtil.copy(target.MD2ModelResource.contents.filter[it instanceof MD2Model && (it as MD2Model).modelLayer instanceof Model]?.get(0)));
+		resTargetV.getContents().add(EcoreUtil.copy(target.MD2ViewResource.contents.filter[it instanceof MD2Model && (it as MD2Model).modelLayer instanceof View]?.get(0)));
+		resTargetC.getContents().add(EcoreUtil.copy(target.MD2ControllerResource.contents.filter[it instanceof MD2Model && (it as MD2Model).modelLayer instanceof Controller]?.get(0)));
+		resTargetW.getContents().add(EcoreUtil.copy(target.MD2WorkflowResource.contents.filter[it instanceof MD2Model && (it as MD2Model).modelLayer instanceof Workflow]?.get(0)));
 		
-		//Load MD2
-		val target = new ResourceSetImpl();
-		val res1 = new ResourceSetImpl().getResource(URI.createURI(RESULTPATH + "/testMD2Model.xmi"), true)
-		target.resources.add(res1);
-		val res2 = new ResourceSetImpl().getResource(URI.createURI(RESULTPATH + "/testMD2View.xmi"), true)
-		target.resources.add(res2);
-		//target = resourceSet.getResource(URI.createURI(RESULTPATH + "/testMD2View.xmi"), true);
-		
-				
-		val maml2md2 = new Maml2md2Transformation(source, target, corr);
-		
-		maml2md2.targetToSource();
-		val x = "dummy"
+		try {
+			resTargetM.save(null);
+			resTargetV.save(null);
+			resTargetC.save(null);
+			resTargetW.save(null);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}			
 	}
 }

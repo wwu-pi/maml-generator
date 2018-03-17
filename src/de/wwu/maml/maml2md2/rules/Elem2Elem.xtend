@@ -92,9 +92,14 @@ abstract class Elem2Elem {
 	}
 	
 	def findOrCreateSourceElemOfType(Corr corr, EClass clazz) {
-		var existingElement = elementsToCorr.keySet.filter[it.eClass == clazz]?.head
+		var existingElement = elementsToCorr.keySet.filter[
+			it.eClass == clazz
+		]?.head
+		println(existingElement + "")
 		if(existingElement === null){
 			existingElement = getOrCreateSourceElem(corr, clazz)
+		} else {
+			corr.sourceElement = existingElement
 		}
 		return existingElement
 	}

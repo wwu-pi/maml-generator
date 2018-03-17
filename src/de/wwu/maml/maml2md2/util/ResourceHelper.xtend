@@ -24,4 +24,8 @@ class ResourceHelper {
 	static def getMD2WorkflowResource(ResourceSet set){
 		set.resources.filter[it.URI.lastSegment == TARGET_MD2_WORKFLOW_RESOURCE]?.head
 	}
+	
+	static def getMAMLResource(ResourceSet set){
+		set.resources.get(0)
+	}
 }

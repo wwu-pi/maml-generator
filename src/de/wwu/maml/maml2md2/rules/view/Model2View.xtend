@@ -14,7 +14,6 @@ class Model2View extends Elem2Elem {
 	
 	new(ResourceSet src, ResourceSet trgt, Resource corr) {
 		super(src, trgt, corr)
-		
 	}
 	
 	override def sourceToTarget() {

@@ -14,7 +14,6 @@ class Model2Workflow extends Elem2Elem {
 	
 	new(ResourceSet src, ResourceSet trgt, Resource corr) {
 		super(src, trgt, corr)
-		
 	}
 	
 	override def sourceToTarget() {
@@ -38,8 +37,9 @@ class Model2Workflow extends Elem2Elem {
 		targetModel.allContents.filter(typeof(de.wwu.md2.framework.mD2.Model))
 			.forEach[m |
 				val corr = m.getOrCreateCorrModelElement(ruleID)
-				val source = corr.getOrCreateSourceElem(sourcePackage.model)
-//				sourceModel.contents += source
+				val source = corr.findOrCreateSourceElemOfType(sourcePackage.model)
+				sourceModel.MAMLResource.contents += source
+				println("Correspondence: " + source + " | " + m)
 			]
 	}
 	

@@ -72,6 +72,8 @@ public class Maml2md2Transformation {
 		
 		// handle deletions
 		deleteUnreferencedTargetElements
+		
+		logTransformations(corrModel)
 	}
 	
 	def void targetToSource() {		
@@ -82,6 +84,8 @@ public class Maml2md2Transformation {
 		
 		// handle deletions
 		deleteUnreferencedSourceElements
+		
+		logTransformations(corrModel)
 	}
 	
 	def boolean checkCorrespondences() {
@@ -123,5 +127,16 @@ public class Maml2md2Transformation {
 			deletionList += c
 		]
 		deletionList.forEach[e | EcoreUtil.delete(e, true)]
+	}
+	
+	def void logTransformations(Resource corrModel){
+		val groupedList = corrModel.contents.filter(Corr).groupBy[it.sourceElement]
+		
+		for(key : groupedList.keySet) {
+			println("Correspondence: " + key)
+			for(value : groupedList.get(key)){
+				println("    | " + value.targetElement)
+			}
+		}
 	}
 }

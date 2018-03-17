@@ -1,37 +1,36 @@
 package de.wwu.maml.maml2md2
 
 import de.wwu.maml.dsl.maml.MamlFactory
+import de.wwu.maml.dsl.maml.MamlPackage
+import de.wwu.maml.dsl.maml.UseCase
+import de.wwu.maml.dsl.mamldata.MamldataPackage
+import de.wwu.maml.dsl.mamlgui.MamlguiPackage
 import de.wwu.maml.maml2md2.rules.Maml2md2Transformation
 import de.wwu.md2.framework.MD2StandaloneSetup
+import de.wwu.md2.framework.mD2.Controller
+import de.wwu.md2.framework.mD2.MD2Model
+import de.wwu.md2.framework.mD2.MD2Package
+import de.wwu.md2.framework.mD2.Model
+import de.wwu.md2.framework.mD2.View
+import de.wwu.md2.framework.mD2.Workflow
 import java.io.IOException
 import org.eclipse.emf.common.util.URI
-import org.eclipse.emf.ecore.EObject
+import org.eclipse.emf.ecore.EPackage
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.emf.ecore.resource.ResourceSet
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl
 import org.eclipse.emf.ecore.util.EcoreUtil
 import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl
+import org.eclipse.emf.mwe.utils.StandaloneSetup
 
-import static extension de.wwu.md2.framework.MD2StandaloneSetup.*
 import static extension de.wwu.maml.maml2md2.util.ResourceHelper.*
-
-import org.eclipse.emf.ecore.EPackage
-import de.wwu.md2.framework.mD2.MD2Package
-import de.wwu.maml.dsl.maml.UseCase
-import org.eclipse.emf.common.util.BasicEList
-import de.wwu.md2.framework.mD2.MD2Model
-import de.wwu.md2.framework.mD2.Model
-import de.wwu.md2.framework.mD2.Workflow
-import de.wwu.md2.framework.mD2.Controller
-import de.wwu.md2.framework.mD2.View
-import de.wwu.md2.framework.mD2.MD2Factory
+import de.wwu.maml.maml2md2.correspondence.maml2md2.Corr
 
 class TransformationRunner {
 	
 	private ResourceSet source = new ResourceSetImpl();
 	private ResourceSet target = new ResourceSetImpl();
 	private Resource corr;
-	private Maml2md2Transformation maml2md2;
 	
 	private static final String RESULTPATH = "results/BXtend";
 	
@@ -87,7 +86,7 @@ class TransformationRunner {
 		corr = new ResourceSetImpl().createResource(URI.createURI("corrModel.corr"));
 		
 		val maml2md2 = new Maml2md2Transformation(source, target, corr);
-		maml2md2.sourceToTarget();
+		maml2md2.sourceToTarget()
 	}
 	
 	def transformMD2toMAML(){
@@ -103,9 +102,7 @@ class TransformationRunner {
 		target.getResource(URI.createURI(RESULTPATH + "/testMD2View.xmi"), true)
 				
 		val maml2md2 = new Maml2md2Transformation(source, target, corr);
-		
-		maml2md2.targetToSource();
-		val x = "dummy"
+		maml2md2.targetToSource()
 	}
 	
 	def static void initEMFRegistration() {
@@ -113,17 +110,17 @@ class TransformationRunner {
 		//XtextResourceSet resourceSet = injector.getInstance(XtextResourceSet);
 		
 		// Register Xtext Resource Factory
-		new org.eclipse.emf.mwe.utils.StandaloneSetup().setPlatformUri("../");
+		new StandaloneSetup().setPlatformUri("../");
 
 		// Register MAML and MD2 meta models
 		if (!EPackage.Registry.INSTANCE.containsKey("http://de/wwu/maml/dsl/maml")) {
-			EPackage.Registry.INSTANCE.put("http://de/wwu/maml/dsl/maml", de.wwu.maml.dsl.maml.MamlPackage.eINSTANCE);
+			EPackage.Registry.INSTANCE.put("http://de/wwu/maml/dsl/maml", MamlPackage.eINSTANCE);
 		}
 		if (!EPackage.Registry.INSTANCE.containsKey("http://de/wwu/maml/dsl/mamldata")) {
-			EPackage.Registry.INSTANCE.put("http://de/wwu/maml/dsl/mamldata", de.wwu.maml.dsl.mamldata.MamldataPackage.eINSTANCE);
+			EPackage.Registry.INSTANCE.put("http://de/wwu/maml/dsl/mamldata", MamldataPackage.eINSTANCE);
 		}
 		if (!EPackage.Registry.INSTANCE.containsKey("http://de/wwu/maml/dsl/mamlgui")) {
-			EPackage.Registry.INSTANCE.put("http://de/wwu/maml/dsl/mamlgui", de.wwu.maml.dsl.mamlgui.MamlguiPackage.eINSTANCE);
+			EPackage.Registry.INSTANCE.put("http://de/wwu/maml/dsl/mamlgui", MamlguiPackage.eINSTANCE);
 		}
 		if (!EPackage.Registry.INSTANCE.containsKey("http://www.wwu.de/md2/framework/MD2")) {
 			EPackage.Registry.INSTANCE.put("http://www.wwu.de/md2/framework/MD2", MD2Package.eINSTANCE);

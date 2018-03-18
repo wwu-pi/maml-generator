@@ -12,7 +12,6 @@ class Model2Workflow extends Elem2Elem {
 	
 	public static final String ruleID = "Model->Workflow"
 	public static final String ruleIDMD2Model = ruleID + "[MD2Model]"
-	public static final String ruleIDPackage = ruleID + "[Package]"
 	
 	new(ResourceSet src, ResourceSet trgt, Resource corr) {
 		super(src, trgt, corr)
@@ -25,8 +24,7 @@ class Model2Workflow extends Elem2Elem {
 				val corrW = m.getOrCreateCorrModelElement(ruleIDMD2Model)
 				val targetW = corrW.getOrCreateTargetElem(targetPackage.MD2Model) as de.wwu.md2.framework.mD2.MD2Model
 				
-				val corrTargetPackageW = m.getOrCreateCorrModelElement(ruleIDPackage)
-				val targetPackageWorkflow = corrTargetPackageW.getOrCreateTargetElem(targetPackage.packageDefinition) as PackageDefinition
+				val targetPackageWorkflow = createTargetElement(targetPackage.packageDefinition) as PackageDefinition
 				targetPackageWorkflow.pkgName = Maml2md2Transformation.PACKAGE_NAME + ".workflows"
 				targetW.package = targetPackageWorkflow
 				

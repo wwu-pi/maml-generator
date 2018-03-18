@@ -2,6 +2,7 @@ package de.wwu.maml.maml2md2.rules;
 
 import de.wwu.maml.dsl.maml.MamlFactory
 import de.wwu.maml.dsl.maml.MamlPackage
+import de.wwu.maml.dsl.mamlgui.MamlguiPackage
 import de.wwu.maml.maml2md2.correspondence.maml2md2.Corr
 import de.wwu.maml.maml2md2.correspondence.maml2md2.Maml2md2Factory
 import de.wwu.maml.maml2md2.correspondence.maml2md2.Transformation
@@ -13,6 +14,7 @@ import org.eclipse.emf.ecore.EClass
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.emf.ecore.resource.ResourceSet
+import de.wwu.maml.dsl.mamldata.MamldataPackage
 
 abstract class Elem2Elem {
 	
@@ -53,7 +55,7 @@ abstract class Elem2Elem {
 		var Corr corr = obj.getCorrModelElem(description)?.head
 		if (corr === null) {
 			corr = corrFactory.createBasicElem => [
-				if (obj.eClass.EPackage instanceof MamlPackage)
+				if (obj.eClass.EPackage instanceof MamlPackage || obj.eClass.EPackage instanceof MamlguiPackage || obj.eClass.EPackage instanceof MamldataPackage)
 					sourceElement = obj
 				if (obj.eClass.EPackage instanceof MD2Package)
 					targetElement = obj
@@ -116,5 +118,11 @@ abstract class Elem2Elem {
 			corr.targetElement = existingElement
 		}
 		return existingElement
+	}
+	
+	def resolveElement(EClass clazz, String ruleId){
+		return elementsToCorr.keySet.filter[it.eClass == clazz]?.filter[
+			candidate | elementsToCorr.get(candidate).filter[it.desc == ruleId].size > 0
+		]?.head
 	}
 }

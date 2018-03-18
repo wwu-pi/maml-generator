@@ -12,7 +12,6 @@ class Model2View extends Elem2Elem {
 	
 	public static final String ruleID = "Model->View"
 	public static final String ruleIDMD2Model = ruleID + "[MD2Model]"
-	public static final String ruleIDPackage = ruleID + "[Package]"
 	
 	new(ResourceSet src, ResourceSet trgt, Resource corr) {
 		super(src, trgt, corr)
@@ -25,8 +24,7 @@ class Model2View extends Elem2Elem {
 				val corrV = m.getOrCreateCorrModelElement(ruleIDMD2Model)
 				val targetV = corrV.getOrCreateTargetElem(targetPackage.MD2Model) as de.wwu.md2.framework.mD2.MD2Model
 				
-				val corrTargetPackageV = m.getOrCreateCorrModelElement(ruleIDPackage)
-				val targetPackageView = corrTargetPackageV.getOrCreateTargetElem(targetPackage.packageDefinition) as PackageDefinition
+				val targetPackageView = createTargetElement(targetPackage.packageDefinition) as PackageDefinition
 				targetPackageView.pkgName = Maml2md2Transformation.PACKAGE_NAME + ".views"
 				targetV.package = targetPackageView
 				

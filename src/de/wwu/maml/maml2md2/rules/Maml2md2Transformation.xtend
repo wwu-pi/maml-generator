@@ -15,6 +15,7 @@ import java.util.Map
 import de.wwu.maml.maml2md2.rules.controller.Model2Controller
 import de.wwu.maml.maml2md2.rules.workflow.Model2Workflow
 import de.wwu.maml.maml2md2.correspondence.maml2md2.Transformation
+import de.wwu.maml.maml2md2.rules.model.DataType2ModelElement
 
 public class Maml2md2Transformation {
 	
@@ -63,6 +64,9 @@ public class Maml2md2Transformation {
 		rules.add(new Model2View(sourceModel, targetModel, corrModel))
 		rules.add(new Model2Controller(sourceModel, targetModel, corrModel))
 		rules.add(new Model2Workflow(sourceModel, targetModel, corrModel))
+		
+		// Model Layer transformations
+		rules.add(new DataType2ModelElement(sourceModel, targetModel, corrModel))
 	}
 	
 	def void sourceToTarget() {

@@ -73,7 +73,7 @@ class DataType2ModelElement extends Elem2Elem {
 				// Create element
 				val corr = src.getOrCreateCorrModelElement(ruleID)
 				val entity = corr.getOrCreateTargetElem(targetPackage.entity) as Entity
-				entity.name = src.name
+				entity.name = src.name.toFirstUpper
 		]
 		
 		sourceModel.allContents.filter(typeof(CustomType))
@@ -86,8 +86,10 @@ class DataType2ModelElement extends Elem2Elem {
 				for(property : src.attributes){
 					val attrCorr = property.getOrCreateCorrModelElement(ruleIDProperty)
 					val attr = attrCorr.getOrCreateTargetElem(targetPackage.attribute) as Attribute
-					attr.name = property.name
+					attr.name = property.name.toFirstLower
 					attr.type = MAMLDataTypeToMD2AttributeType(property.type)
+					attr.extendedName = null; // Not explicitly modelled in MAML
+					attr.description = null; // Not explicitly modelled in MAML
 					
 					values.add(attr)
 					targetModel.getMD2ModelResource.contents += attr

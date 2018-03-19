@@ -1,30 +1,15 @@
 package de.wwu.maml.maml2md2
 
 import de.wwu.maml.dsl.maml.MamlFactory
-import de.wwu.maml.dsl.maml.MamlPackage
 import de.wwu.maml.dsl.maml.UseCase
-import de.wwu.maml.dsl.mamldata.MamldataPackage
-import de.wwu.maml.dsl.mamlgui.MamlguiPackage
 import de.wwu.maml.maml2md2.rules.Maml2md2Transformation
-import de.wwu.md2.framework.MD2StandaloneSetup
-import de.wwu.md2.framework.mD2.Controller
-import de.wwu.md2.framework.mD2.MD2Model
-import de.wwu.md2.framework.mD2.MD2Package
-import de.wwu.md2.framework.mD2.Model
-import de.wwu.md2.framework.mD2.View
-import de.wwu.md2.framework.mD2.Workflow
-import java.io.IOException
 import org.eclipse.emf.common.util.URI
-import org.eclipse.emf.ecore.EPackage
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.emf.ecore.resource.ResourceSet
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl
 import org.eclipse.emf.ecore.util.EcoreUtil
-import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl
-import org.eclipse.emf.mwe.utils.StandaloneSetup
 
 import static extension de.wwu.maml.maml2md2.util.ResourceHelper.*
-import de.wwu.maml.maml2md2.correspondence.maml2md2.Corr
 
 class TransformationRunner {
 	
@@ -41,7 +26,6 @@ class TransformationRunner {
 		val runner = new TransformationRunner()
 		runner.transformMAMLtoMD2()
 //		runner.transformMD2toMAML()
-		runner.saveModels("test")
 	}
 	
 	/**
@@ -51,7 +35,7 @@ class TransformationRunner {
 	 * to create a corresponding PersonRegister.
 	 */
 	def transformMAMLtoMD2() {
-		TransformationRunner.initEMFRegistration()
+		XmiToMd2Converter.init()
 
 		println("Start transformation: MAML -> MD2")
 		
@@ -63,7 +47,8 @@ class TransformationRunner {
 		// Define the transformation input
 		// TODO crawl folders to find all .maml files
 		val modelSources = newArrayList(); // List of MAML use cases
-		modelSources.add(URI.createURI(RESULTPATH + "/WHO5.maml"));
+		val inputUri = URI.createURI(RESULTPATH + "/WHO5.maml")
+		modelSources.add(inputUri);
 
 		for (URI modelSource : modelSources) {
 			val inResource = new ResourceSetImpl().getResource(modelSource, true);
@@ -87,10 +72,30 @@ class TransformationRunner {
 		
 		val maml2md2 = new Maml2md2Transformation(source, target, corr);
 		maml2md2.sourceToTarget()
+		
+		// Save MD2 models
+		val inputFileName = inputUri.lastSegment.substring(0, inputUri.lastSegment.lastIndexOf('.'))
+		val targetFileM = RESULTPATH + "/" + inputFileName + "MD2Model.md2"
+		val targetFileV = RESULTPATH + "/" + inputFileName + "MD2View.md2"
+		val targetFileC = RESULTPATH + "/" + inputFileName + "MD2Controller.md2"
+		val targetFileW = RESULTPATH + "/" + inputFileName + "MD2Workflow.md2"
+		
+		try {
+			XmiToMd2Converter.XmiToMd2(target.MD2ModelResource, targetFileM)
+		} catch (Exception e){ e.printStackTrace() }
+		try {
+			XmiToMd2Converter.XmiToMd2(target.MD2ViewResource, targetFileV)
+		} catch (Exception e){ e.printStackTrace() }
+		try {
+			XmiToMd2Converter.XmiToMd2(target.MD2ControllerResource, targetFileC)
+		} catch (Exception e){ e.printStackTrace() }
+		try {
+			XmiToMd2Converter.XmiToMd2(target.MD2WorkflowResource, targetFileW)
+		} catch (Exception e){ e.printStackTrace() }
 	}
 	
 	def transformMD2toMAML(){
-		TransformationRunner.initEMFRegistration()
+		//TransformationRunner.initEMFRegistration()
 
 		println("Start transformation: MD2 -> MAML")
 				
@@ -103,64 +108,5 @@ class TransformationRunner {
 				
 		val maml2md2 = new Maml2md2Transformation(source, target, corr);
 		maml2md2.targetToSource()
-	}
-	
-	def static void initEMFRegistration() {
-		MD2StandaloneSetup.doSetup //createInjectorAndDoEMFRegistration();
-		//XtextResourceSet resourceSet = injector.getInstance(XtextResourceSet);
-		
-		// Register Xtext Resource Factory
-		new StandaloneSetup().setPlatformUri("../");
-
-		// Register MAML and MD2 meta models
-		if (!EPackage.Registry.INSTANCE.containsKey("http://de/wwu/maml/dsl/maml")) {
-			EPackage.Registry.INSTANCE.put("http://de/wwu/maml/dsl/maml", MamlPackage.eINSTANCE);
-		}
-		if (!EPackage.Registry.INSTANCE.containsKey("http://de/wwu/maml/dsl/mamldata")) {
-			EPackage.Registry.INSTANCE.put("http://de/wwu/maml/dsl/mamldata", MamldataPackage.eINSTANCE);
-		}
-		if (!EPackage.Registry.INSTANCE.containsKey("http://de/wwu/maml/dsl/mamlgui")) {
-			EPackage.Registry.INSTANCE.put("http://de/wwu/maml/dsl/mamlgui", MamlguiPackage.eINSTANCE);
-		}
-		if (!EPackage.Registry.INSTANCE.containsKey("http://www.wwu.de/md2/framework/MD2")) {
-			EPackage.Registry.INSTANCE.put("http://www.wwu.de/md2/framework/MD2", MD2Package.eINSTANCE);
-		}	
-	}
-	
-	/**
-	 * Allows to save the current state of the source and target models
-	 * 
-	 * @param name : Filename 
-	 */
-	def void saveModels(String name) {
-		val set = new ResourceSetImpl();
-		set.getResourceFactoryRegistry().getExtensionToFactoryMap().put(Resource.Factory.Registry.DEFAULT_EXTENSION, new EcoreResourceFactoryImpl());
-		
-		val srcURI = URI.createFileURI(RESULTPATH + "/" + name + "MAML.xmi");
-		val trgURIM = URI.createFileURI(RESULTPATH + "/" + name + "MD2Model.xmi"); // Todo serialize as MD2 models
-		val trgURIV = URI.createFileURI(RESULTPATH + "/" + name + "MD2View.xmi");
-		val trgURIC = URI.createFileURI(RESULTPATH + "/" + name + "MD2Controller.xmi");
-		val trgURIW = URI.createFileURI(RESULTPATH + "/" + name + "MD2Workflow.xmi");
-		
-		val resSource = set.createResource(srcURI);
-		val resTargetM = set.createResource(trgURIM);
-		val resTargetV = set.createResource(trgURIV);
-		val resTargetC = set.createResource(trgURIC);
-		val resTargetW = set.createResource(trgURIW);
-		
-		resSource.getContents().add(EcoreUtil.copy(source.getMAMLResource.contents.get(0)));
-		resTargetM.getContents().add(EcoreUtil.copy(target.MD2ModelResource.contents.filter[it instanceof MD2Model && (it as MD2Model).modelLayer instanceof Model]?.get(0)));
-		resTargetV.getContents().add(EcoreUtil.copy(target.MD2ViewResource.contents.filter[it instanceof MD2Model && (it as MD2Model).modelLayer instanceof View]?.get(0)));
-		resTargetC.getContents().add(EcoreUtil.copy(target.MD2ControllerResource.contents.filter[it instanceof MD2Model && (it as MD2Model).modelLayer instanceof Controller]?.get(0)));
-		resTargetW.getContents().add(EcoreUtil.copy(target.MD2WorkflowResource.contents.filter[it instanceof MD2Model && (it as MD2Model).modelLayer instanceof Workflow]?.get(0)));
-		
-		try {
-			resTargetM.save(null);
-			resTargetV.save(null);
-			resTargetC.save(null);
-			resTargetW.save(null);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}			
 	}
 }

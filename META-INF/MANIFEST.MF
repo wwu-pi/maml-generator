@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: de.wwu.maml.maml2md2
+Bundle-SymbolicName: de.wwu.maml.maml2md2; singleton:=true
+Bundle-Version: 1.0.0
+Require-Bundle: org.eclipse.emf.ecore,
+ de.wwu.maml.dsl,
+ de.wwu.md2.framework,
+ com.google.inject,
+ org.eclipse.xtext.xbase.lib,
+ org.eclipse.xtext,
+ org.eclipse.xtend.lib,
+ org.eclipse.xtend.lib.macro,
+ org.eclipse.emf.ecore.xmi;bundle-version="2.13.0"

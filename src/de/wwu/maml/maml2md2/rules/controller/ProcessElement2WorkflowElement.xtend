@@ -16,6 +16,12 @@ import org.eclipse.emf.ecore.resource.ResourceSet
 
 import static extension de.wwu.maml.maml2md2.util.MamlHelper.*
 import static extension de.wwu.maml.maml2md2.util.ResourceHelper.*
+import de.wwu.md2.framework.mD2.EventBindingTask
+import de.wwu.md2.framework.mD2.FireEventAction
+import de.wwu.md2.framework.mD2.WorkflowEvent
+import de.wwu.md2.framework.mD2.SimpleActionRef
+import de.wwu.md2.framework.mD2.GlobalEventRef
+import de.wwu.md2.framework.mD2.GlobalEventType
 
 class ProcessElement2WorkflowElement extends Elem2Elem {
 	
@@ -53,7 +59,7 @@ class ProcessElement2WorkflowElement extends Elem2Elem {
 				wfe.processChain.add(defaultPc)
 				wfe.defaultProcessChain = defaultPc
 				
-				val initAction = src.createMd2InitAction()
+				val initAction = src.getOrCreateMd2InitAction()
 				wfe.actions.add(initAction)
 				wfe.initActions.add(initAction)
 				
@@ -62,6 +68,34 @@ class ProcessElement2WorkflowElement extends Elem2Elem {
 				(container as Controller)?.controllerElements?.add(wfe)
 				
 				MD2ControllerContent.add(wfe)
+			]
+			
+		sourceModel.allContents.filter(typeof(InteractionProcessElement))
+			.forEach[src |
+				// Create WorkflowEvent
+				val corrEvent = src.getOrCreateCorrModelElement(ruleIDworkflowEvent)
+				val wfEvent = corrEvent.getOrCreateTargetElem(targetPackage.workflowEvent) as WorkflowEvent
+				wfEvent.name = "dummy" //TODO
+				
+				// Create FireEventAction
+				val fireEventAction = createTargetElement(targetPackage.fireEventAction) as FireEventAction
+				fireEventAction.workflowEvent = wfEvent
+				
+				val simpleActionRef = createTargetElement(targetPackage.simpleActionRef) as SimpleActionRef
+				simpleActionRef.action = fireEventAction
+				
+				// TODO Dummy task binding (global event ref)
+				val gobalEventRef = createTargetElement(targetPackage.globalEventRef) as GlobalEventRef
+				gobalEventRef.event = GlobalEventType.ON_CONNECTION_LOST
+				
+				// Create EventBindingTask
+				val fireEventBinding = createTargetElement(targetPackage.eventBindingTask) as EventBindingTask
+				fireEventBinding.actions.add(simpleActionRef)
+				fireEventBinding.events.add(gobalEventRef)
+				
+				// Attach to workflowElement
+				val initAction = src.getOrCreateMd2InitAction
+				initAction.codeFragments.add(fireEventBinding)
 			]
 	}
 	
@@ -74,7 +108,7 @@ class ProcessElement2WorkflowElement extends Elem2Elem {
 //			]
 	}
 	
-	def Action createMd2InitAction(InteractionProcessElement src){
+	def CustomAction getOrCreateMd2InitAction(InteractionProcessElement src){
 		// TODO dummy
 		val corr = src.getOrCreateCorrModelElement(ruleIDinitAction)
 		val action = corr.getOrCreateTargetElem(targetPackage.customAction) as CustomAction

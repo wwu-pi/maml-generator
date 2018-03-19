@@ -20,6 +20,7 @@ import de.wwu.maml.maml2md2.rules.controller.LocalDataSource2ContentProvider
 import de.wwu.maml.maml2md2.rules.workflow.Role2App
 import de.wwu.maml.maml2md2.rules.controller.ProcessElement2WorkflowElement
 import de.wwu.maml.maml2md2.rules.view.ProcessElement2ViewFrame
+import de.wwu.maml.maml2md2.rules.workflow.ProcessElement2WorkflowElementEntry
 
 public class Maml2md2Transformation {
 	
@@ -81,6 +82,7 @@ public class Maml2md2Transformation {
 		
 		// Workflow layer transformations
 		rules.add(new Role2App(sourceModel, targetModel, corrModel))
+		rules.add(new ProcessElement2WorkflowElementEntry(sourceModel, targetModel, corrModel))
 		
 	}
 	

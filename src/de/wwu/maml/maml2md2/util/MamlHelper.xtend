@@ -1,10 +1,16 @@
 package de.wwu.maml.maml2md2.util
 
-import de.wwu.maml.dsl.mamldata.DataType
+import de.wwu.maml.dsl.maml.AutomatedProcessElement
+import de.wwu.maml.dsl.maml.DataSource
+import de.wwu.maml.dsl.maml.InteractionProcessElement
+import de.wwu.maml.dsl.maml.ProcessFlowElement
+import de.wwu.maml.dsl.maml.ProcessStartEvent
+import de.wwu.maml.dsl.maml.Xor
+import de.wwu.maml.dsl.mamldata.AnonymousType
 import de.wwu.maml.dsl.mamldata.Collection
 import de.wwu.maml.dsl.mamldata.CustomType
-import de.wwu.maml.dsl.mamldata.AnonymousType
-import de.wwu.maml.dsl.maml.InteractionProcessElement
+import de.wwu.maml.dsl.mamldata.DataType
+import de.wwu.maml.dsl.mamldata.Enum
 
 class MamlHelper {
 	
@@ -13,7 +19,7 @@ class MamlHelper {
 			Collection: return getDataTypeName(type.type) + "Coll"
 			AnonymousType: return "Anonymous" + type.hashCode
 			CustomType: return type.name
-			de.wwu.maml.dsl.mamldata.Enum: return type.name
+			Enum: return type.name
 			default: return null
 		}
 	}
@@ -65,5 +71,18 @@ class MamlHelper {
 		
 		// First character lowercase
 		return filteredText.toFirstLower;
+	}
+	
+	static def boolean isFirstInteractionProcessElement(ProcessFlowElement pe){
+		val foundStart = pe.previousElements.map[it.sourceProcessFlowElement].map[
+			switch it {
+				ProcessStartEvent: return true
+				Xor,
+				DataSource,
+				AutomatedProcessElement: return isFirstInteractionProcessElement(it)
+				default: return false
+			}
+		]
+		return foundStart.exists[it === true]
 	}
 }

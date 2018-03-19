@@ -21,7 +21,7 @@ class ProcessElement2WorkflowElement extends Elem2Elem {
 	
 	public static final String ruleID = "ProcessElement->WorkflowElement"
 	public static final String ruleIDinitAction = ruleID + "[initAction]"
-	//public static final String ruleIDworkflowEvent = "ProcessElement->WorkflowEvent"
+	public static final String ruleIDworkflowEvent = "ProcessElement->WorkflowEvent" //TODO
 	
 	new(ResourceSet src, ResourceSet trgt, Resource corr) {
 		super(src, trgt, corr)

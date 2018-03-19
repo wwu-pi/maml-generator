@@ -9,6 +9,9 @@ import de.wwu.md2.framework.mD2.WorkflowElementReference
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.emf.ecore.resource.ResourceSet
 
+import static extension de.wwu.maml.maml2md2.util.MamlHelper.*
+import de.wwu.maml.dsl.maml.UseCase
+
 class Role2App extends Elem2Elem {
 	
 	public static final String ruleID = "Role->App"
@@ -33,28 +36,11 @@ class Role2App extends Elem2Elem {
 				app.workflowElements.addAll(src.processElements.map[pe |
 					val wfeRef = createTargetElement(targetPackage.workflowElementReference) as WorkflowElementReference
 					wfeRef.workflowElementReference = pe.getOrCreateCorrModelElement(ProcessElement2WorkflowElement.ruleID).targetElement as WorkflowElement
-					// TODO startable
+					wfeRef.startable = pe.firstInteractionProcessElement
+					if(wfeRef.startable) wfeRef.alias = (pe.eContainer as UseCase).title
 					
 					return wfeRef
 				])
-				
-//				src.processElements.forEach[pe |
-//					// Create workflowElementEntry
-//					val wfeEntryCorr = pe.getOrCreateCorrModelElement(ruleIDwfeEntry)
-//					val entry = wfeEntryCorr.getOrCreateTargetElem(targetPackage.workflowElementEntry) as WorkflowElementEntry
-//					
-//					val wfeCorr = pe.getOrCreateCorrModelElement(ProcessElement2WorkflowElement.ruleID)
-//					entry.workflowElement = wfeCorr.targetElement as WorkflowElement
-//					
-//					// TODO Dummy FireEventEnty
-//					val fireEventEntry = createTargetElement(targetPackage.fireEventEntry) as FireEventEntry
-//					val eventCorr = pe.getOrCreateCorrModelElement(ProcessElement2WorkflowElement.ruleIDworkflowEvent)
-//					fireEventEntry.event = eventCorr.targetElement as WorkflowEvent // TODO
-//					fireEventEntry.endWorkflow = true
-//					entry.firedEvents.add(fireEventEntry)
-//					
-//					wfes.add(entry)
-//				]
 				
 				MD2Workflow.apps.add(app)
 			]

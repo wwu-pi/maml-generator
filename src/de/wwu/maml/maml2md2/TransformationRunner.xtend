@@ -69,11 +69,12 @@ class TransformationRunner {
 		maml2md2.sourceToTarget()
 		
 		// Save MD2 models
-		val projectName = inputUri.lastSegment.substring(0, inputUri.lastSegment.lastIndexOf('.'))
-		val targetPath = RESULTPATH + "/"
-		
 		try {
+			val projectName = inputUri.lastSegment.substring(0, inputUri.lastSegment.lastIndexOf('.'))
+			val targetPath = RESULTPATH + "/"
+		
 			XmiToMd2Converter.XmiToMd2(md2Resource, targetPath, projectName)
+			println("Done. Generated MD2 output saved to " + targetPath)
 		} catch (Exception e){ e.printStackTrace() }
 	}
 	

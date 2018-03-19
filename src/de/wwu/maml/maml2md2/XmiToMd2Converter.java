@@ -16,6 +16,11 @@ import org.eclipse.emf.ecore.xmi.XMLResource;
 import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.resource.XtextResourceSet;
+import org.eclipse.xtext.util.CancelIndicator;
+import org.eclipse.xtext.validation.CheckMode;
+import org.eclipse.xtext.validation.IResourceValidator;
+import org.eclipse.xtext.validation.Issue;
+
 import com.google.inject.Injector;
 
 import de.wwu.maml.maml2md2.util.ResourceHelper;
@@ -108,9 +113,18 @@ public class XmiToMd2Converter {
 		int workflowIndex = resourceMd2W.getContents().indexOf(ResourceHelper.getMD2WorkflowContainer(resourceMd2W));
 		EObject workflow = resourceMd2W.getContents().remove(workflowIndex);
 		resourceMd2W.getContents().add(0, workflow);				
-
-		// TODO check that at least one element is contained
-
+		
+		// Validate model before serialization
+		System.out.println("Performing validation...");
+		IResourceValidator validator = ((XtextResource) resourceMd2M).getResourceServiceProvider().getResourceValidator();
+		List<Issue> issues = validator.validate(resourceMd2M, CheckMode.ALL, CancelIndicator.NullImpl);
+		for(Issue issue : issues) {
+			System.out.println(issue.getMessage());
+		}
+		
+		// Save MD2 models
+		System.out.println("Saving generated MD2 models...");
+		
 		try {
 			resourceMd2M.save(Collections.emptyMap());
 			resourceMd2V.save(Collections.emptyMap());

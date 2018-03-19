@@ -36,9 +36,10 @@ class ProcessElement2WorkflowElement extends Elem2Elem {
 			.forEach[src |
 				// Create default process chain
 				val defaultPc = createTargetElement(targetPackage.processChain) as ProcessChain
-				defaultPc.name = "defaultProcessChain"
+				defaultPc.name = "defaultChain"
 				
 				val pcStep = createTargetElement(targetPackage.processChainStep) as ProcessChainStep
+				pcStep.name = defaultPc.name + "Step1"
 				val viewRef = createTargetElement(targetPackage.abstractViewFrameRef) as AbstractViewFrameRef
 				viewRef.ref = resolveElement(targetPackage.viewFrame, ProcessElement2ViewFrame.ruleID) as ViewFrame
 				pcStep.view = viewRef
@@ -77,6 +78,7 @@ class ProcessElement2WorkflowElement extends Elem2Elem {
 		// TODO dummy
 		val corr = src.getOrCreateCorrModelElement(ruleIDinitAction)
 		val action = corr.getOrCreateTargetElem(targetPackage.customAction) as CustomAction
+		action.name = src.workflowElementName + "InitAction"
 		
 		return action
 	}

@@ -17,6 +17,9 @@ import de.wwu.maml.maml2md2.rules.workflow.Model2Workflow
 import de.wwu.maml.maml2md2.correspondence.maml2md2.Transformation
 import de.wwu.maml.maml2md2.rules.model.DataType2ModelElement
 import de.wwu.maml.maml2md2.rules.controller.LocalDataSource2ContentProvider
+import de.wwu.maml.maml2md2.rules.workflow.Role2App
+import de.wwu.maml.maml2md2.rules.controller.ProcessElement2WorkflowElement
+import de.wwu.maml.maml2md2.rules.view.ProcessElement2ViewFrame
 
 public class Maml2md2Transformation {
 	
@@ -69,8 +72,16 @@ public class Maml2md2Transformation {
 		// Model Layer transformations
 		rules.add(new DataType2ModelElement(sourceModel, targetModel, corrModel))
 		
+		// View Layer transformation
+		rules.add(new ProcessElement2ViewFrame(sourceModel, targetModel, corrModel))
+		
 		// Controller Layer transformations
 		rules.add(new LocalDataSource2ContentProvider(sourceModel, targetModel, corrModel))
+		rules.add(new ProcessElement2WorkflowElement(sourceModel, targetModel, corrModel))
+		
+		// Workflow layer transformations
+		rules.add(new Role2App(sourceModel, targetModel, corrModel))
+		
 	}
 	
 	def void sourceToTarget() {

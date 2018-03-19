@@ -1,6 +1,7 @@
 package de.wwu.maml.maml2md2.util
 
 import org.eclipse.emf.ecore.resource.ResourceSet
+import de.wwu.maml.maml2md2.rules.Elem2Elem
 
 class ResourceHelper {
 	

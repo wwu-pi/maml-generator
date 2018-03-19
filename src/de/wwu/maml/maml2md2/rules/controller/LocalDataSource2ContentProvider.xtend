@@ -75,7 +75,7 @@ class LocalDataSource2ContentProvider extends Elem2Elem {
 			val container = resolveElement(targetPackage.controller, Model2Controller.ruleID)
 			(container as Controller)?.controllerElements.add(cp)
 			
-			targetModel.getMD2ModelResource.contents += cp
+			MD2ControllerContent.add(cp)
 		}
 		
 		return cp

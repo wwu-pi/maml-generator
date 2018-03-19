@@ -15,6 +15,14 @@ import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.emf.ecore.resource.ResourceSet
 import de.wwu.maml.dsl.mamldata.MamldataPackage
+import de.wwu.maml.maml2md2.rules.view.Model2View
+import de.wwu.md2.framework.mD2.View
+import de.wwu.maml.maml2md2.rules.model.Model2Model
+import de.wwu.md2.framework.mD2.Model
+import de.wwu.maml.maml2md2.rules.controller.Model2Controller
+import de.wwu.md2.framework.mD2.Controller
+import de.wwu.md2.framework.mD2.Workflow
+import de.wwu.maml.maml2md2.rules.workflow.Model2Workflow
 
 abstract class Elem2Elem {
 	
@@ -124,5 +132,21 @@ abstract class Elem2Elem {
 		return elementsToCorr.keySet.filter[it.eClass == clazz]?.filter[
 			candidate | elementsToCorr.get(candidate).filter[it.desc == ruleId].size > 0
 		]?.head
+	}
+	
+	def getMD2ModelContent(){
+		(resolveElement(targetPackage.model, Model2Model.ruleID) as Model)?.modelElements
+	}
+	
+	def getMD2ViewContent(){
+		(resolveElement(targetPackage.view, Model2View.ruleID) as View)?.viewElements
+	}
+	
+	def getMD2ControllerContent(){
+		(resolveElement(targetPackage.controller, Model2Controller.ruleID) as Controller)?.controllerElements
+	}
+	
+	def getMD2Workflow(){
+		(resolveElement(targetPackage.workflow, Model2Workflow.ruleID) as Workflow)
 	}
 }

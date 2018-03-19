@@ -24,6 +24,7 @@ import de.wwu.md2.framework.mD2.DateTimeType
 import de.wwu.md2.framework.mD2.DateType
 import de.wwu.md2.framework.mD2.Entity
 import de.wwu.md2.framework.mD2.EnumBody
+import de.wwu.md2.framework.mD2.FileType
 import de.wwu.md2.framework.mD2.FloatType
 import de.wwu.md2.framework.mD2.IntegerType
 import de.wwu.md2.framework.mD2.Model
@@ -33,9 +34,6 @@ import de.wwu.md2.framework.mD2.StringType
 import de.wwu.md2.framework.mD2.TimeType
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.emf.ecore.resource.ResourceSet
-
-import static extension de.wwu.maml.maml2md2.util.ResourceHelper.*
-import de.wwu.md2.framework.mD2.FileType
 
 class DataType2ModelElement extends Elem2Elem {
 	
@@ -64,7 +62,7 @@ class DataType2ModelElement extends Elem2Elem {
 				val container = resolveElement(targetPackage.model, Model2Model.ruleID)
 				(container as Model)?.modelElements.add(enum)
 				
-				targetModel.getMD2ModelResource.contents += enum
+				MD2ModelContent.add(enum)
 			]
 			
 		// Entity needs two steps: first create all target types empty, then process attributes (to avoid missing references) 
@@ -82,7 +80,6 @@ class DataType2ModelElement extends Elem2Elem {
 				val entity = corr.targetElement as Entity
 				
 				// Process contained attributes
-				val values = entity.attributes
 				for(property : src.attributes){
 					val attrCorr = property.getOrCreateCorrModelElement(ruleIDProperty)
 					val attr = attrCorr.getOrCreateTargetElem(targetPackage.attribute) as Attribute
@@ -91,15 +88,14 @@ class DataType2ModelElement extends Elem2Elem {
 					attr.extendedName = null; // Not explicitly modelled in MAML
 					attr.description = null; // Not explicitly modelled in MAML
 					
-					values.add(attr)
-					targetModel.getMD2ModelResource.contents += attr
+					entity.attributes.add(attr)
 				}
 				
 				// Attach to container 
 				val container = resolveElement(targetPackage.model, Model2Model.ruleID)
 				(container as Model)?.modelElements.add(entity)
 				
-				targetModel.getMD2ModelResource.contents += entity
+				MD2ModelContent.add(entity)
 			]
 	}
 	

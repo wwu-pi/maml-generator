@@ -9,8 +9,6 @@ import org.eclipse.emf.ecore.resource.ResourceSet
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl
 import org.eclipse.emf.ecore.util.EcoreUtil
 
-import static extension de.wwu.maml.maml2md2.util.ResourceHelper.*
-
 class TransformationRunner {
 	
 	private ResourceSet source = new ResourceSetImpl();
@@ -64,33 +62,18 @@ class TransformationRunner {
 		}
 		
 		// Create empty resources for target and correlation models 
-		target.createResource(URI.createURI("targetModel.md2"));
-		target.createResource(URI.createURI("targetView.md2"));
-		target.createResource(URI.createURI("targetController.md2"));
-		target.createResource(URI.createURI("targetWorkflow.md2"));
+		val md2Resource = target.createResource(URI.createURI("fullModel.md2"));
 		corr = new ResourceSetImpl().createResource(URI.createURI("corrModel.corr"));
 		
 		val maml2md2 = new Maml2md2Transformation(source, target, corr);
 		maml2md2.sourceToTarget()
 		
 		// Save MD2 models
-		val inputFileName = inputUri.lastSegment.substring(0, inputUri.lastSegment.lastIndexOf('.'))
-		val targetFileM = RESULTPATH + "/" + inputFileName + "MD2Model.md2"
-		val targetFileV = RESULTPATH + "/" + inputFileName + "MD2View.md2"
-		val targetFileC = RESULTPATH + "/" + inputFileName + "MD2Controller.md2"
-		val targetFileW = RESULTPATH + "/" + inputFileName + "MD2Workflow.md2"
+		val projectName = inputUri.lastSegment.substring(0, inputUri.lastSegment.lastIndexOf('.'))
+		val targetPath = RESULTPATH + "/"
 		
 		try {
-			XmiToMd2Converter.XmiToMd2(target.MD2ModelResource, targetFileM)
-		} catch (Exception e){ e.printStackTrace() }
-		try {
-			XmiToMd2Converter.XmiToMd2(target.MD2ViewResource, targetFileV)
-		} catch (Exception e){ e.printStackTrace() }
-		try {
-			XmiToMd2Converter.XmiToMd2(target.MD2ControllerResource, targetFileC)
-		} catch (Exception e){ e.printStackTrace() }
-		try {
-			XmiToMd2Converter.XmiToMd2(target.MD2WorkflowResource, targetFileW)
+			XmiToMd2Converter.XmiToMd2(md2Resource, targetPath, projectName)
 		} catch (Exception e){ e.printStackTrace() }
 	}
 	

@@ -31,7 +31,7 @@ class Model2View extends Elem2Elem {
 				val corrLayerV = m.getOrCreateCorrModelElement(ruleID)
 				val targetViewLayer = corrLayerV.getOrCreateTargetElem(targetPackage.view) as de.wwu.md2.framework.mD2.View
 				targetV.modelLayer = targetViewLayer
-				targetModel.getMD2ViewResource.contents += targetV
+				targetModel.getMD2Resource.contents += targetV
 			]
 	}
 	

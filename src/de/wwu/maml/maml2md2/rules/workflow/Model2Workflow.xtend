@@ -31,7 +31,7 @@ class Model2Workflow extends Elem2Elem {
 				val corrLayerW = m.getOrCreateCorrModelElement(ruleID)
 				val targetWorkflowLayer = corrLayerW.getOrCreateTargetElem(targetPackage.workflow) as de.wwu.md2.framework.mD2.Workflow
 				targetW.modelLayer = targetWorkflowLayer
-				targetModel.getMD2WorkflowResource.contents += targetW
+				targetModel.getMD2Resource.contents += targetW
 			]
 	}
 	

@@ -31,7 +31,7 @@ class Model2Controller extends Elem2Elem {
 				val corrLayerC = m.getOrCreateCorrModelElement(ruleID)
 				val targetControllerLayer = corrLayerC.getOrCreateTargetElem(targetPackage.controller) as de.wwu.md2.framework.mD2.Controller
 				targetC.modelLayer = targetControllerLayer
-				targetModel.getMD2ControllerResource.contents += targetC
+				targetModel.getMD2Resource.contents += targetC
 			]
 	}
 	

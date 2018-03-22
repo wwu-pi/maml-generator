@@ -3,6 +3,7 @@ package de.wwu.maml.maml2md2.util
 import de.wwu.maml.dsl.maml.AutomatedProcessElement
 import de.wwu.maml.dsl.maml.DataSource
 import de.wwu.maml.dsl.maml.InteractionProcessElement
+import de.wwu.maml.dsl.maml.ParameterConnector
 import de.wwu.maml.dsl.maml.ProcessFlowElement
 import de.wwu.maml.dsl.maml.ProcessStartEvent
 import de.wwu.maml.dsl.maml.Xor
@@ -11,6 +12,7 @@ import de.wwu.maml.dsl.mamldata.Collection
 import de.wwu.maml.dsl.mamldata.CustomType
 import de.wwu.maml.dsl.mamldata.DataType
 import de.wwu.maml.dsl.mamldata.Enum
+import java.util.Arrays
 
 class MamlHelper {
 	
@@ -30,6 +32,11 @@ class MamlHelper {
 	
 	static def String getWorkflowElementName(InteractionProcessElement ipe){
 		ipe.description?.getAllowedAttributeName.toFirstUpper + "WorkflowElement"
+	}
+	
+	static def camelCaseToSpacedString(String text){
+		val words = Arrays.asList(text.split("(?<=[a-z])(?=[A-Z])"))
+		return String.join(" ", words.map[it.toFirstLower]);
 	}
 	
 	static def String getAllowedAttributeName(String text){
@@ -84,5 +91,15 @@ class MamlHelper {
 			}
 		]
 		return foundStart.exists[it === true]
+	}
+	
+	static def getHumanCaption(ParameterConnector conn){
+		if(conn.description !== null && conn.description != "" && conn.description != " ") {
+			return conn.description
+		} else if(conn.targetElement.description !== null){
+			return conn.targetElement.description.camelCaseToSpacedString
+		} else {
+			return "unnamedElement"
+		}
 	}
 }

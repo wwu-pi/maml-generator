@@ -1,6 +1,14 @@
 package de.wwu.maml.maml2md2.rules.view
 
+import de.wwu.maml.dsl.maml.CreateEntity
 import de.wwu.maml.dsl.maml.InteractionProcessElement
+import de.wwu.maml.dsl.maml.ParameterConnector
+import de.wwu.maml.dsl.maml.ParameterSource
+import de.wwu.maml.dsl.maml.ShowEntity
+import de.wwu.maml.dsl.maml.UpdateEntity
+import de.wwu.maml.dsl.mamldata.CustomType
+import de.wwu.maml.dsl.mamlgui.AccessType
+import de.wwu.maml.dsl.mamlgui.Attribute
 import de.wwu.maml.maml2md2.rules.Elem2Elem
 import de.wwu.md2.framework.mD2.Label
 import de.wwu.md2.framework.mD2.ViewFrame
@@ -12,14 +20,17 @@ import static extension de.wwu.maml.maml2md2.util.MamlHelper.*
 class ProcessElement2ViewFrame extends Elem2Elem {
 	
 	public static final String ruleID = "ProcessElement->ViewFrame"
+	private val Attribute2ViewElement viewElementTransformer; 
 	
 	new(ResourceSet src, ResourceSet trgt, Resource corr) {
 		super(src, trgt, corr)
+		
+		viewElementTransformer = new Attribute2ViewElement(src, trgt, corr)
 	}
 	 
 	/* 
 	 * Dependencies:
-	 * 
+	 * - DataType (for attribute transformation)
 	 */
 	override def sourceToTarget() {
 		sourceModel.allContents.filter(typeof(InteractionProcessElement))
@@ -29,11 +40,20 @@ class ProcessElement2ViewFrame extends Elem2Elem {
 				
 				viewFrame.name = src.viewName
 				
-				// TODO dummy view element
-				val viewElem = createTargetElement(targetPackage.label) as Label
-				viewElem.text = "Dummy label"
-				viewElem.name = viewElem.text.allowedAttributeName
-				viewFrame.elements.add(viewElem)
+				// Transform view content
+				val contentElements = src.ipeToViewContent;
+				if(contentElements.size == 0){
+					// View must contain at least one element
+					val viewElem = createTargetElement(targetPackage.label) as Label
+					viewElem.text = " "
+					viewElem.name = viewElem.text.allowedAttributeName
+					viewFrame.elements.add(viewElem)
+				} else {
+					// Add real content 
+					contentElements.forEach[
+						viewFrame.elements.add(it)
+					]
+				}
 				
 				// Attach to container
 				MD2ViewContent.add(viewFrame)
@@ -47,5 +67,52 @@ class ProcessElement2ViewFrame extends Elem2Elem {
 //				val source = corr.findOrCreateSourceElemOfType(sourcePackage.model)
 //				sourceModel.MAMLResource.contents += source
 //			]
+	}
+	
+	def ipeToViewContent(InteractionProcessElement ipe){
+		// Prepare ordered list of flattened elements to show 
+		val orderedParams = ipe.getOrderedParametersFlattened
+				
+		val guiElements = switch ipe {
+			CreateEntity,
+			UpdateEntity: ipe.transformCreateUpdateEntity(orderedParams)
+			ShowEntity: ipe.transformCreateUpdateEntity(orderedParams)
+			//TODO more view types
+		}
+		
+		return guiElements
+	}
+	
+	def transformCreateUpdateEntity(InteractionProcessElement ipe, Iterable<ParameterConnector> params){
+		// Transform each element to viewElement
+		val viewElements = params.flatMap[
+			viewElementTransformer.sourceToTarget(it, it.accessType === AccessType.WRITE)
+		]
+		
+		return viewElements
+	}
+	
+	def transformShowEntity(ShowEntity show, Iterable<ParameterConnector> params){
+		// Transform each element to viewElement
+		val viewElements = params.flatMap[
+			viewElementTransformer.sourceToTarget(it, false)
+		]
+		
+		return viewElements
+	}
+
+	def Iterable<ParameterConnector> getOrderedParametersFlattened(ParameterSource src){
+		// Order content by specified order attribute
+		val orderedParameters = src.parameters.sortBy[it.order]
+		
+		// Flatten indirect (nested) attributes
+		return orderedParameters.flatMap[
+			val target = it.targetElement
+			if(target instanceof Attribute && target.type instanceof CustomType){
+				return getOrderedParametersFlattened(target)
+			} else {
+				return newArrayList(it)
+			}
+		]
 	}
 }

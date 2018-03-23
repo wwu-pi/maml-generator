@@ -13,6 +13,8 @@ import de.wwu.maml.dsl.mamldata.CustomType
 import de.wwu.maml.dsl.mamldata.DataType
 import de.wwu.maml.dsl.mamldata.Enum
 import java.util.Arrays
+import de.wwu.maml.dsl.maml.ParameterSource
+import de.wwu.maml.dsl.mamlgui.Attribute
 
 class MamlHelper {
 	
@@ -101,5 +103,25 @@ class MamlHelper {
 		} else {
 			return "unnamedElement"
 		}
+	}
+	
+	static def Iterable<ParameterConnector> getOrderedParametersFlattened(ParameterSource src){
+		// Order content by specified order attribute
+		val orderedParameters = src.parameters.sortBy[it.order]
+		
+		// Flatten indirect (nested) attributes
+		return orderedParameters.flatMap[
+			val target = it.targetElement
+			if(target instanceof Attribute && target.type instanceof CustomType){
+				return getOrderedParametersFlattened(target)
+			} else {
+				return newArrayList(it)
+			}
+		]
+	}
+	
+	static def String maxLength(String input, int maxLength){
+		if(input.length > maxLength) return input.substring(0, maxLength)
+		return input 
 	}
 }

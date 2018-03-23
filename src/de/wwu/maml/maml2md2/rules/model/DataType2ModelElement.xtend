@@ -34,6 +34,7 @@ import de.wwu.md2.framework.mD2.StringType
 import de.wwu.md2.framework.mD2.TimeType
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.emf.ecore.resource.ResourceSet
+import de.wwu.maml.dsl.maml.InteractionProcessElement
 
 class DataType2ModelElement extends Elem2Elem {
 	
@@ -157,4 +158,25 @@ class DataType2ModelElement extends Elem2Elem {
 		}
 	}
 	
+	/**
+	 * Helper to get MD2 attribute (data element) for a MAML attribute (view element)
+	 * Dependency:
+	 * - ModelElements
+	 */  
+	def de.wwu.md2.framework.mD2.Attribute MD2attributeForMamlAttribute(de.wwu.maml.dsl.mamlgui.Attribute attr){
+		val container = attr.eContainer
+		switch container{
+			Attribute: {
+				// Nested attribute
+				if(container.type instanceof CustomType) {
+					return (container.type.getOrCreateCorrModelElement(ruleID) as Entity).attributes.filter[it.name == attr.description]?.head
+				}	
+			}
+			InteractionProcessElement: {
+				// Attribute of custom type within IPE 
+				return (container.dataType.getOrCreateCorrModelElement(ruleID) as Entity).attributes.filter[it.name == attr.description]?.head 
+			}
+			// TODO transitive relationships 
+		}
+	}
 }

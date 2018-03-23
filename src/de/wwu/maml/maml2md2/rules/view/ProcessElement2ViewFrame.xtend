@@ -3,12 +3,9 @@ package de.wwu.maml.maml2md2.rules.view
 import de.wwu.maml.dsl.maml.CreateEntity
 import de.wwu.maml.dsl.maml.InteractionProcessElement
 import de.wwu.maml.dsl.maml.ParameterConnector
-import de.wwu.maml.dsl.maml.ParameterSource
 import de.wwu.maml.dsl.maml.ShowEntity
 import de.wwu.maml.dsl.maml.UpdateEntity
-import de.wwu.maml.dsl.mamldata.CustomType
 import de.wwu.maml.dsl.mamlgui.AccessType
-import de.wwu.maml.dsl.mamlgui.Attribute
 import de.wwu.maml.maml2md2.rules.Elem2Elem
 import de.wwu.md2.framework.mD2.Label
 import de.wwu.md2.framework.mD2.ViewFrame
@@ -99,20 +96,5 @@ class ProcessElement2ViewFrame extends Elem2Elem {
 		]
 		
 		return viewElements
-	}
-
-	def Iterable<ParameterConnector> getOrderedParametersFlattened(ParameterSource src){
-		// Order content by specified order attribute
-		val orderedParameters = src.parameters.sortBy[it.order]
-		
-		// Flatten indirect (nested) attributes
-		return orderedParameters.flatMap[
-			val target = it.targetElement
-			if(target instanceof Attribute && target.type instanceof CustomType){
-				return getOrderedParametersFlattened(target)
-			} else {
-				return newArrayList(it)
-			}
-		]
-	}
+	}	
 }

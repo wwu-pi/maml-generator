@@ -35,7 +35,7 @@ import static extension de.wwu.maml.maml2md2.util.MamlHelper.*
 
 class Attribute2ViewElement extends Elem2Elem {
 	
-	public static final String ruleID = "Attribute->ViewElement"
+	public static final String ruleID = "Attribute->ViewGUIElement"
 	
 	new(ResourceSet src, ResourceSet trgt, Resource corr) {
 		super(src, trgt, corr)
@@ -70,7 +70,7 @@ class Attribute2ViewElement extends Elem2Elem {
 		val corr = label.getOrCreateCorrModelElement(ruleID)
 		val viewElem = corr.getOrCreateTargetElem(targetPackage.label) as de.wwu.md2.framework.mD2.Label
 		
-		viewElem.name = label.description?.allowedAttributeName.substring(0, 10) ?: "label" // TODO better way to name label
+		viewElem.name = label.description?.allowedAttributeName.maxLength(15) ?: "label" // TODO better way to name label
 		viewElem.text = label.description
 		
 		return viewElem

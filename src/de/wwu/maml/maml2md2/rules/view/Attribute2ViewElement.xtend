@@ -182,7 +182,6 @@ class Attribute2ViewElement extends Elem2Elem {
 		viewElem.labelText = src.getHumanCaption
 		viewElem.isDisabled = !editable
 		viewElem.defaultValue = (attr.type as Enum).values.get(0)?.value
-		val elem =  attr.type.getOrCreateCorrModelElement(DataType2ModelElement.ruleID)
 		viewElem.enumReference = attr.type.getOrCreateCorrModelElement(DataType2ModelElement.ruleID)?.targetElement as de.wwu.md2.framework.mD2.Enum
 		
 		return viewElem

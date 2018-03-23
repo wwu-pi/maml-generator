@@ -8,6 +8,7 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.emf.ecore.resource.ResourceSet
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl
 import org.eclipse.emf.ecore.util.EcoreUtil
+import de.wwu.maml.dsl.maml.Model
 
 class TransformationRunner {
 	
@@ -46,6 +47,7 @@ class TransformationRunner {
 		// TODO crawl folders to find all .maml files
 		val modelSources = newArrayList(); // List of MAML use cases
 		val inputUri = URI.createURI(RESULTPATH + "/WHO5.maml")
+		mamlRoot.projectName = "WHO5"
 		modelSources.add(inputUri);
 
 		for (URI modelSource : modelSources) {
@@ -70,10 +72,9 @@ class TransformationRunner {
 		
 		// Save MD2 models
 		try {
-			val projectName = inputUri.lastSegment.substring(0, inputUri.lastSegment.lastIndexOf('.'))
 			val targetPath = RESULTPATH + "/"
 		
-			XmiToMd2Converter.XmiToMd2(md2Resource, targetPath, projectName)
+			XmiToMd2Converter.XmiToMd2(md2Resource, targetPath, (md2Resource.contents.get(0) as Model).projectName)
 			println("Done. Generated MD2 output saved to " + targetPath)
 		} catch (Exception e){ e.printStackTrace() }
 	}

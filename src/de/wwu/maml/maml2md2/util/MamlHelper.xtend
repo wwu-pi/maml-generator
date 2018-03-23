@@ -15,6 +15,8 @@ import de.wwu.maml.dsl.mamldata.Enum
 import java.util.Arrays
 import de.wwu.maml.dsl.maml.ParameterSource
 import de.wwu.maml.dsl.mamlgui.Attribute
+import de.wwu.maml.dsl.maml.UseCase
+import de.wwu.maml.dsl.mamlgui.GUIElement
 
 class MamlHelper {
 	
@@ -123,5 +125,9 @@ class MamlHelper {
 	static def String maxLength(String input, int maxLength){
 		if(input.length > maxLength) return input.substring(0, maxLength)
 		return input 
+	}
+	
+	static def incomingConnectors(GUIElement attr){
+		return (attr.eContainer as UseCase).attributes.flatMap[it.parameters].filter[it.targetElement == attr]
 	}
 }

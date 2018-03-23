@@ -2,6 +2,7 @@ package de.wwu.maml.maml2md2.rules.model
 
 import de.wwu.maml.dsl.mamldata.Boolean
 import de.wwu.maml.dsl.mamldata.Collection
+import de.wwu.maml.dsl.mamldata.ComplexType
 import de.wwu.maml.dsl.mamldata.CustomType
 import de.wwu.maml.dsl.mamldata.DataType
 import de.wwu.maml.dsl.mamldata.Date
@@ -34,7 +35,8 @@ import de.wwu.md2.framework.mD2.StringType
 import de.wwu.md2.framework.mD2.TimeType
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.emf.ecore.resource.ResourceSet
-import de.wwu.maml.dsl.maml.InteractionProcessElement
+
+import static extension de.wwu.maml.maml2md2.util.MamlHelper.*
 
 class DataType2ModelElement extends Elem2Elem {
 	
@@ -52,7 +54,7 @@ class DataType2ModelElement extends Elem2Elem {
 				// Create element and its content
 				val corr = src.getOrCreateCorrModelElement(ruleID)
 				val enum = corr.getOrCreateTargetElem(targetPackage.enum) as de.wwu.md2.framework.mD2.Enum
-				enum.name = src.name
+				enum.name = src.name.allowedAttributeName.toFirstUpper
 				enum.enumBody = createTargetElement(targetPackage.enumBody) as EnumBody
 				val values = enum.enumBody.elements
 				for(value : src.values){
@@ -72,7 +74,7 @@ class DataType2ModelElement extends Elem2Elem {
 				// Create element
 				val corr = src.getOrCreateCorrModelElement(ruleID)
 				val entity = corr.getOrCreateTargetElem(targetPackage.entity) as Entity
-				entity.name = src.name.toFirstUpper
+				entity.name = src.name.allowedAttributeName.toFirstUpper
 		]
 		
 		sourceModel.allContents.filter(typeof(CustomType))
@@ -84,7 +86,7 @@ class DataType2ModelElement extends Elem2Elem {
 				for(property : src.attributes){
 					val attrCorr = property.getOrCreateCorrModelElement(ruleIDProperty)
 					val attr = attrCorr.getOrCreateTargetElem(targetPackage.attribute) as Attribute
-					attr.name = property.name.toFirstLower
+					attr.name = property.name.allowedAttributeName
 					attr.type = MAMLDataTypeToMD2AttributeType(property.type)
 					attr.extendedName = null; // Not explicitly modelled in MAML
 					attr.description = null; // Not explicitly modelled in MAML
@@ -150,33 +152,11 @@ class DataType2ModelElement extends Elem2Elem {
 				type.many = true
 				return type
 			}
-			CustomType: {
+			ComplexType: { // Enum and CustomType -> referencedTypes
 				val type = createTargetElement(targetPackage.referencedType) as ReferencedType
 				type.element = mamlType.getOrCreateCorrModelElement(ruleID).targetElement as ModelElement
 				return type
 			}
-		}
-	}
-	
-	/**
-	 * Helper to get MD2 attribute (data element) for a MAML attribute (view element)
-	 * Dependency:
-	 * - ModelElements
-	 */  
-	def de.wwu.md2.framework.mD2.Attribute MD2attributeForMamlAttribute(de.wwu.maml.dsl.mamlgui.Attribute attr){
-		val container = attr.eContainer
-		switch container{
-			Attribute: {
-				// Nested attribute
-				if(container.type instanceof CustomType) {
-					return (container.type.getOrCreateCorrModelElement(ruleID) as Entity).attributes.filter[it.name == attr.description]?.head
-				}	
-			}
-			InteractionProcessElement: {
-				// Attribute of custom type within IPE 
-				return (container.dataType.getOrCreateCorrModelElement(ruleID) as Entity).attributes.filter[it.name == attr.description]?.head 
-			}
-			// TODO transitive relationships 
 		}
 	}
 }

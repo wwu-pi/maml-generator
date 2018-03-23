@@ -13,9 +13,8 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.emf.ecore.resource.ResourceSet
 
 import static extension de.wwu.maml.maml2md2.util.MamlHelper.*
-import static extension de.wwu.maml.maml2md2.util.ResourceHelper.*
 
-class LocalDataSource2ContentProvider extends Elem2Elem {
+class DataSource2ContentProvider extends Elem2Elem {
 	
 	public static final String ruleID = "LocalDataSource->ContentProvider"
 	public static final String ruleIDmultiCP = ruleID + "[multi]"
@@ -28,7 +27,7 @@ class LocalDataSource2ContentProvider extends Elem2Elem {
 		// TODO limit multicontentprovider generation for types which are used in selection steps only
 			
 		// Local CP
-		sourceModel.allContents.filter(typeof(LocalDataSource))
+		sourceModel.allContents.filter(typeof(DataSource))
 			.forEach[src |
 				val cp = createMD2ContentProvider(src, false)
 				cp.local = true
@@ -38,7 +37,7 @@ class LocalDataSource2ContentProvider extends Elem2Elem {
 			]
 			
 		// Remote CP
-		sourceModel.allContents.filter(typeof(LocalDataSource))
+		sourceModel.allContents.filter(typeof(DataSource))
 			.forEach[src |
 				val cp = createMD2ContentProvider(src, false)
 				cp.connection = null //TODO
@@ -70,6 +69,13 @@ class LocalDataSource2ContentProvider extends Elem2Elem {
 			targetType.entity = dataTypeCorr.targetElement as ModelElement
 			targetType.many = isMultiProvider
 			cp.type = targetType
+			
+			// Local or remote provider
+			if(src instanceof LocalDataSource){
+				cp.local = true
+			} else {
+				cp.connection = null // TODO
+			}
 								
 			// Attach to container 
 			val container = resolveElement(targetPackage.controller, Model2Controller.ruleID)

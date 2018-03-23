@@ -1,41 +1,38 @@
 package de.wwu.maml.maml2md2.rules.controller
 
+import de.wwu.maml.dsl.maml.DataSource
 import de.wwu.maml.dsl.maml.InteractionProcessElement
+import de.wwu.maml.dsl.maml.UseCase
+import de.wwu.maml.dsl.mamldata.ComplexType
+import de.wwu.maml.dsl.mamldata.Multiplicity
+import de.wwu.maml.dsl.mamlgui.Attribute
 import de.wwu.maml.maml2md2.rules.Elem2Elem
+import de.wwu.maml.maml2md2.rules.view.Attribute2Attribute
+import de.wwu.maml.maml2md2.rules.view.Attribute2ViewElement
 import de.wwu.maml.maml2md2.rules.view.ProcessElement2ViewFrame
 import de.wwu.md2.framework.mD2.AbstractViewFrameRef
-import de.wwu.md2.framework.mD2.Action
+import de.wwu.md2.framework.mD2.AbstractViewGUIElementRef
+import de.wwu.md2.framework.mD2.ContentProvider
+import de.wwu.md2.framework.mD2.ContentProviderPath
 import de.wwu.md2.framework.mD2.Controller
 import de.wwu.md2.framework.mD2.CustomAction
+import de.wwu.md2.framework.mD2.EventBindingTask
+import de.wwu.md2.framework.mD2.FireEventAction
+import de.wwu.md2.framework.mD2.GlobalEventRef
+import de.wwu.md2.framework.mD2.GlobalEventType
+import de.wwu.md2.framework.mD2.MappingTask
+import de.wwu.md2.framework.mD2.PathTail
 import de.wwu.md2.framework.mD2.ProcessChain
 import de.wwu.md2.framework.mD2.ProcessChainStep
+import de.wwu.md2.framework.mD2.SimpleActionRef
 import de.wwu.md2.framework.mD2.ViewFrame
+import de.wwu.md2.framework.mD2.ViewGUIElement
 import de.wwu.md2.framework.mD2.WorkflowElement
+import de.wwu.md2.framework.mD2.WorkflowEvent
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.emf.ecore.resource.ResourceSet
 
 import static extension de.wwu.maml.maml2md2.util.MamlHelper.*
-import static extension de.wwu.maml.maml2md2.util.ResourceHelper.*
-import de.wwu.md2.framework.mD2.EventBindingTask
-import de.wwu.md2.framework.mD2.FireEventAction
-import de.wwu.md2.framework.mD2.WorkflowEvent
-import de.wwu.md2.framework.mD2.SimpleActionRef
-import de.wwu.md2.framework.mD2.GlobalEventRef
-import de.wwu.md2.framework.mD2.GlobalEventType
-import de.wwu.maml.dsl.mamlgui.Attribute
-import de.wwu.maml.dsl.mamldata.CustomType
-import de.wwu.maml.dsl.mamldata.ComplexType
-import de.wwu.maml.dsl.mamldata.Multiplicity
-import de.wwu.md2.framework.mD2.MappingTask
-import de.wwu.maml.maml2md2.rules.view.Attribute2ViewElement
-import de.wwu.md2.framework.mD2.AbstractViewGUIElementRef
-import de.wwu.md2.framework.mD2.ViewElement
-import de.wwu.md2.framework.mD2.ViewGUIElement
-import de.wwu.md2.framework.mD2.AbstractContentProviderPath
-import de.wwu.md2.framework.mD2.ContentProviderPath
-import de.wwu.md2.framework.mD2.ContentProvider
-import de.wwu.md2.framework.mD2.PathTail
-import de.wwu.maml.maml2md2.rules.model.DataType2ModelElement
 
 class ProcessElement2WorkflowElement extends Elem2Elem {
 	
@@ -126,29 +123,32 @@ class ProcessElement2WorkflowElement extends Elem2Elem {
 	}
 	
 	def CustomAction getOrCreateMd2InitAction(InteractionProcessElement src){
-		// TODO dummy
 		val corr = src.getOrCreateCorrModelElement(ruleIDinitAction)
 		val action = corr.getOrCreateTargetElem(targetPackage.customAction) as CustomAction
 		action.name = src.workflowElementName + "InitAction"
 		
 		// Add initial data mappings
-		src.orderedParametersFlattened.map[it.targetElement].filter(Attribute).forEach[
-			if(!(it.type instanceof ComplexType)){
+		src.orderedParametersFlattened.filter[it.targetElement instanceof Attribute].forEach[
+			if(!(it.targetElement.type instanceof ComplexType)){ // only map lowest-level input fields
+				val attr = it.targetElement as Attribute
+						
 				// Get content provider
-				val cp = if(it.multiplicity == Multiplicity.ONE || it.multiplicity == Multiplicity.ZEROONE) {
-						src.getOrCreateCorrModelElement(LocalDataSource2ContentProvider.ruleID).targetElement as ContentProvider
+				val dataSrc = (attr.eContainer as UseCase).eAllContents.filter(DataSource)?.head
+				val cp = if(attr.multiplicity == Multiplicity.ONE || attr.multiplicity == Multiplicity.ZEROONE) {
+						// TODO this is a simplification
+						dataSrc.getOrCreateCorrModelElement(DataSource2ContentProvider.ruleID).targetElement as ContentProvider
 					} else {
-						src.getOrCreateCorrModelElement(LocalDataSource2ContentProvider.ruleIDmultiCP).targetElement as ContentProvider
+						dataSrc.getOrCreateCorrModelElement(DataSource2ContentProvider.ruleIDmultiCP).targetElement as ContentProvider
 					}
 					
 				// Build content provider path
 				val cpPath = createTargetElement(targetPackage.contentProviderPath) as ContentProviderPath
 				cpPath.contentProviderRef = cp
 				cpPath.tail = createTargetElement(targetPackage.pathTail) as PathTail
-				cpPath.tail.attributeRef = new DataType2ModelElement(sourceModel, targetModel, corrModel).MD2attributeForMamlAttribute(it)
+				cpPath.tail.attributeRef = attr.getOrCreateCorrModelElement(Attribute2Attribute.ruleID).targetElement as de.wwu.md2.framework.mD2.Attribute
 				
 				// Retrieve view element reference
-				val viewElement = src.getOrCreateCorrModelElement(Attribute2ViewElement.ruleID).targetElement as ViewGUIElement
+				val viewElement = it.getOrCreateCorrModelElement(Attribute2ViewElement.ruleID).targetElement as ViewGUIElement
 				val ref = createTargetElement(targetPackage.abstractViewGUIElementRef) as AbstractViewGUIElementRef
 				ref.ref = viewElement
 				

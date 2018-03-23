@@ -16,11 +16,12 @@ import de.wwu.maml.maml2md2.rules.controller.Model2Controller
 import de.wwu.maml.maml2md2.rules.workflow.Model2Workflow
 import de.wwu.maml.maml2md2.correspondence.maml2md2.Transformation
 import de.wwu.maml.maml2md2.rules.model.DataType2ModelElement
-import de.wwu.maml.maml2md2.rules.controller.LocalDataSource2ContentProvider
 import de.wwu.maml.maml2md2.rules.workflow.Role2App
 import de.wwu.maml.maml2md2.rules.controller.ProcessElement2WorkflowElement
 import de.wwu.maml.maml2md2.rules.view.ProcessElement2ViewFrame
 import de.wwu.maml.maml2md2.rules.workflow.ProcessElement2WorkflowElementEntry
+import de.wwu.maml.maml2md2.rules.view.Attribute2Attribute
+import de.wwu.maml.maml2md2.rules.controller.DataSource2ContentProvider
 
 public class Maml2md2Transformation {
 	
@@ -75,9 +76,10 @@ public class Maml2md2Transformation {
 		
 		// View Layer transformation
 		rules.add(new ProcessElement2ViewFrame(sourceModel, targetModel, corrModel))
+		rules.add(new Attribute2Attribute(sourceModel, targetModel, corrModel))
 		
 		// Controller Layer transformations
-		rules.add(new LocalDataSource2ContentProvider(sourceModel, targetModel, corrModel))
+		rules.add(new DataSource2ContentProvider(sourceModel, targetModel, corrModel))
 		rules.add(new ProcessElement2WorkflowElement(sourceModel, targetModel, corrModel))
 		
 		// Workflow layer transformations
@@ -157,7 +159,7 @@ public class Maml2md2Transformation {
 		for(key : groupedList.keySet) {
 			println("Correspondence: " + key)
 			for(value : groupedList.get(key)){
-				println("    | " + value.targetElement)
+				println("    | " + value.desc + " | " + value.targetElement)
 			}
 		}
 	}

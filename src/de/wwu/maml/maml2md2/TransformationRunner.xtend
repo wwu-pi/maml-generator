@@ -22,8 +22,9 @@ class TransformationRunner {
 	 * Main program
 	 */	
 	def static void main(String[] args){
+		val fileName = "VisualAcuity" // "WHO5"
 		val runner = new TransformationRunner()
-		runner.transformMAMLtoMD2()
+		runner.transformMAMLtoMD2(fileName)
 //		runner.transformMD2toMAML()
 	}
 	
@@ -33,7 +34,7 @@ class TransformationRunner {
 	 * Finally a FamilyRegister is added to the source model and an initial forward transformation is issued
 	 * to create a corresponding PersonRegister.
 	 */
-	def transformMAMLtoMD2() {
+	def transformMAMLtoMD2(String filename) {
 		XmiToMd2Converter.init()
 
 		println("Start transformation: MAML -> MD2")
@@ -46,8 +47,8 @@ class TransformationRunner {
 		// Define the transformation input
 		// TODO crawl folders to find all .maml files
 		val modelSources = newArrayList(); // List of MAML use cases
-		val inputUri = URI.createURI(RESULTPATH + "/WHO5.maml")
-		mamlRoot.projectName = "WHO5"
+		val inputUri = URI.createURI(RESULTPATH + "/" + filename + ".maml")
+		mamlRoot.projectName = filename
 		modelSources.add(inputUri);
 
 		for (URI modelSource : modelSources) {
@@ -74,7 +75,7 @@ class TransformationRunner {
 		try {
 			val targetPath = RESULTPATH + "/"
 		
-			XmiToMd2Converter.XmiToMd2(md2Resource, targetPath, (md2Resource.contents.get(0) as Model).projectName)
+			XmiToMd2Converter.XmiToMd2(md2Resource, targetPath, mamlRoot.projectName)
 			println("Done. Generated MD2 output saved to " + targetPath)
 		} catch (Exception e){ e.printStackTrace() }
 	}

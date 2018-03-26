@@ -15,6 +15,7 @@ import org.eclipse.emf.ecore.resource.ResourceSet
 import static extension de.wwu.maml.maml2md2.util.MamlHelper.*
 import de.wwu.maml.dsl.maml.Model
 import de.wwu.md2.framework.mD2.RemoteConnection
+import org.eclipse.xtext.EcoreUtil2
 
 class DataSource2ContentProvider extends Elem2Elem {
 	
@@ -64,7 +65,11 @@ class DataSource2ContentProvider extends Elem2Elem {
 		val cp = corr.getOrCreateTargetElem(targetPackage.contentProvider) as ContentProvider
 		
 		if(src.dataType instanceof ComplexType){
-			cp.name = src.toUniqueName(src.dataType.dataTypeName.allowedAttributeName + if(isMultiProvider){ "MultiProvider" } else { "Provider" }).toFirstUpper
+			if(isMultiProvider){ 
+				cp.name = EcoreUtil2.copy(src).toUniqueName(src.dataType.dataTypeName.allowedAttributeName + "MultiProvider").toFirstUpper 
+			} else { 
+				cp.name = src.toUniqueName(src.dataType.dataTypeName.allowedAttributeName + "Provider").toFirstUpper 
+			}
 			
 			val dataTypeCorr = src.dataType.getOrCreateCorrModelElement(DataType2ModelElement.ruleID)
 			val targetType = createTargetElement(targetPackage.referencedModelType) as ReferencedModelType

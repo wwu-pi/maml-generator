@@ -22,6 +22,7 @@ import de.wwu.maml.maml2md2.rules.view.ProcessElement2ViewFrame
 import de.wwu.maml.maml2md2.rules.workflow.ProcessElement2WorkflowElementEntry
 import de.wwu.maml.maml2md2.rules.view.Attribute2Attribute
 import de.wwu.maml.maml2md2.rules.controller.DataSource2ContentProvider
+import de.wwu.maml.dsl.maml.Model
 
 public class Maml2md2Transformation {
 	
@@ -59,6 +60,9 @@ public class Maml2md2Transformation {
 		if (corrModel.contents.size == 0) {
 			corrModel.contents.add(de.wwu.maml.maml2md2.correspondence.maml2md2.Maml2md2Factory.eINSTANCE.createTransformation)	
 		}
+		
+		// Set project name
+		PACKAGE_NAME = (sourceModel.resources.get(0).getContents().get(0) as Model).projectName
 		
 		addRules
 	}

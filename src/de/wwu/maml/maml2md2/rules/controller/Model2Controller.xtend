@@ -12,6 +12,7 @@ class Model2Controller extends Elem2Elem {
 	
 	public static final String ruleID = "Model->Controller"
 	public static final String ruleIDMD2Model = ruleID + "[MD2Model]"
+	public static final String ruleIDremoteConnection = ruleID + "[RemoteConnection]"
 	
 	new(ResourceSet src, ResourceSet trgt, Resource corr) {
 		super(src, trgt, corr)
@@ -32,6 +33,13 @@ class Model2Controller extends Elem2Elem {
 				val targetControllerLayer = corrLayerC.getOrCreateTargetElem(targetPackage.controller) as de.wwu.md2.framework.mD2.Controller
 				targetC.modelLayer = targetControllerLayer
 				targetModel.getMD2Resource.contents += targetC
+				
+				// Create default remote connection (for workflow manager and remote content providers
+				val corrRC = m.getOrCreateCorrModelElement(ruleIDremoteConnection)
+				val targetConnection = corrRC.getOrCreateTargetElem(targetPackage.remoteConnection) as de.wwu.md2.framework.mD2.RemoteConnection
+				targetConnection.name = "defaultBackend"
+				targetConnection.uri = "http://localhost:8080/backend"
+				targetControllerLayer.controllerElements.add(targetConnection)
 			]
 	}
 	

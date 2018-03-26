@@ -13,6 +13,8 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.emf.ecore.resource.ResourceSet
 
 import static extension de.wwu.maml.maml2md2.util.MamlHelper.*
+import de.wwu.maml.dsl.maml.Model
+import de.wwu.md2.framework.mD2.RemoteConnection
 
 class DataSource2ContentProvider extends Elem2Elem {
 	
@@ -74,7 +76,7 @@ class DataSource2ContentProvider extends Elem2Elem {
 			if(src instanceof LocalDataSource){
 				cp.local = true
 			} else {
-				cp.connection = null // TODO
+				cp.connection = (src.eContainer.eContainer as Model).getCorrModelElem(Model2Controller.ruleIDremoteConnection)?.head?.targetElement as RemoteConnection
 			}
 								
 			// Attach to container 

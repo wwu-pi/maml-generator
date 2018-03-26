@@ -69,7 +69,7 @@ class ProcessElement2WorkflowElement extends Elem2Elem {
 				// Create workflow element
 				val corr = src.getOrCreateCorrModelElement(ruleID)
 				val wfe = corr.getOrCreateTargetElem(targetPackage.workflowElement) as WorkflowElement
-				wfe.name = src.toUniqueName(src.workflowElementName)
+				wfe.name = src.toUniqueName(src.workflowElementName).toFirstUpper
 				wfe.processChain.add(defaultPc)
 				wfe.defaultProcessChain = defaultPc
 				

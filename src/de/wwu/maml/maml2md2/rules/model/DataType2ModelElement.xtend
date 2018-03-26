@@ -83,7 +83,9 @@ class DataType2ModelElement extends Elem2Elem {
 				val entity = corr.targetElement as Entity
 				
 				// Process contained attributes
-				for(property : src.attributes){
+				// NOTICE assumption: multiple occurrences of the same attribute name have been checked to be of correct type beforehand
+				val propertyList = src.attributes.groupBy[it.name.allowedAttributeName].values.map[it.head]
+				for(property : propertyList){
 					val attrCorr = property.getOrCreateCorrModelElement(ruleIDProperty)
 					val attr = attrCorr.getOrCreateTargetElem(targetPackage.attribute) as Attribute
 					attr.name = property.toUniqueName(entity.name + "." + property.name.allowedAttributeName)

@@ -130,4 +130,12 @@ class MamlHelper {
 	static def incomingConnectors(GUIElement attr){
 		return (attr.eContainer as UseCase).attributes.flatMap[it.parameters].filter[it.targetElement == attr]
 	}
+	
+	static def getLastSegment(String qualifiedName){
+		return qualifiedName.split("\\.")?.last ?: qualifiedName
+	}
+	
+	static def getPathWithoutLastSegment(String qualifiedName){
+		return qualifiedName.substring(0, qualifiedName.length - qualifiedName.lastSegment.length)
+	}
 }

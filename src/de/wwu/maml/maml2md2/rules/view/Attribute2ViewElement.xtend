@@ -70,7 +70,7 @@ class Attribute2ViewElement extends Elem2Elem {
 		val corr = label.getOrCreateCorrModelElement(ruleID)
 		val viewElem = corr.getOrCreateTargetElem(targetPackage.label) as de.wwu.md2.framework.mD2.Label
 		
-		viewElem.name = label.toUniqueName(label.description ?: "label", 15) // TODO better way to name label
+		viewElem.name = label.toUniqueName(label.description.allowedAttributeName ?: "label", 15) // TODO better way to name label
 		viewElem.text = label.description
 		
 		return viewElem
@@ -193,7 +193,7 @@ class Attribute2ViewElement extends Elem2Elem {
 		val corr = attr.getOrCreateCorrModelElement(ruleID)
 		val viewElem = corr.getOrCreateTargetElem(targetPackage.label) as de.wwu.md2.framework.mD2.Label
 		
-		viewElem.name = attr.toUniqueName(attr.description ?: "label", 15) // TODO better way to name label
+		viewElem.name = attr.toUniqueName(attr.description.allowedAttributeName ?: "label", 15) // TODO better way to name label
 		viewElem.text = src.getHumanCaption
 		
 		return viewElem

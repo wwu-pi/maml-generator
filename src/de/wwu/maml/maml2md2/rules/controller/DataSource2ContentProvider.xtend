@@ -64,7 +64,7 @@ class DataSource2ContentProvider extends Elem2Elem {
 		val cp = corr.getOrCreateTargetElem(targetPackage.contentProvider) as ContentProvider
 		
 		if(src.dataType instanceof ComplexType){
-			cp.name = src.toUniqueName(src.dataType.dataTypeName + if(isMultiProvider){ "MultiProvider" } else { "Provider" }).toFirstUpper
+			cp.name = src.toUniqueName(src.dataType.dataTypeName.allowedAttributeName + if(isMultiProvider){ "MultiProvider" } else { "Provider" }).toFirstUpper
 			
 			val dataTypeCorr = src.dataType.getOrCreateCorrModelElement(DataType2ModelElement.ruleID)
 			val targetType = createTargetElement(targetPackage.referencedModelType) as ReferencedModelType

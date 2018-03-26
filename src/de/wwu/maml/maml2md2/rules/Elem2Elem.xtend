@@ -158,8 +158,8 @@ abstract class Elem2Elem {
 		return elem.toUniqueName(shortName)
 	}
 	
-	def toUniqueName(EObject elem, String name){
-		val allowedName = name.allowedAttributeName
+	def toUniqueName(EObject elem, String qualifiedName){
+		val allowedName = qualifiedName.pathWithoutLastSegment + qualifiedName.lastSegment.allowedAttributeName
 		
 		if(!uniqueObjectNames.containsKey(elem)) {
 			// Ensure a new object has a unique name using suffix
@@ -169,6 +169,6 @@ abstract class Elem2Elem {
 			}
 			uniqueObjectNames.put(elem, allowedName + if(suffix == 0) "" else suffix)
 		}
-		return uniqueObjectNames.get(elem)
+		return uniqueObjectNames.get(elem).lastSegment
 	}
 }

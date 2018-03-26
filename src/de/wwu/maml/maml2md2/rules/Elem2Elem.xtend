@@ -164,7 +164,7 @@ abstract class Elem2Elem {
 		if(!uniqueObjectNames.containsKey(elem)) {
 			// Ensure a new object has a unique name using suffix
 			var suffix = 0
-			while(uniqueObjectNames.values.contains(allowedName + if(suffix == 0) "" else suffix)){
+			while(uniqueObjectNames.values.containsIgnoreCase(allowedName + if(suffix == 0) "" else suffix)){
 				suffix++
 			}
 			uniqueObjectNames.put(elem, allowedName + if(suffix == 0) "" else suffix)

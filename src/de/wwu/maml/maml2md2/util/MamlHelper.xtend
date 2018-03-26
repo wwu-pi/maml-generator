@@ -138,4 +138,8 @@ class MamlHelper {
 	static def getPathWithoutLastSegment(String qualifiedName){
 		return qualifiedName.substring(0, qualifiedName.length - qualifiedName.lastSegment.length)
 	}
+	
+	static def containsIgnoreCase(java.util.Collection<String> elements, String search){
+		return elements.filter[it.equalsIgnoreCase(search)].size > 0
+	}
 }

@@ -7,12 +7,14 @@ import de.wwu.maml.maml2md2.rules.Elem2Elem
 import de.wwu.maml.maml2md2.rules.Maml2md2Transformation
 
 import static extension de.wwu.maml.maml2md2.util.ResourceHelper.*
+import de.wwu.md2.framework.mD2.Main
 
 class Model2Controller extends Elem2Elem {
 	
 	public static final String ruleID = "Model->Controller"
 	public static final String ruleIDMD2Model = ruleID + "[MD2Model]"
 	public static final String ruleIDremoteConnection = ruleID + "[RemoteConnection]"
+	public static final String ruleIDmainBlock = ruleID + "[Main]"
 	
 	new(ResourceSet src, ResourceSet trgt, Resource corr) {
 		super(src, trgt, corr)
@@ -40,6 +42,15 @@ class Model2Controller extends Elem2Elem {
 				targetConnection.name = "defaultBackend"
 				targetConnection.uri = "http://localhost:8080/backend"
 				targetControllerLayer.controllerElements.add(targetConnection)
+				
+				// Create main block
+				val corrMain = m.getOrCreateCorrModelElement(ruleIDmainBlock)
+				val targetMain = corrMain.getOrCreateTargetElem(targetPackage.main) as Main
+				targetMain.appVersion = "1.0"
+				targetMain.modelVersion = "1.0"
+				targetMain.defaultConnection = targetConnection
+				targetMain.workflowManager = targetConnection
+				targetControllerLayer.controllerElements.add(targetMain)
 			]
 	}
 	

@@ -54,7 +54,7 @@ class DataType2ModelElement extends Elem2Elem {
 				// Create element and its content
 				val corr = src.getOrCreateCorrModelElement(ruleID)
 				val enum = corr.getOrCreateTargetElem(targetPackage.enum) as de.wwu.md2.framework.mD2.Enum
-				enum.name = src.name.allowedAttributeName.toFirstUpper
+				enum.name = src.toUniqueName(src.name).toFirstUpper
 				enum.enumBody = createTargetElement(targetPackage.enumBody) as EnumBody
 				val values = enum.enumBody.elements
 				for(value : src.values){
@@ -74,7 +74,7 @@ class DataType2ModelElement extends Elem2Elem {
 				// Create element
 				val corr = src.getOrCreateCorrModelElement(ruleID)
 				val entity = corr.getOrCreateTargetElem(targetPackage.entity) as Entity
-				entity.name = src.name.allowedAttributeName.toFirstUpper
+				entity.name = src.toUniqueName(src.name).toFirstUpper
 		]
 		
 		sourceModel.allContents.filter(typeof(CustomType))
@@ -86,7 +86,7 @@ class DataType2ModelElement extends Elem2Elem {
 				for(property : src.attributes){
 					val attrCorr = property.getOrCreateCorrModelElement(ruleIDProperty)
 					val attr = attrCorr.getOrCreateTargetElem(targetPackage.attribute) as Attribute
-					attr.name = property.name.allowedAttributeName
+					attr.name = property.toUniqueName(property.name)
 					attr.type = MAMLDataTypeToMD2AttributeType(property.type)
 					attr.extendedName = null; // Not explicitly modelled in MAML
 					attr.description = null; // Not explicitly modelled in MAML

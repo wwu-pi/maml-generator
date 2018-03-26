@@ -148,12 +148,12 @@ class ProcessElement2WorkflowElement extends Elem2Elem {
 				cpPath.tail.attributeRef = attr.getOrCreateCorrModelElement(Attribute2Attribute.ruleID).targetElement as de.wwu.md2.framework.mD2.Attribute
 				
 				// Retrieve view element reference
-				val viewElement = it.getOrCreateCorrModelElement(Attribute2ViewElement.ruleID).targetElement as ViewGUIElement
+				val viewElement = attr.getOrCreateCorrModelElement(Attribute2ViewElement.ruleID).targetElement as ViewGUIElement
 				val ref = createTargetElement(targetPackage.abstractViewGUIElementRef) as AbstractViewGUIElementRef
 				ref.ref = viewElement
 				
 				// Create mapping task
-				val attrCorr = it.getOrCreateCorrModelElement(ruleIDinitActionAttrBinding)
+				val attrCorr = attr.getOrCreateCorrModelElement(ruleIDinitActionAttrBinding)
 				val dataMapping = attrCorr.getOrCreateTargetElem(targetPackage.mappingTask) as MappingTask
 				dataMapping.referencedViewField = ref 
 				dataMapping.pathDefinition = cpPath

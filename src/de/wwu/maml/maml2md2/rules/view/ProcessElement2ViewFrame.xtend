@@ -35,7 +35,7 @@ class ProcessElement2ViewFrame extends Elem2Elem {
 				val corr = src.getOrCreateCorrModelElement(ruleID)
 				val viewFrame = corr.getOrCreateTargetElem(targetPackage.viewFrame) as ViewFrame
 				
-				viewFrame.name = src.viewName
+				viewFrame.name = src.toUniqueName(src.viewName)
 				
 				// Transform view content
 				val contentElements = src.ipeToViewContent;
@@ -43,7 +43,7 @@ class ProcessElement2ViewFrame extends Elem2Elem {
 					// View must contain at least one element
 					val viewElem = createTargetElement(targetPackage.label) as Label
 					viewElem.text = " "
-					viewElem.name = viewElem.text.allowedAttributeName
+					viewElem.name = viewElem.toUniqueName("dummyLabel")
 					viewFrame.elements.add(viewElem)
 				} else {
 					// Add real content 

@@ -50,12 +50,12 @@ class Attribute2Attribute extends Elem2Elem {
 				InteractionProcessElement: {
 					val corr = child.getOrCreateCorrModelElement(ruleID)
 					val entity = parent.dataType.getOrCreateCorrModelElement(DataType2ModelElement.ruleID).targetElement as Entity
-					corr.targetElement = entity.attributes.filter[it.name == child.description.allowedAttributeName]?.head
+					corr.targetElement = entity.attributes.filter[it.name == child.description.allowedAttributeName]?.head //TODO correct with unique names??
 				}
 				Attribute: {
 					val corr = child.getOrCreateCorrModelElement(ruleID)
 					val entity = parent.type.getOrCreateCorrModelElement(DataType2ModelElement.ruleID).targetElement as Entity
-					corr.targetElement = entity.attributes.filter[it.name == child.description.allowedAttributeName]?.head
+					corr.targetElement = entity.attributes.filter[it.name == child.description.allowedAttributeName]?.head //TODO correct with unique names??
 				}
 			}
 			
@@ -75,12 +75,12 @@ class Attribute2Attribute extends Elem2Elem {
 			Attribute: {
 				// Nested attribute
 				if(container.type instanceof CustomType) {
-					return (container.type.getOrCreateCorrModelElement(ruleID) as Entity).attributes.filter[it.name == attr.description]?.head
+					return (container.type.getOrCreateCorrModelElement(ruleID) as Entity).attributes.filter[it.name == attr.description]?.head //TODO correct with unique names??
 				}	
 			}
 			InteractionProcessElement: {
 				// Attribute of custom type within IPE 
-				return (container.dataType.getOrCreateCorrModelElement(ruleID) as Entity).attributes.filter[it.name == attr.description]?.head 
+				return (container.dataType.getOrCreateCorrModelElement(ruleID) as Entity).attributes.filter[it.name == attr.description]?.head //TODO correct with unique names??
 			}
 			// TODO transitive relationships 
 		}

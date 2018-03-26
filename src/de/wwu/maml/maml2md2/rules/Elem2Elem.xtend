@@ -23,6 +23,7 @@ import de.wwu.maml.maml2md2.rules.controller.Model2Controller
 import de.wwu.md2.framework.mD2.Controller
 import de.wwu.md2.framework.mD2.Workflow
 import de.wwu.maml.maml2md2.rules.workflow.Model2Workflow
+import static extension de.wwu.maml.maml2md2.util.MamlHelper.*
 
 abstract class Elem2Elem {
 	
@@ -37,6 +38,8 @@ abstract class Elem2Elem {
 	protected val targetPackage = MD2Package::eINSTANCE
 	
 	protected static Map<EObject, List<Corr>> elementsToCorr = newHashMap
+	
+	protected Map<EObject, String> uniqueObjectNames = newHashMap
 	
 	new(ResourceSet src, ResourceSet trgt, Resource corr) {
 		sourceModel = src
@@ -148,5 +151,24 @@ abstract class Elem2Elem {
 	
 	def getMD2Workflow(){
 		(resolveElement(targetPackage.workflow, Model2Workflow.ruleID) as Workflow)
+	}
+	
+	def toUniqueName(EObject elem, String name, int maxLength){
+		val shortName = name.allowedAttributeName.maxLength(maxLength)
+		return elem.toUniqueName(shortName)
+	}
+	
+	def toUniqueName(EObject elem, String name){
+		val allowedName = name.allowedAttributeName
+		
+		if(!uniqueObjectNames.containsKey(elem)) {
+			// Ensure a new object has a unique name using suffix
+			var suffix = 0
+			while(uniqueObjectNames.values.contains(allowedName + if(suffix == 0) "" else suffix)){
+				suffix++
+			}
+			uniqueObjectNames.put(elem, allowedName + if(suffix == 0) "" else suffix)
+		}
+		return uniqueObjectNames.get(elem)
 	}
 }

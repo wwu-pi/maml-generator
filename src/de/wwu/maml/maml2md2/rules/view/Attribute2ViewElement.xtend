@@ -70,7 +70,7 @@ class Attribute2ViewElement extends Elem2Elem {
 		val corr = label.getOrCreateCorrModelElement(ruleID)
 		val viewElem = corr.getOrCreateTargetElem(targetPackage.label) as de.wwu.md2.framework.mD2.Label
 		
-		viewElem.name = label.description?.allowedAttributeName.maxLength(15) ?: "label" // TODO better way to name label
+		viewElem.name = label.toUniqueName(label.description ?: "label", 15) // TODO better way to name label
 		viewElem.text = label.description
 		
 		return viewElem
@@ -96,7 +96,7 @@ class Attribute2ViewElement extends Elem2Elem {
 		val corr = attr.getOrCreateCorrModelElement(ruleID)
 		val viewElem = corr.getOrCreateTargetElem(targetPackage.textInput) as TextInput
 		
-		viewElem.name = attr.description.allowedAttributeName + "Field"
+		viewElem.name = attr.toUniqueName(attr.description.allowedAttributeName + "Field")
 		viewElem.labelText = src.getHumanCaption
 		viewElem.isDisabled = !editable
 		viewElem.defaultValue = ""
@@ -109,7 +109,7 @@ class Attribute2ViewElement extends Elem2Elem {
 		val corr = attr.getOrCreateCorrModelElement(ruleID)
 		val viewElem = corr.getOrCreateTargetElem(targetPackage.booleanInput) as BooleanInput
 		
-		viewElem.name = attr.description.allowedAttributeName + "Field"
+		viewElem.name = attr.toUniqueName(attr.description.allowedAttributeName + "Field")
 		viewElem.labelText = src.getHumanCaption
 		viewElem.isDisabled = !editable
 		viewElem.defaultValue = "false"
@@ -121,7 +121,7 @@ class Attribute2ViewElement extends Elem2Elem {
 		val corr = attr.getOrCreateCorrModelElement(ruleID)
 		val viewElem = corr.getOrCreateTargetElem(targetPackage.integerInput) as IntegerInput
 		
-		viewElem.name = attr.description.allowedAttributeName + "Field"
+		viewElem.name = attr.toUniqueName(attr.description.allowedAttributeName + "Field")
 		viewElem.labelText = src.getHumanCaption
 		viewElem.isDisabled = !editable
 		viewElem.defaultValue = 0
@@ -133,7 +133,7 @@ class Attribute2ViewElement extends Elem2Elem {
 		val corr = attr.getOrCreateCorrModelElement(ruleID)
 		val viewElem = corr.getOrCreateTargetElem(targetPackage.numberInput) as NumberInput
 		
-		viewElem.name = attr.description.allowedAttributeName + "Field"
+		viewElem.name = attr.toUniqueName(attr.description.allowedAttributeName + "Field")
 		viewElem.labelText = src.getHumanCaption
 		viewElem.isDisabled = !editable
 		viewElem.defaultValue = 0.0
@@ -145,7 +145,7 @@ class Attribute2ViewElement extends Elem2Elem {
 		val corr = attr.getOrCreateCorrModelElement(ruleID)
 		val viewElem = corr.getOrCreateTargetElem(targetPackage.dateInput) as DateInput
 		
-		viewElem.name = attr.description.allowedAttributeName + "Field"
+		viewElem.name = attr.toUniqueName(attr.description.allowedAttributeName + "Field")
 		viewElem.labelText = src.getHumanCaption
 		viewElem.isDisabled = !editable
 		
@@ -156,7 +156,7 @@ class Attribute2ViewElement extends Elem2Elem {
 		val corr = attr.getOrCreateCorrModelElement(ruleID)
 		val viewElem = corr.getOrCreateTargetElem(targetPackage.dateTimeInput) as DateTimeInput
 		
-		viewElem.name = attr.description.allowedAttributeName + "Field"
+		viewElem.name = attr.toUniqueName(attr.description.allowedAttributeName + "Field")
 		viewElem.labelText = src.getHumanCaption
 		viewElem.isDisabled = !editable
 		
@@ -167,7 +167,7 @@ class Attribute2ViewElement extends Elem2Elem {
 		val corr = attr.getOrCreateCorrModelElement(ruleID)
 		val viewElem = corr.getOrCreateTargetElem(targetPackage.timeInput) as TimeInput
 		
-		viewElem.name = attr.description.allowedAttributeName + "Field"
+		viewElem.name = attr.toUniqueName(attr.description.allowedAttributeName + "Field")
 		viewElem.labelText = src.getHumanCaption
 		viewElem.isDisabled = !editable
 		
@@ -178,7 +178,7 @@ class Attribute2ViewElement extends Elem2Elem {
 		val corr = attr.getOrCreateCorrModelElement(ruleID)
 		val viewElem = corr.getOrCreateTargetElem(targetPackage.optionInput) as OptionInput
 		
-		viewElem.name = attr.description.allowedAttributeName + "Field"
+		viewElem.name = attr.toUniqueName(attr.description.allowedAttributeName + "Field")
 		viewElem.labelText = src.getHumanCaption
 		viewElem.isDisabled = !editable
 		viewElem.defaultValue = (attr.type as Enum).values.get(0)?.value
@@ -193,7 +193,7 @@ class Attribute2ViewElement extends Elem2Elem {
 		val corr = attr.getOrCreateCorrModelElement(ruleID)
 		val viewElem = corr.getOrCreateTargetElem(targetPackage.label) as de.wwu.md2.framework.mD2.Label
 		
-		viewElem.name = attr.description?.allowedAttributeName.substring(0, 10) ?: "label" // TODO better way to name label
+		viewElem.name = attr.toUniqueName(attr.description ?: "label", 15) // TODO better way to name label
 		viewElem.text = src.getHumanCaption
 		
 		return viewElem

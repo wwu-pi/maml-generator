@@ -87,28 +87,28 @@ public class XmiToMd2Converter {
 		// but all others need to be present to resolve cross references!! 
 		
 		// Copy content: Model layer
-		Resource resourceMd2M = resourceSet.createResource(URI.createFileURI(outputPath + projectName + "Model.md2"));
+		Resource resourceMd2M = resourceSet.createResource(URI.createFileURI(outputPath + "/models/" + projectName + "Model.md2"));
 		resourceMd2M.getContents().addAll(EcoreUtil2.copyAll(inputResource.getContents()));
 		int modelIndex = resourceMd2M.getContents().indexOf(ResourceHelper.getMD2ModelContainer(resourceMd2M));
 		EObject model = resourceMd2M.getContents().remove(modelIndex);
 		resourceMd2M.getContents().add(0, model);	
 		
 		// Copy content: Controller layer
-		Resource resourceMd2V = resourceSet.createResource(URI.createFileURI(outputPath + projectName + "View.md2"));
+		Resource resourceMd2V = resourceSet.createResource(URI.createFileURI(outputPath + "/views/" + projectName + "View.md2"));
 		resourceMd2V.getContents().addAll(EcoreUtil2.copyAll(inputResource.getContents()));
 		int viewIndex = resourceMd2V.getContents().indexOf(ResourceHelper.getMD2ViewContainer(resourceMd2V));
 		EObject view = resourceMd2V.getContents().remove(viewIndex);
 		resourceMd2V.getContents().add(0, view);
 
 		// Copy and shift content: Controller layer
-		Resource resourceMd2C = resourceSet.createResource(URI.createFileURI(outputPath + projectName + "Controller.md2"));
+		Resource resourceMd2C = resourceSet.createResource(URI.createFileURI(outputPath + "/controllers/" + projectName + "Controller.md2"));
 		resourceMd2C.getContents().addAll(EcoreUtil2.copyAll(inputResource.getContents()));
 		int controllerIndex = resourceMd2C.getContents().indexOf(ResourceHelper.getMD2ControllerContainer(resourceMd2C));
 		EObject controller = resourceMd2C.getContents().remove(controllerIndex);
 		resourceMd2C.getContents().add(0, controller);
 		
 		// Copy content: Controller layer
-		Resource resourceMd2W = resourceSet.createResource(URI.createFileURI(outputPath + projectName + "Workflow.md2"));
+		Resource resourceMd2W = resourceSet.createResource(URI.createFileURI(outputPath + "/workflows/" + projectName + "Workflow.md2"));
 		resourceMd2W.getContents().addAll(EcoreUtil2.copyAll(inputResource.getContents()));
 		int workflowIndex = resourceMd2W.getContents().indexOf(ResourceHelper.getMD2WorkflowContainer(resourceMd2W));
 		EObject workflow = resourceMd2W.getContents().remove(workflowIndex);

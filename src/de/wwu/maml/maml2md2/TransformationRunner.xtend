@@ -72,7 +72,7 @@ class TransformationRunner {
 		
 		// Save MD2 models
 		try {
-			val targetPath = RESULTPATH + "/"
+			val targetPath = RESULTPATH + "/" + mamlRoot.projectName + "/"
 		
 			XmiToMd2Converter.XmiToMd2(md2Resource, targetPath, mamlRoot.projectName)
 			println("Done. Generated MD2 output saved to " + targetPath)

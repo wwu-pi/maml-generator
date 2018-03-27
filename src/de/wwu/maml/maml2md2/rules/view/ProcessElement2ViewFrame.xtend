@@ -36,6 +36,7 @@ class ProcessElement2ViewFrame extends Elem2Elem {
 				val viewFrame = corr.getOrCreateTargetElem(targetPackage.viewFrame) as ViewFrame
 				
 				viewFrame.name = src.toUniqueName(src.viewName.allowedAttributeName).toFirstUpper
+				viewFrame.title = src.description
 				
 				// Transform view content
 				val contentElements = src.ipeToViewContent;

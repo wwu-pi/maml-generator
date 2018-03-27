@@ -55,7 +55,7 @@ class MamlHelper {
 		
 		// Only alphabetic characters in front
 		if(!text.matches("[a-zA-Z].*")){
-			return if(out.length() == 1) { "" } else { getAllowedAttributeName(text.substring(1)) };
+			return if(out.length() <= 1) { "" } else { getAllowedAttributeName(text.substring(1)) };
 		}
 
 		// Replace spaces by camel cased name (and trim)
@@ -98,12 +98,12 @@ class MamlHelper {
 	}
 	
 	static def getHumanCaption(ParameterConnector conn){
-		if(conn.description !== null && conn.description != "" && conn.description != " ") {
+		if(conn.description !== null) {
 			return conn.description
 		} else if(conn.targetElement.description !== null){
 			return conn.targetElement.description.camelCaseToSpacedString
 		} else {
-			return "unnamedElement"
+			return ""
 		}
 	}
 	

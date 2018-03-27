@@ -2,7 +2,10 @@ package de.wwu.maml.maml2md2.rules.controller
 
 import de.wwu.maml.dsl.maml.DataSource
 import de.wwu.maml.dsl.maml.InteractionProcessElement
+import de.wwu.maml.dsl.maml.ProcessConnector
+import de.wwu.maml.dsl.maml.ProcessFlowElement
 import de.wwu.maml.dsl.maml.UseCase
+import de.wwu.maml.dsl.maml.Xor
 import de.wwu.maml.dsl.mamldata.ComplexType
 import de.wwu.maml.dsl.mamldata.Multiplicity
 import de.wwu.maml.dsl.mamlgui.Attribute
@@ -33,6 +36,10 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.emf.ecore.resource.ResourceSet
 
 import static extension de.wwu.maml.maml2md2.util.MamlHelper.*
+import de.wwu.md2.framework.mD2.ViewAction
+import de.wwu.md2.framework.mD2.ViewElementEventRef
+import de.wwu.md2.framework.mD2.ElementEventType
+import de.wwu.md2.framework.mD2.CallTask
 
 class ProcessElement2WorkflowElement extends Elem2Elem {
 	
@@ -40,6 +47,9 @@ class ProcessElement2WorkflowElement extends Elem2Elem {
 	public static final String ruleIDinitAction = ruleID + "[initAction]"
 	public static final String ruleIDinitActionAttrBinding = ruleID + "[initialBinding]"
 	public static final String ruleIDworkflowEvent = "ProcessElement->WorkflowEvent"
+	public static final String ruleIDviewAction = ruleIDworkflowEvent + "[viewAction]"
+	public static final String ruleIDaction = ruleIDworkflowEvent + "[action]"
+	public static final String ruleIDactionButton = ruleIDworkflowEvent + "[button]"
 	
 	new(ResourceSet src, ResourceSet trgt, Resource corr) {
 		super(src, trgt, corr)
@@ -84,32 +94,112 @@ class ProcessElement2WorkflowElement extends Elem2Elem {
 				MD2ControllerContent.add(wfe)
 			]
 			
+		// Process sequence of workflow elements
 		sourceModel.allContents.filter(typeof(InteractionProcessElement))
 			.forEach[src |
-				// Create WorkflowEvent
-				val corrEvent = src.getOrCreateCorrModelElement(ruleIDworkflowEvent)
-				val wfEvent = corrEvent.getOrCreateTargetElem(targetPackage.workflowEvent) as WorkflowEvent
-				wfEvent.name = "dummy" //TODO
+				// Find subsequent steps and create workflow events + view actions
+				val nextSteps = getNextSteps(src)
 				
-				// Create FireEventAction
-				val fireEventAction = createTargetElement(targetPackage.fireEventAction) as FireEventAction
-				fireEventAction.workflowEvent = wfEvent
-				
-				val simpleActionRef = createTargetElement(targetPackage.simpleActionRef) as SimpleActionRef
-				simpleActionRef.action = fireEventAction
-				
-				// TODO Dummy task binding (global event ref)
-				val gobalEventRef = createTargetElement(targetPackage.globalEventRef) as GlobalEventRef
-				gobalEventRef.event = GlobalEventType.ON_CONNECTION_LOST
-				
-				// Create EventBindingTask
-				val fireEventBinding = createTargetElement(targetPackage.eventBindingTask) as EventBindingTask
-				fireEventBinding.actions.add(simpleActionRef)
-				fireEventBinding.events.add(gobalEventRef)
-				
-				// Attach to workflowElement
-				val initAction = src.getOrCreateMd2InitAction
-				initAction.codeFragments.add(fireEventBinding)
+				if(nextSteps.size == 0){
+					// Final step -> End workflow
+					
+					// Create view button and attach to view frame
+					val corr = src.getOrCreateCorrModelElement(ruleIDactionButton)
+					val viewElem = corr.getOrCreateTargetElem(targetPackage.button) as de.wwu.md2.framework.mD2.Button
+					viewElem.name = "finishWorkflow"
+					viewElem.text = "Finish"
+					val viewFrame = src.getOrCreateCorrModelElement(ProcessElement2ViewFrame.ruleID).targetElement as ViewFrame
+					viewFrame.elements.add(viewElem)
+					
+					// Create WorkflowEvent
+					val corrEvent = src.getOrCreateCorrModelElement(ruleIDworkflowEvent)
+					val wfEvent = corrEvent.getOrCreateTargetElem(targetPackage.workflowEvent) as WorkflowEvent
+					wfEvent.name = "finish" + (src.getOrCreateCorrModelElement(ruleID).targetElement as WorkflowElement).name.toFirstUpper
+					
+					// Create FireEventAction
+					val fireEventAction = createTargetElement(targetPackage.fireEventAction) as FireEventAction
+					fireEventAction.workflowEvent = wfEvent
+					
+					val simpleActionRef = createTargetElement(targetPackage.simpleActionRef) as SimpleActionRef
+					simpleActionRef.action = fireEventAction
+					
+					// Task binding to button click
+					val abstractViewElementRef = createTargetElement(targetPackage.abstractViewGUIElementRef) as AbstractViewGUIElementRef
+					abstractViewElementRef.ref = viewElem
+					
+					val viewElementEventRef = createTargetElement(targetPackage.viewElementEventRef) as ViewElementEventRef
+					viewElementEventRef.referencedField = abstractViewElementRef 
+					viewElementEventRef.event = ElementEventType.ON_CLICK
+					
+					// Create EventBindingTask
+					val fireEventBinding = createTargetElement(targetPackage.eventBindingTask) as EventBindingTask
+					fireEventBinding.actions.add(simpleActionRef)
+					fireEventBinding.events.add(viewElementEventRef)
+					
+					// Attach to workflowElement
+					val initAction = src.getOrCreateMd2InitAction
+					initAction.codeFragments.add(fireEventBinding)
+				} else {
+					// Has subsequent steps -> generate view actions
+					
+//					// Create WorkflowEvent
+//					val corrEvent = src.getOrCreateCorrModelElement(ruleIDworkflowEvent)
+//					val wfEvent = corrEvent.getOrCreateTargetElem(targetPackage.workflowEvent) as WorkflowEvent
+//					wfEvent.name = "dummy" //TODO
+//					
+//					// Create FireEventAction
+//					val fireEventAction = createTargetElement(targetPackage.fireEventAction) as FireEventAction
+//					fireEventAction.workflowEvent = wfEvent
+//					
+//					val simpleActionRef = createTargetElement(targetPackage.simpleActionRef) as SimpleActionRef
+//					simpleActionRef.action = fireEventAction
+//					
+//					// TODO Dummy task binding (global event ref)
+//					val gobalEventRef = createTargetElement(targetPackage.globalEventRef) as GlobalEventRef
+//					gobalEventRef.event = GlobalEventType.ON_CONNECTION_LOST
+//					
+//					// Create EventBindingTask
+//					val fireEventBinding = createTargetElement(targetPackage.eventBindingTask) as EventBindingTask
+//					fireEventBinding.actions.add(simpleActionRef)
+//					fireEventBinding.events.add(gobalEventRef)
+//					
+//					// Attach to workflowElement
+//					val initAction = src.getOrCreateMd2InitAction
+//					initAction.codeFragments.add(fireEventBinding)
+					
+					nextSteps.forEach[
+						val targetWfe = it.targetProcessFlowElement.getOrCreateCorrModelElement(ruleID).targetElement as WorkflowElement
+						
+						// Create workflow event
+						val corrEvent = src.getOrCreateCorrModelElement(ruleIDworkflowEvent)
+						val wfEvent = corrEvent.getOrCreateTargetElem(targetPackage.workflowEvent) as WorkflowEvent
+						wfEvent.name = "start" + targetWfe.name.toFirstUpper + "Event"
+						
+						// Create custom action
+						val corrAction = it.getOrCreateCorrModelElement(ruleIDaction)
+						val action = corrAction.getOrCreateTargetElem(targetPackage.customAction) as CustomAction
+						action.name = "start" + targetWfe.name.toFirstUpper + "Action"
+
+						// Create FireEventAction and att to custom action
+						val fireEventAction = createTargetElement(targetPackage.fireEventAction) as FireEventAction
+						fireEventAction.workflowEvent = wfEvent
+						val simpleActionRef = createTargetElement(targetPackage.simpleActionRef) as SimpleActionRef
+						simpleActionRef.action = fireEventAction
+						val callTask = createTargetElement(targetPackage.callTask) as CallTask
+						callTask.action = simpleActionRef
+						action.codeFragments.add(callTask)
+						
+						// Attach to workflowElement
+						val wfe = src.getOrCreateCorrModelElement(ruleID).getOrCreateTargetElem(targetPackage.workflowElement) as WorkflowElement
+						wfe.actions.add(action)
+						
+						// Create viewAction and bind custom action
+						val corrViewAction = src.getOrCreateCorrModelElement(ruleIDviewAction)
+						val viewAction = corrViewAction.getOrCreateTargetElem(targetPackage.viewAction) as ViewAction
+						viewAction.title = it.description
+						viewAction.action = action
+					]
+				}
 			]
 	}
 	
@@ -120,6 +210,20 @@ class ProcessElement2WorkflowElement extends Elem2Elem {
 //				val source = corr.findOrCreateSourceElemOfType(sourcePackage.model)
 //				sourceModel.MAMLResource.contents += source
 //			]
+	}
+	
+	def Iterable<ProcessConnector> getNextSteps(ProcessFlowElement elem){
+		return elem.nextElements.flatMap[
+			val target = it.targetProcessFlowElement
+			var Iterable<ProcessConnector> result = null
+			switch target {
+				InteractionProcessElement: result = #[it]
+				DataSource: result = target.getNextSteps
+				Xor: result = target.getNextSteps // TODO automatically evaluated Xors
+				default: result = emptyList // Unimplemented, e.g. Loop, Events ...
+			}
+			return result
+		]
 	}
 	
 	def CustomAction getOrCreateMd2InitAction(InteractionProcessElement src){

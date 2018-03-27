@@ -31,7 +31,7 @@ class Role2App extends Elem2Elem {
 				val corr = src.getOrCreateCorrModelElement(ruleID)
 				val app = corr.getOrCreateTargetElem(targetPackage.app) as App
 				app.name = src.toUniqueName(src.name.allowedAttributeName + "App")
-				app.appName = app.name
+				app.appName = src.name + "App"
 				
 				app.workflowElements.addAll(src.processElements.map[pe |
 					val wfeRef = createTargetElement(targetPackage.workflowElementReference) as WorkflowElementReference

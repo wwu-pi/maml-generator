@@ -67,7 +67,7 @@ class ProcessElement2WorkflowElement extends Elem2Elem {
 				val pcStep = createTargetElement(targetPackage.processChainStep) as ProcessChainStep
 				pcStep.name = defaultPc.name + "Step1"
 				val viewRef = createTargetElement(targetPackage.abstractViewFrameRef) as AbstractViewFrameRef
-				viewRef.ref = resolveElement(targetPackage.viewFrame, ProcessElement2ViewFrame.ruleID) as ViewFrame
+				viewRef.ref = src.getOrCreateCorrModelElement(ProcessElement2ViewFrame.ruleID).targetElement as ViewFrame
 				pcStep.view = viewRef
 				
 				defaultPc.processChainSteps.add(pcStep)

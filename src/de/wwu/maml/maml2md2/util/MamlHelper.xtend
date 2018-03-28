@@ -17,6 +17,7 @@ import de.wwu.maml.dsl.maml.ParameterSource
 import de.wwu.maml.dsl.mamlgui.Attribute
 import de.wwu.maml.dsl.maml.UseCase
 import de.wwu.maml.dsl.mamlgui.GUIElement
+import de.wwu.maml.dsl.maml.ProcessConnector
 
 class MamlHelper {
 	
@@ -141,5 +142,19 @@ class MamlHelper {
 	
 	static def containsIgnoreCase(java.util.Collection<String> elements, String search){
 		return elements.filter[it.equalsIgnoreCase(search)].size > 0
+	}
+	
+	static def Iterable<ProcessConnector> getNextSteps(ProcessFlowElement elem){
+		return elem.nextElements.flatMap[
+			val target = it.targetProcessFlowElement
+			var Iterable<ProcessConnector> result = null
+			switch target {
+				InteractionProcessElement: result = #[it]
+				DataSource: result = target.getNextSteps
+				Xor: result = target.getNextSteps // TODO automatically evaluated Xors
+				default: result = emptyList // Unimplemented, e.g. Loop, Events ...
+			}
+			return result
+		]
 	}
 }

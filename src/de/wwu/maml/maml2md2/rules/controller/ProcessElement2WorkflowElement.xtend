@@ -166,7 +166,7 @@ class ProcessElement2WorkflowElement extends Elem2Elem {
 						wfe.actions.add(action)
 						
 						// Create viewAction and bind custom action to view frame
-						val corrViewAction = src.getOrCreateCorrModelElement(ruleIDviewAction)
+						val corrViewAction = src.getOrCreateCorrModelElement(ruleIDviewAction + combinationSuffix)
 						val viewAction = corrViewAction.getOrCreateTargetElem(targetPackage.viewAction) as ViewAction
 						viewAction.title = it.description
 						viewAction.action = action

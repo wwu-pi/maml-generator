@@ -73,7 +73,7 @@ class MamlHelper {
 		var filteredText = "";
 		var nextUpper = false;
 		for(char c : text.toCharArray()){
-			if((c + "").matches("[a-zA-Z0-9_\\-]")) {
+			if((c + "").matches("[a-zA-Z0-9_]")) {
 				filteredText += if(nextUpper) { (c + "").toUpperCase() } else { c };
 				nextUpper = false;
 			} else {

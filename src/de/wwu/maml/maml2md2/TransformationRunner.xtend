@@ -21,7 +21,7 @@ class TransformationRunner {
 	 * Main program
 	 */	
 	def static void main(String[] args){
-		val fileName = "VisualAcuity" // "WHO5"
+		val fileName = "WHO5" // "VisualAcuity"
 		val runner = new TransformationRunner()
 		runner.transformMAMLtoMD2(fileName)
 //		runner.transformMD2toMAML()

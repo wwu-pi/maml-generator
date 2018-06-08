@@ -1,10 +1,10 @@
 # Directories #
-/build/
-/bin/
+build/
+bin/
 target/
-/src-gen/
-/xtend-gen/
-/results/
+src-gen/
+xtend-gen/
+results/
  
 # OS Files #
 .DS_Store
